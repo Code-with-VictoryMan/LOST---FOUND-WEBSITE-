@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Dashboard | Sai University</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN for Custom Dashboard Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand-group">
+        <div class="brand-logo">🎓</div>
+        <div>
+          <h1 class="brand-title">Sai University</h1>
+          <span class="brand-subtitle">Campus Management Console</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">← Back to Portal</a>
+        <div class="user-badge">
+          <span id="dashUserDisplay">Loading...</span>
+          <button id="dashLogout" class="btn-icon" title="Logout">🚪</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container dashboard-layout">
+    <!-- Admin Analytics Section (Visible to Admins) -->
+    <section id="adminAnalyticsSection" class="hidden">
+      <div class="dash-section-header">
+        <div>
+          <h2>Campus Analytics & Overview</h2>
+          <p class="section-desc">Real-time statistics on recovery rate, incident buildings, and categories.</p>
+        </div>
+        <div class="badge-pill admin-badge">Admin Privileges Active</div>
+      </div>
+
+      <!-- Stat Counters -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total Listings</span>
+          <span class="stat-value" id="statTotalItems">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Lost Items</span>
+          <span class="stat-value stat-lost" id="statLostItems">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Found Items</span>
+          <span class="stat-value stat-found" id="statFoundItems">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Recovery Rate</span>
+          <span class="stat-value stat-resolved" id="statRecoveryRate">0%</span>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h4>Listings by Campus Building</h4>
+          <canvas id="buildingChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>Listings by Category</h4>
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Personal Listings Section -->
+    <section class="dashboard-block">
+      <div class="dash-section-header">
+        <div>
+          <h3>My Reported Items</h3>
+          <p class="section-desc">Manage items you reported as lost or found and view received claims.</p>
+        </div>
+      </div>
+      <div id="myItemsTableContainer" class="table-container">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Type</th>
+              <th>Building</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions / Verification</th>
+            </tr>
+          </thead>
+          <tbody id="myItemsBody">
+            <tr><td colspan="6" class="text-center">Loading your reports...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Student Claims Submitted Section -->
+    <section class="dashboard-block">
+      <div class="dash-section-header">
+        <div>
+          <h3>My Claims & Recovery Requests</h3>
+          <p class="section-desc">Track status of items you have claimed.</p>
+        </div>
+      </div>
+      <div id="myClaimsTableContainer" class="table-container">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Target Item</th>
+              <th>Proof Provided</th>
+              <th>Claim Date</th>
+              <th>Status</th>
+              <th>Reviewer Feedback</th>
+            </tr>
+          </thead>
+          <tbody id="myClaimsBody">
+            <tr><td colspan="5" class="text-center">Loading claims...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Review Received Claims -->
+  <div id="reviewClaimsModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-lg">
+      <div class="modal-header">
+        <h3>Review Ownership Claims</h3>
+        <button class="modal-close" id="btnCloseReview">&times;</button>
+      </div>
+      <div class="modal-body" id="claimsReviewContent">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="dashboard.js"></script>
+</body>
+</html>

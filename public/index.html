@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sai University | Campus Lost & Found Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand-group">
+        <div class="brand-logo">🎓</div>
+        <div>
+          <h1 class="brand-title">Sai University</h1>
+          <span class="brand-subtitle">Campus Lost & Found Portal</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <a href="index.html" class="active">Browse Items</a>
+        <a href="dashboard.html" id="navDashboard" class="hidden">My Dashboard</a>
+        <button id="btnOpenReport" class="btn btn-primary">+ Report Item</button>
+        <div id="authActions">
+          <button id="btnOpenAuth" class="btn btn-outline">Sign In / Register</button>
+        </div>
+        <div id="userBadge" class="user-badge hidden">
+          <span id="userNameDisplay">Student</span>
+          <button id="btnLogout" class="btn-icon" title="Logout">🚪</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero & Search Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="badge-pill">Official Campus Community Service</div>
+      <h2>Reuniting Sai University Students with Lost Belongings</h2>
+      <p>Report misplaced or found items across campus, search active listings, and verify ownership claims seamlessly.</p>
+      
+      <!-- Interactive Filter Bar -->
+      <div class="search-filter-card">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search keywords (e.g. calculator, Dell, ID card, hydro flask)...">
+        </div>
+
+        <div class="filter-controls-grid">
+          <select id="filterType">
+            <option value="all">All Listings (Lost & Found)</option>
+            <option value="lost">Lost Items Only</option>
+            <option value="found">Found Items Only</option>
+          </select>
+
+          <select id="filterCategory">
+            <option value="all">All Categories</option>
+            <option value="Electronics & Gadgets">Electronics & Gadgets</option>
+            <option value="Student ID & Cards">Student ID & Cards</option>
+            <option value="Books & Stationery">Books & Stationery</option>
+            <option value="Wallets & Bags">Wallets & Bags</option>
+            <option value="Clothing & Accessories">Clothing & Accessories</option>
+            <option value="Keys & Access Cards">Keys & Access Cards</option>
+            <option value="Water Bottles & Flasks">Water Bottles & Flasks</option>
+            <option value="Other Belongings">Other Belongings</option>
+          </select>
+
+          <select id="filterBuilding">
+            <option value="all">All Campus Buildings</option>
+            <option value="Academic Block A">Academic Block A</option>
+            <option value="Academic Block B">Academic Block B</option>
+            <option value="Central Library">Central Library</option>
+            <option value="Student Dining & Cafeteria">Student Dining & Cafeteria</option>
+            <option value="Sports Complex & Gymnasium">Sports Complex & Gymnasium</option>
+            <option value="Computer Science Labs">Computer Science Labs</option>
+            <option value="Innovation & Design Studio">Innovation & Design Studio</option>
+            <option value="Auditorium">Auditorium</option>
+            <option value="Campus Grounds / Lawn">Campus Grounds / Lawn</option>
+          </select>
+
+          <select id="filterSort">
+            <option value="newest">Reported: Newest First</option>
+            <option value="event_recent">Incident Date: Recent First</option>
+            <option value="oldest">Incident Date: Oldest First</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Items Feed -->
+  <main class="main-container">
+    <div class="feed-header">
+      <div>
+        <h3 class="section-title">Active Campus Listings</h3>
+        <p class="section-desc">Showing items actively reported across Sai University campus.</p>
+      </div>
+      <div id="resultsCount" class="results-tag">Loading records...</div>
+    </div>
+
+    <!-- Dynamic Item Cards Grid -->
+    <div id="itemsGrid" class="items-grid"></div>
+  </main>
+
+  <!-- Modal: Report Item -->
+  <div id="reportModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Report a Lost or Found Item</h3>
+        <button class="modal-close" id="btnCloseReport">&times;</button>
+      </div>
+      <form id="reportForm" class="modal-form">
+        <!-- Live Duplicate Alert Container -->
+        <div id="duplicateAlertBox" class="duplicate-alert hidden">
+          ⚠️ <strong>Possible Duplicate Match:</strong> An item matching this description was recently reported in this building. Please check existing listings before proceeding!
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reportType">Listing Type *</label>
+            <select id="reportType" required>
+              <option value="lost">I Lost Something</option>
+              <option value="found">I Found Something</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reportCategory">Category *</label>
+            <select id="reportCategory" required>
+              <option value="Electronics & Gadgets">Electronics & Gadgets</option>
+              <option value="Student ID & Cards">Student ID & Cards</option>
+              <option value="Books & Stationery">Books & Stationery</option>
+              <option value="Wallets & Bags">Wallets & Bags</option>
+              <option value="Clothing & Accessories">Clothing & Accessories</option>
+              <option value="Keys & Access Cards">Keys & Access Cards</option>
+              <option value="Water Bottles & Flasks">Water Bottles & Flasks</option>
+              <option value="Other Belongings">Other Belongings</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reportTitle">Item Name / Title *</label>
+          <input type="text" id="reportTitle" placeholder="e.g. Casio fx-991EX Scientific Calculator" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reportBuilding">Campus Building *</label>
+            <select id="reportBuilding" required>
+              <option value="Academic Block A">Academic Block A</option>
+              <option value="Academic Block B">Academic Block B</option>
+              <option value="Central Library">Central Library</option>
+              <option value="Student Dining & Cafeteria">Student Dining & Cafeteria</option>
+              <option value="Sports Complex & Gymnasium">Sports Complex & Gymnasium</option>
+              <option value="Computer Science Labs">Computer Science Labs</option>
+              <option value="Innovation & Design Studio">Innovation & Design Studio</option>
+              <option value="Auditorium">Auditorium</option>
+              <option value="Campus Grounds / Lawn">Campus Grounds / Lawn</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reportDate">Date Incident Occurred *</label>
+            <input type="date" id="reportDate" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reportLocation">Specific Spot / Classroom / Desk *</label>
+          <input type="text" id="reportLocation" placeholder="e.g. Lab 2, Workstation 12 or 2nd Floor Dining Table" required>
+        </div>
+
+        <div class="form-group">
+          <label for="reportDescription">Detailed Description *</label>
+          <textarea id="reportDescription" rows="3" placeholder="Provide distinct characteristics: color, brand, stickers, scratches, case, or contents..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reportImage">Image Web Link (Optional)</label>
+          <input type="url" id="reportImage" placeholder="https://example.com/item-photo.jpg">
+          <small class="form-hint">Leave blank to use an automated category stock photo.</small>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelReport">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitReport">Submit Campus Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Submit Claim -->
+  <div id="claimModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Submit Ownership Claim</h3>
+        <button class="modal-close" id="btnCloseClaim">&times;</button>
+      </div>
+      <form id="claimForm" class="modal-form">
+        <input type="hidden" id="claimItemId">
+        <div class="claim-item-summary" id="claimItemSummary"></div>
+
+        <div class="form-group">
+          <label for="claimProof">Verification Proof *</label>
+          <textarea id="claimProof" rows="4" placeholder="Prove your ownership: Describe hidden contents, serial numbers, wallpapers, passcode pattern, distinctive scratches, or purchase receipts..." required minlength="15"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="claimPhone">Contact Mobile Number *</label>
+          <input type="tel" id="claimPhone" placeholder="+91 98840 XXXXX" required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelClaim">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Claim Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Authentication (Login / Register) -->
+  <div id="authModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Sign In</h3>
+        <button class="modal-close" id="btnCloseAuth">&times;</button>
+      </div>
+      <form id="authForm" class="modal-form">
+        <div id="registerFields" class="hidden">
+          <div class="form-group">
+            <label for="authName">Full Name *</label>
+            <input type="text" id="authName" placeholder="Sai Sravan V">
+          </div>
+          <div class="form-group">
+            <label for="authRole">Account Type</label>
+            <select id="authRole">
+              <option value="student">Student</option>
+              <option value="faculty">Faculty / Staff</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="authEmail">Sai University Email *</label>
+          <input type="email" id="authEmail" placeholder="student@saiuniversity.edu.in" required>
+        </div>
+
+        <div class="form-group">
+          <label for="authPassword">Password *</label>
+          <input type="password" id="authPassword" placeholder="••••••••" required minlength="6">
+        </div>
+
+        <div class="modal-footer">
+          <span class="auth-toggle-text">
+            <span id="authTogglePrompt">New here?</span>
+            <a href="#" id="authToggleLink">Create an account</a>
+          </span>
+          <button type="submit" class="btn btn-primary" id="btnAuthSubmit">Sign In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

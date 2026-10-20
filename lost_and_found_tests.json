@@ -1,0 +1,283 @@
+{
+  "info": {
+    "_postman_id": "sai-lost-found-2026",
+    "name": "Sai University Campus Lost & Found API Tests",
+    "description": "Comprehensive Postman test collection with 10 test cases covering authentication, CRUD, claims, unauthorized access, and admin analytics.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "studentToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "testItemId", "value": "" },
+    { "key": "testClaimId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. User Registration (Success)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Student\",\n  \"email\": \"test.student@saiuniversity.edu.in\",\n  \"password\": \"Password123\",\n  \"role\": \"student\",\n  \"phone\": \"+91 99999 88888\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201 Created or 400 Duplicate', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. User Registration (Validation Error - Missing Password)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Incomplete User\",\n  \"email\": \"incomplete@saiuniversity.edu.in\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 Bad Request', function () {",
+              "    pm.response.to.have.status(400);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. User Login & Token Generation",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"saisravan@saiuniversity.edu.in\",\n  \"password\": \"StudentPassword123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 and Token Generated', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.token).to.not.be.empty;",
+              "    pm.collectionVariables.set('studentToken', jsonData.token);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Retrieve Items with Filter and Search Parameters",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/items?type=found&category=Electronics%20%26%20Gadgets&building=Computer%20Science%20Labs",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "items"],
+          "query": [
+            { "key": "type", "value": "found" },
+            { "key": "category", "value": "Electronics & Gadgets" },
+            { "key": "building", "value": "Computer Science Labs" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 and data returned as array', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data).to.be.an('array');",
+              "    if(jsonData.data.length > 0) {",
+              "        pm.collectionVariables.set('testItemId', jsonData.data[0]._id);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Create New Lost/Found Item (Protected Route)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Postman API Test Flash Drive (Sandisk 64GB)\",\n  \"type\": \"found\",\n  \"category\": \"Electronics & Gadgets\",\n  \"building\": \"Central Library\",\n  \"specificLocation\": \"Reading Desk 12\",\n  \"dateOccurred\": \"2026-10-20\",\n  \"description\": \"Red and black swivel flash drive found on desk.\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/items", "host": ["{{baseUrl}}"], "path": ["api", "items"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201 and Item created', function () {",
+              "    pm.response.to.have.status(201);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data._id).to.not.be.empty;",
+              "    pm.collectionVariables.set('testItemId', jsonData.data._id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Retrieve Single Item Details",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/items/{{testItemId}}", "host": ["{{baseUrl}}"], "path": ["api", "items", "{{testItemId}}"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 and matches Item ID', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data._id).to.eql(pm.collectionVariables.get('testItemId'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Unauthorized Access (Missing Bearer Token)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Unauthorized Item\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/items", "host": ["{{baseUrl}}"], "path": ["api", "items"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Submit Ownership Claim for an Item",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"itemId\": \"{{testItemId}}\",\n  \"proofDescription\": \"My student ID number is labeled in marker on the back of the device\",\n  \"contactPhone\": \"+91 98840 55667\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/claims", "host": ["{{baseUrl}}"], "path": ["api", "claims"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Claim submitted (201) or rejected self-claim (400)', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Admin Login & Authorization",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@saiuniversity.edu.in\",\n  \"password\": \"AdminPassword123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Admin logged in and role verified', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.user.role).to.eql('admin');",
+              "    pm.collectionVariables.set('adminToken', jsonData.token);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Admin Analytics Endpoint (Protected & Role Guarded)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/admin/stats", "host": ["{{baseUrl}}"], "path": ["api", "admin", "stats"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 and analytics metrics exist', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.stats.totalItems).to.be.above(0);",
+              "    pm.expect(jsonData.categoryStats).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
