@@ -1,12 +1,28 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Item = require('../models/Item');
+const offlineStore = require('../config/offlineStore');
 const { protect } = require('../middleware/auth');
 
 // @route   GET /api/items (Search, Filter, Sort)
 router.get('/', async (req, res) => {
   try {
     const { search, type, category, building, status, sort } = req.query;
+
+    // Resilient offline fallback if MongoDB is disconnected / buffering
+    if (mongoose.connection.readyState !== 1) {
+      let filtered = [...offlineStore.items];
+      if (search && search.trim() !== '') {
+        const s = search.toLowerCase();
+        filtered = filtered.filter(i => i.title.toLowerCase().includes(s) || i.description.toLowerCase().includes(s) || (i.specificLocation || '').toLowerCase().includes(s));
+      }
+      if (type && type !== 'all') filtered = filtered.filter(i => i.type === type);
+      if (category && category !== 'all') filtered = filtered.filter(i => i.category === category);
+      if (building && building !== 'all') filtered = filtered.filter(i => i.building === building);
+      return res.status(200).json({ success: true, count: filtered.length, data: filtered });
+    }
+
     let query = {};
 
     if (search && search.trim() !== '') {
@@ -47,21 +63,27 @@ router.get('/', async (req, res) => {
 // @route   POST /api/items/scan-match (Scan Item & Find Owner)
 router.post('/scan-match', async (req, res) => {
   try {
-    const { queryText, category, building } = req.body;
+    const queryText = req.body.queryText || req.body.keyword || req.body.text || '';
+    const { category, building } = req.body;
     if (!queryText || queryText.trim() === '') {
       return res.status(400).json({ success: false, message: 'Please provide scanned text or keywords' });
     }
 
-    // Retrieve all active lost items
-    const lostItems = await Item.find({ type: 'lost', status: { $ne: 'resolved' } })
-      .populate('reportedBy', 'name email phone role');
+    // Retrieve active lost items (Atlas or offlineStore)
+    let lostItems = [];
+    if (mongoose.connection.readyState !== 1) {
+      lostItems = offlineStore.items.filter(i => i.type === 'lost' && i.status !== 'resolved');
+    } else {
+      lostItems = await Item.find({ type: 'lost', status: { $ne: 'resolved' } })
+        .populate('reportedBy', 'name email phone role');
+    }
 
     const searchTerms = queryText.toLowerCase().split(/\s+/).filter(w => w.length > 2);
 
     const scoredItems = lostItems.map(item => {
       let score = 0;
-      const titleLower = item.title.toLowerCase();
-      const descLower = item.description.toLowerCase();
+      const titleLower = (item.title || '').toLowerCase();
+      const descLower = (item.description || '').toLowerCase();
       const locLower = (item.specificLocation || '').toLowerCase();
 
       searchTerms.forEach(term => {
@@ -78,8 +100,10 @@ router.post('/scan-match', async (req, res) => {
         score += 20;
       }
 
+      const itemObj = typeof item.toObject === 'function' ? item.toObject() : item;
+
       return {
-        item,
+        item: itemObj,
         score: Math.min(score, 100)
       };
     }).filter(resItem => resItem.score >= 20)
@@ -100,11 +124,11 @@ router.post('/scan-match', async (req, res) => {
       matchFound: true,
       confidence: bestMatch.score,
       bestMatch: {
-        ...bestMatch.item.toObject(),
+        ...bestMatch.item,
         matchScore: bestMatch.score
       },
       otherMatches: scoredItems.slice(1, 4).map(m => ({
-        ...m.item.toObject(),
+        ...m.item,
         matchScore: m.score
       }))
     });
@@ -119,6 +143,24 @@ router.get('/check-duplicate', async (req, res) => {
     const { title, category, building } = req.query;
     if (!title || !category) {
       return res.status(200).json({ success: true, duplicates: [] });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      const words = title.toLowerCase().split(' ').filter(w => w.length > 2);
+      const duplicates = offlineStore.items.filter(item => {
+        if (item.category !== category) return false;
+        if (building && building !== 'all' && item.building !== building) return false;
+        if (item.status === 'resolved') return false;
+        const itemTitle = item.title.toLowerCase();
+        return words.some(w => itemTitle.includes(w));
+      }).map(i => ({
+        title: i.title,
+        type: i.type,
+        building: i.building,
+        specificLocation: i.specificLocation,
+        dateOccurred: i.dateOccurred
+      }));
+      return res.status(200).json({ success: true, duplicates });
     }
 
     const words = title.split(' ').filter(w => w.length > 2);
@@ -143,6 +185,14 @@ router.get('/check-duplicate', async (req, res) => {
 // @route   GET /api/items/:id
 router.get('/:id', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const item = offlineStore.items.find(i => i._id.toString() === req.params.id.toString());
+      if (!item) {
+        return res.status(404).json({ success: false, message: 'Item listing not found' });
+      }
+      return res.status(200).json({ success: true, data: item });
+    }
+
     const item = await Item.findById(req.params.id).populate('reportedBy', 'name email phone');
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item listing not found' });
@@ -162,6 +212,29 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'All fields (title, type, category, description, building, location, date) are mandatory'
+      });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      const newItem = {
+        _id: 'itm_' + Date.now(),
+        title,
+        type,
+        category,
+        description,
+        building,
+        specificLocation,
+        dateOccurred: new Date(dateOccurred),
+        imageUrl: imageUrl && imageUrl.trim() !== '' ? imageUrl : 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80',
+        status: 'open',
+        reportedBy: req.user || offlineStore.users[1],
+        createdAt: new Date()
+      };
+      offlineStore.items.unshift(newItem);
+      return res.status(201).json({
+        success: true,
+        message: 'Item report posted successfully',
+        data: newItem
       });
     }
 

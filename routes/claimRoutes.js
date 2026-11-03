@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Claim = require('../models/Claim');
 const Item = require('../models/Item');
+const offlineStore = require('../config/offlineStore');
 const { protect } = require('../middleware/auth');
 
 // @route   POST /api/claims (Submit Claim for an Item)
@@ -13,6 +15,46 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Item ID, proof description, and contact phone are required'
+      });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      const item = offlineStore.items.find(i => i._id.toString() === itemId.toString());
+      if (!item) {
+        return res.status(404).json({ success: false, message: 'Target item not found' });
+      }
+      const reporterId = item.reportedBy?._id ? item.reportedBy._id.toString() : item.reportedBy.toString();
+      if (reporterId === req.user._id.toString()) {
+        return res.status(400).json({
+          success: false,
+          message: 'You cannot submit an ownership claim on an item you reported yourself'
+        });
+      }
+
+      const existing = offlineStore.claims.find(c => c.item.toString() === itemId.toString() && c.claimant.toString() === req.user._id.toString() && c.status === 'pending');
+      if (existing) {
+        return res.status(400).json({
+          success: false,
+          message: 'You already have an active pending claim for this item'
+        });
+      }
+
+      const newClaim = {
+        _id: 'clm_' + Date.now(),
+        item: itemId,
+        claimant: req.user._id,
+        proofDescription,
+        contactPhone,
+        status: 'pending',
+        createdAt: new Date()
+      };
+      offlineStore.claims.push(newClaim);
+      item.status = 'claimed';
+
+      return res.status(201).json({
+        success: true,
+        message: 'Claim request submitted for verification',
+        data: newClaim
       });
     }
 
@@ -61,6 +103,20 @@ router.post('/', protect, async (req, res) => {
 // @route   GET /api/claims/my-claims (Student dashboard view)
 router.get('/my-claims', protect, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const userClaims = offlineStore.claims
+        .filter(c => c.claimant.toString() === req.user._id.toString())
+        .map(c => {
+          const item = offlineStore.items.find(i => i._id.toString() === c.item.toString());
+          return { ...c, item };
+        });
+      return res.status(200).json({
+        success: true,
+        count: userClaims.length,
+        data: userClaims
+      });
+    }
+
     const claims = await Claim.find({ claimant: req.user._id })
       .populate('item')
       .sort({ createdAt: -1 });
