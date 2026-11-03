@@ -35,8 +35,29 @@
   </header>
 
   <main class="main-container dashboard-layout">
-    <!-- Admin Analytics Section (Visible to Admins) -->
-    <section id="adminAnalyticsSection" class="hidden">
+    <!-- Unauthenticated Sign-In State -->
+    <section id="dashAuthPrompt" class="dashboard-block hidden" style="text-align:center; padding: 3.5rem 1.5rem; max-width: 600px; margin: 3rem auto; background: rgba(18, 22, 31, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; backdrop-filter: blur(20px);">
+      <span style="font-size:3.5rem; display:block; margin-bottom:1rem;">🔐</span>
+      <h2 style="font-size:1.8rem; font-weight:800; color:#fff; margin-bottom:0.6rem;">Sign In to Campus Dashboard</h2>
+      <p style="color:var(--text-secondary); margin-bottom:2rem; font-size:0.95rem;">Please authenticate to access personal item reports, review incoming ownership claims, and inspect campus recovery analytics.</p>
+      
+      <div style="display:flex; flex-direction:column; gap:0.9rem; max-width:380px; margin:0 auto 1.5rem auto;">
+        <button id="quickLoginAdmin" class="btn btn-primary" style="justify-content:center; padding:0.85rem; font-weight:700; font-size:0.92rem;">
+          🛡️ Sign In as Campus Admin (Full Charts &amp; Stats)
+        </button>
+        <button id="quickLoginStudent" class="btn btn-outline" style="justify-content:center; padding:0.85rem; border-color:var(--accent-cyan); color:var(--accent-cyan); font-weight:700; font-size:0.92rem;">
+          🎓 Sign In as Student (Sai Sravan)
+        </button>
+        <a href="index.html" class="btn btn-outline" style="justify-content:center; padding:0.85rem; color:var(--text-secondary); border-color:rgba(255,255,255,0.15); font-size:0.92rem;">
+          ← Return to Browse Feed
+        </a>
+      </div>
+      <p style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem;">Sai University Evaluation Mode &bull; Instant 1-Click Access</p>
+    </section>
+
+    <div id="dashboardContent">
+      <!-- Admin Analytics Section (Visible to Admins) -->
+      <section id="adminAnalyticsSection" class="hidden">
       <div class="dash-section-header">
         <div>
           <h2 style="font-size:1.8rem;font-weight:800;color:#fff;">Campus Analytics &amp; Recovery Metrics</h2>
@@ -133,6 +154,7 @@
         </table>
       </div>
     </section>
+    </div> <!-- /#dashboardContent -->
   </main>
 
   <!-- FIXED BOTTOM BLUR (Frosted Glass Floating Dock) -->

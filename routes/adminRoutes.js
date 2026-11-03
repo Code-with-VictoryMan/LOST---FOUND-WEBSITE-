@@ -100,6 +100,14 @@ router.get('/all-items', protect, adminOnly, async (req, res) => {
 // @route   GET /api/admin/all-claims
 router.get('/all-claims', protect, adminOnly, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const claims = offlineStore.claims.map(c => {
+        const item = offlineStore.items.find(i => i._id.toString() === c.item.toString());
+        const claimant = offlineStore.users.find(u => u._id.toString() === c.claimant.toString());
+        return { ...c, item, claimant };
+      });
+      return res.status(200).json({ success: true, count: claims.length, data: claims });
+    }
     const claims = await Claim.find()
       .populate('item', 'title category building type status')
       .populate('claimant', 'name email phone')

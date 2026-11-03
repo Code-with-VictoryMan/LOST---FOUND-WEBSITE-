@@ -1,32 +1,33 @@
-const authToken = localStorage.getItem('sai_portal_token');
-const currentUser = JSON.parse(localStorage.getItem('sai_portal_user'));
-
-if (!authToken || !currentUser) {
-  window.location.href = 'index.html';
+let authToken = localStorage.getItem('sai_portal_token');
+let currentUser = null;
+try {
+  currentUser = JSON.parse(localStorage.getItem('sai_portal_user'));
+} catch (e) {
+  currentUser = null;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const dashUserDisplay = document.getElementById('dashUserDisplay');
-  if (dashUserDisplay && currentUser) {
-    dashUserDisplay.textContent = `${currentUser.name} (${currentUser.role})`;
+  setupDashboardView();
+
+  const quickLoginAdmin = document.getElementById('quickLoginAdmin');
+  if (quickLoginAdmin) {
+    quickLoginAdmin.addEventListener('click', () => performQuickLogin('admin@saiuniversity.edu.in', 'AdminPassword123'));
   }
-  
+
+  const quickLoginStudent = document.getElementById('quickLoginStudent');
+  if (quickLoginStudent) {
+    quickLoginStudent.addEventListener('click', () => performQuickLogin('saisravan@saiuniversity.edu.in', 'StudentPassword123'));
+  }
+
   const dashLogout = document.getElementById('dashLogout');
   if (dashLogout) {
     dashLogout.addEventListener('click', () => {
       localStorage.clear();
-      window.location.href = 'index.html';
+      authToken = null;
+      currentUser = null;
+      setupDashboardView();
     });
   }
-
-  if (currentUser && currentUser.role === 'admin') {
-    const adminSection = document.getElementById('adminAnalyticsSection');
-    if (adminSection) adminSection.classList.remove('hidden');
-    loadAdminStats();
-  }
-
-  loadMyReportedItems();
-  loadMyClaims();
 
   const btnCloseReview = document.getElementById('btnCloseReview');
   if (btnCloseReview) {
@@ -36,6 +37,64 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+async function performQuickLogin(email, password) {
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      authToken = data.token;
+      currentUser = data.user;
+      localStorage.setItem('sai_portal_token', data.token);
+      localStorage.setItem('sai_portal_user', JSON.stringify(data.user));
+      setupDashboardView();
+    } else {
+      alert(data.message || 'Login failed');
+    }
+  } catch (err) {
+    alert('Failed to connect to authentication service');
+  }
+}
+
+function setupDashboardView() {
+  const dashAuthPrompt = document.getElementById('dashAuthPrompt');
+  const dashboardContent = document.getElementById('dashboardContent');
+  const dashUserDisplay = document.getElementById('dashUserDisplay');
+  const adminSection = document.getElementById('adminAnalyticsSection');
+
+  if (!authToken || !currentUser) {
+    if (dashAuthPrompt) dashAuthPrompt.classList.remove('hidden');
+    if (dashboardContent) dashboardContent.classList.add('hidden');
+    if (dashUserDisplay) dashUserDisplay.textContent = 'Guest (Not Signed In)';
+    return;
+  }
+
+  if (dashAuthPrompt) dashAuthPrompt.classList.add('hidden');
+  if (dashboardContent) dashboardContent.classList.remove('hidden');
+  if (dashUserDisplay) {
+    dashUserDisplay.innerHTML = `
+      <span>${currentUser.name} (${currentUser.role.toUpperCase()})</span>
+      ${currentUser.role !== 'admin' 
+        ? `<button onclick="performQuickLogin('admin@saiuniversity.edu.in','AdminPassword123')" class="btn btn-outline btn-sm" style="margin-left:0.6rem;padding:0.25rem 0.6rem;font-size:0.75rem;border-color:var(--accent-cyan);color:var(--accent-cyan);">Switch to Admin View</button>`
+        : `<button onclick="performQuickLogin('saisravan@saiuniversity.edu.in','StudentPassword123')" class="btn btn-outline btn-sm" style="margin-left:0.6rem;padding:0.25rem 0.6rem;font-size:0.75rem;border-color:rgba(255,255,255,0.2);color:#fff;">Switch to Student View</button>`
+      }
+    `;
+  }
+
+  if (currentUser.role === 'admin') {
+    if (adminSection) adminSection.classList.remove('hidden');
+    loadAdminStats();
+  } else {
+    if (adminSection) adminSection.classList.add('hidden');
+  }
+
+  loadMyReportedItems();
+  loadMyClaims();
+}
+
 async function loadAdminStats() {
   try {
     const res = await fetch('/api/admin/stats', {
@@ -44,12 +103,16 @@ async function loadAdminStats() {
     const data = await res.json();
     if (data.success) {
       const { stats, categoryStats, buildingStats } = data;
-      document.getElementById('statTotalItems').textContent = stats.totalItems;
-      document.getElementById('statLostItems').textContent = stats.lostItems;
-      document.getElementById('statFoundItems').textContent = stats.foundItems;
-      document.getElementById('statRecoveryRate').textContent = `${stats.recoveryRate}%`;
+      const elTotal = document.getElementById('statTotalItems');
+      const elLost = document.getElementById('statLostItems');
+      const elFound = document.getElementById('statFoundItems');
+      const elRec = document.getElementById('statRecoveryRate');
 
-      // Render Charts with Chart.js
+      if (elTotal) elTotal.textContent = stats.totalItems;
+      if (elLost) elLost.textContent = stats.lostItems;
+      if (elFound) elFound.textContent = stats.foundItems;
+      if (elRec) elRec.textContent = `${stats.recoveryRate}%`;
+
       renderBuildingChart(buildingStats);
       renderCategoryChart(categoryStats);
     }
@@ -58,11 +121,16 @@ async function loadAdminStats() {
   }
 }
 
+let buildingChartInstance = null;
+let categoryChartInstance = null;
+
 function renderBuildingChart(buildingStats) {
   const canvas = document.getElementById('buildingChart');
-  if (!canvas) return;
+  if (!canvas || !window.Chart) return;
   const ctx = canvas.getContext('2d');
-  new Chart(ctx, {
+  if (buildingChartInstance) buildingChartInstance.destroy();
+
+  buildingChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: buildingStats.map(b => b._id.replace('Academic Block ', 'Block ').replace('Student Dining & ', '')),
@@ -94,9 +162,11 @@ function renderBuildingChart(buildingStats) {
 
 function renderCategoryChart(categoryStats) {
   const canvas = document.getElementById('categoryChart');
-  if (!canvas) return;
+  if (!canvas || !window.Chart) return;
   const ctx = canvas.getContext('2d');
-  new Chart(ctx, {
+  if (categoryChartInstance) categoryChartInstance.destroy();
+
+  categoryChartInstance = new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels: categoryStats.map(c => c._id),
@@ -129,13 +199,16 @@ async function loadMyReportedItems() {
     });
     const data = await res.json();
     
-    // Filter personal listings if standard student
+    const allItems = data.data || [];
     const items = currentUser.role === 'admin' 
-      ? data.data 
-      : data.data.filter(item => item.reportedBy && (item.reportedBy._id === currentUser.id || item.reportedBy === currentUser.id));
+      ? allItems 
+      : allItems.filter(item => {
+          const reporterId = item.reportedBy?._id ? String(item.reportedBy._id) : (item.reportedBy ? String(item.reportedBy) : '');
+          return reporterId === String(currentUser.id);
+        });
 
     if (!items || items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);">You have not reported any items yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);padding:2rem;">You have not reported any items yet.</td></tr>`;
       return;
     }
 
@@ -154,7 +227,7 @@ async function loadMyReportedItems() {
       </tr>
     `).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);">Failed to load reports.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);padding:2rem;">Failed to load reports.</td></tr>`;
   }
 }
 
@@ -168,7 +241,7 @@ async function loadMyClaims() {
     const data = await res.json();
 
     if (!data.data || data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);">You have not submitted any claims yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);padding:2rem;">You have not submitted any claims yet.</td></tr>`;
       return;
     }
 
@@ -182,7 +255,7 @@ async function loadMyClaims() {
       </tr>
     `).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);">Failed to load claims.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);padding:2rem;">Failed to load claims.</td></tr>`;
   }
 }
 
@@ -199,7 +272,7 @@ window.reviewClaims = async function(itemId) {
     const data = await res.json();
 
     if (!data.data || data.data.length === 0) {
-      container.innerHTML = '<p style="color:var(--text-secondary);">No claims have been submitted for this item yet.</p>';
+      container.innerHTML = '<p style="color:var(--text-secondary);padding:1.5rem 0;">No ownership claims have been submitted for this item yet.</p>';
       return;
     }
 
@@ -218,7 +291,7 @@ window.reviewClaims = async function(itemId) {
       </div>
     `).join('');
   } catch (err) {
-    container.innerHTML = '<p style="color:var(--danger);">Error retrieving claims.</p>';
+    container.innerHTML = '<p style="color:var(--danger);padding:1.5rem 0;">Error retrieving claims.</p>';
   }
 };
 
