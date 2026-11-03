@@ -83,6 +83,7 @@ In accordance with Section 5 of the project syllabus:
 1. **Interactive Administrative Dashboard Charts:** Integrated Chart.js to render real-time bar charts of campus building distribution and donut charts of category frequency.
 2. **Campus Building & Specific Location Filter:** Specialized taxonomy covering official Sai University facilities (Academic Blocks A/B, Library, Dining Hall, Sports Complex, CS Labs, Auditorium, Campus Grounds).
 3. **Automated Duplicate Match Alert:** Client triggers an asynchronous pre-flight check upon title entry. If an item in the same category was reported in that building, a warning badge alerts the student before duplicate submission.
+4. **Camera Item Scanner & Instant Owner Lookup:** Allows a student who finds a misplaced item anywhere on campus to capture/upload a photo, identify the item, and scan active lost reports. If a match is found, the system instantly reveals verified owner contact details (Name, Department, Official Email, Phone) so the item can be returned immediately.
 
 ---
 
@@ -98,8 +99,9 @@ In accordance with Section 5 of the project syllabus:
 | 6 | `/api/items/:id` | GET | Retrieve single item details with populate | None | 200 OK |
 | 7 | `/api/items` | POST | Guard against unauthorized access | None | 401 Unauthorized |
 | 8 | `/api/claims` | POST | Submit ownership claim with proof description | Bearer JWT | 201 Created |
-| 9 | `/api/auth/login` | POST | Admin login authentication | None | 200 OK |
-| 10 | `/api/admin/stats` | GET | Access aggregate analytics and metrics | Admin JWT | 200 OK |
+| 9 | `/api/items/scan-match` | POST | Scan found item keywords & return owner profile | None | 200 OK |
+| 10 | `/api/auth/login` | POST | Admin login authentication | None | 200 OK |
+| 11 | `/api/admin/stats` | GET | Access aggregate analytics and metrics | Admin JWT | 200 OK |
 
 ---
 

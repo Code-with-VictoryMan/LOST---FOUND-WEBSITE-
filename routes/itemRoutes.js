@@ -44,6 +44,75 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route   POST /api/items/scan-match (Scan Item & Find Owner)
+router.post('/scan-match', async (req, res) => {
+  try {
+    const { queryText, category, building } = req.body;
+    if (!queryText || queryText.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Please provide scanned text or keywords' });
+    }
+
+    // Retrieve all active lost items
+    const lostItems = await Item.find({ type: 'lost', status: { $ne: 'resolved' } })
+      .populate('reportedBy', 'name email phone role');
+
+    const searchTerms = queryText.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+    const scoredItems = lostItems.map(item => {
+      let score = 0;
+      const titleLower = item.title.toLowerCase();
+      const descLower = item.description.toLowerCase();
+      const locLower = (item.specificLocation || '').toLowerCase();
+
+      searchTerms.forEach(term => {
+        if (titleLower.includes(term)) score += 40;
+        if (descLower.includes(term)) score += 20;
+        if (locLower.includes(term)) score += 15;
+      });
+
+      if (category && category !== 'all' && item.category === category) {
+        score += 25;
+      }
+
+      if (building && building !== 'all' && item.building === building) {
+        score += 20;
+      }
+
+      return {
+        item,
+        score: Math.min(score, 100)
+      };
+    }).filter(resItem => resItem.score >= 20)
+      .sort((a, b) => b.score - a.score);
+
+    if (scoredItems.length === 0) {
+      return res.status(200).json({
+        success: true,
+        matchFound: false,
+        message: 'No matching lost reports found in the campus database.',
+        matches: []
+      });
+    }
+
+    const bestMatch = scoredItems[0];
+    return res.status(200).json({
+      success: true,
+      matchFound: true,
+      confidence: bestMatch.score,
+      bestMatch: {
+        ...bestMatch.item.toObject(),
+        matchScore: bestMatch.score
+      },
+      otherMatches: scoredItems.slice(1, 4).map(m => ({
+        ...m.item.toObject(),
+        matchScore: m.score
+      }))
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // @route   GET /api/items/check-duplicate (Custom Feature: Duplicate Detection)
 router.get('/check-duplicate', async (req, res) => {
   try {

@@ -4,6 +4,8 @@ let currentUser = JSON.parse(localStorage.getItem('sai_portal_user')) || null;
 let authToken = localStorage.getItem('sai_portal_token') || null;
 let isRegisterMode = false;
 let searchDebounceTimer = null;
+let cameraStream = null;
+let scannedPhotoData = null;
 
 // DOM Elements
 const itemsGrid = document.getElementById('itemsGrid');
@@ -16,6 +18,7 @@ const filterSort = document.getElementById('filterSort');
 
 // Modals & Drawers
 const menuBlurDrawer = document.getElementById('menuBlurDrawer');
+const scanModal = document.getElementById('scanModal');
 const reportModal = document.getElementById('reportModal');
 const claimModal = document.getElementById('claimModal');
 const authModal = document.getElementById('authModal');
@@ -163,6 +166,265 @@ async function checkForDuplicates() {
   alertBox.classList.add('hidden');
 }
 
+// Scanner Functions
+window.openScannerModal = function() {
+  if (scanModal) {
+    scanModal.classList.remove('hidden');
+    resetScannerState();
+  }
+};
+
+window.closeScannerModal = function() {
+  if (scanModal) {
+    scanModal.classList.add('hidden');
+    stopCamera();
+  }
+};
+
+function resetScannerState() {
+  const scanVideo = document.getElementById('scanVideo');
+  const scanPreviewImg = document.getElementById('scanPreviewImg');
+  const scanPlaceholder = document.getElementById('scanPlaceholder');
+  const btnCapturePhoto = document.getElementById('btnCapturePhoto');
+  const btnToggleCamera = document.getElementById('btnToggleCamera');
+  const scanResultsArea = document.getElementById('scanResultsArea');
+
+  if (scanVideo) scanVideo.classList.add('hidden');
+  if (scanPreviewImg) { scanPreviewImg.classList.add('hidden'); scanPreviewImg.src = ''; }
+  if (scanPlaceholder) scanPlaceholder.classList.remove('hidden');
+  if (btnCapturePhoto) btnCapturePhoto.classList.add('hidden');
+  if (btnToggleCamera) btnToggleCamera.textContent = '📹 Start Camera';
+  if (scanResultsArea) { scanResultsArea.classList.add('hidden'); scanResultsArea.innerHTML = ''; }
+  scannedPhotoData = null;
+}
+
+async function toggleCamera() {
+  const scanVideo = document.getElementById('scanVideo');
+  const scanPlaceholder = document.getElementById('scanPlaceholder');
+  const scanPreviewImg = document.getElementById('scanPreviewImg');
+  const btnCapturePhoto = document.getElementById('btnCapturePhoto');
+  const btnToggleCamera = document.getElementById('btnToggleCamera');
+
+  if (cameraStream) {
+    stopCamera();
+    btnToggleCamera.textContent = '📹 Start Camera';
+    btnCapturePhoto.classList.add('hidden');
+    scanVideo.classList.add('hidden');
+    scanPlaceholder.classList.remove('hidden');
+  } else {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      scanVideo.srcObject = cameraStream;
+      scanVideo.classList.remove('hidden');
+      scanPlaceholder.classList.add('hidden');
+      scanPreviewImg.classList.add('hidden');
+      btnCapturePhoto.classList.remove('hidden');
+      btnToggleCamera.textContent = '⏹️ Stop Camera';
+    } catch (err) {
+      console.warn('Camera access denied or unavailable, using photo upload instead:', err);
+      showToast('Camera not available. You can upload a photo of the item.');
+    }
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+}
+
+function capturePhoto() {
+  const scanVideo = document.getElementById('scanVideo');
+  const scanPreviewImg = document.getElementById('scanPreviewImg');
+  const btnCapturePhoto = document.getElementById('btnCapturePhoto');
+  const btnToggleCamera = document.getElementById('btnToggleCamera');
+
+  if (!scanVideo || !cameraStream) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = scanVideo.videoWidth || 640;
+  canvas.height = scanVideo.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(scanVideo, 0, 0, canvas.width, canvas.height);
+
+  scannedPhotoData = canvas.toDataURL('image/jpeg', 0.85);
+  scanPreviewImg.src = scannedPhotoData;
+  scanPreviewImg.classList.remove('hidden');
+  scanVideo.classList.add('hidden');
+  btnCapturePhoto.classList.add('hidden');
+  btnToggleCamera.textContent = '📹 Retake Camera Photo';
+  stopCamera();
+  showToast('Photo captured! Now specify item label to scan database.');
+}
+
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    scannedPhotoData = evt.target.result;
+    const scanPreviewImg = document.getElementById('scanPreviewImg');
+    const scanPlaceholder = document.getElementById('scanPlaceholder');
+    const scanVideo = document.getElementById('scanVideo');
+    stopCamera();
+
+    if (scanVideo) scanVideo.classList.add('hidden');
+    if (scanPlaceholder) scanPlaceholder.classList.add('hidden');
+    if (scanPreviewImg) {
+      scanPreviewImg.src = scannedPhotoData;
+      scanPreviewImg.classList.remove('hidden');
+    }
+
+    // Auto-populate keywords from file name if helpful
+    const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    const keywordsInput = document.getElementById('scanItemKeywords');
+    if (keywordsInput && !keywordsInput.value) {
+      keywordsInput.value = cleanName;
+    }
+    showToast('Photo uploaded successfully.');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function executeScanMatch() {
+  const keywordsInput = document.getElementById('scanItemKeywords');
+  const queryText = keywordsInput ? keywordsInput.value.trim() : '';
+  const building = document.getElementById('scanBuilding').value;
+  const category = document.getElementById('scanCategory').value;
+  const resultsArea = document.getElementById('scanResultsArea');
+
+  if (!queryText) {
+    alert('Please enter or scan the item name / markings (e.g. calculator, Dell, AirPods, lanyard)');
+    return;
+  }
+
+  resultsArea.classList.remove('hidden');
+  resultsArea.innerHTML = `
+    <div style="text-align:center;padding:1.5rem;color:var(--accent-cyan);">
+      <div style="font-size:1.8rem;animation:pulse 1.2s infinite;">📡</div>
+      <p style="margin-top:0.5rem;font-weight:600;">Searching active Sai University lost reports...</p>
+      <small style="color:var(--text-muted);">Comparing location: ${building} | Keywords: ${escapeHtml(queryText)}</small>
+    </div>
+  `;
+
+  try {
+    const res = await fetch('/api/items/scan-match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ queryText, category, building })
+    });
+    const data = await res.json();
+
+    if (data.success && data.matchFound && data.bestMatch) {
+      const match = data.bestMatch;
+      const owner = match.reportedBy || {};
+
+      resultsArea.innerHTML = `
+        <div class="scan-match-banner">
+          <div class="scan-match-header">
+            <div>
+              <span style="font-size:1.1rem;font-weight:800;color:#6ee7b7;">🎯 Match Found in Campus Database!</span>
+              <p style="font-size:0.78rem;color:var(--text-secondary);">An active lost report matches your found item description.</p>
+            </div>
+            <span class="match-confidence-pill">${match.matchScore || 90}% Match Confidence</span>
+          </div>
+
+          <!-- Matched Item Summary -->
+          <div style="display:flex;gap:1rem;background:rgba(10,13,19,0.7);padding:0.9rem;border-radius:10px;border:1px solid var(--border-subtle);align-items:center;">
+            <img src="${match.imageUrl}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
+            <div>
+              <strong style="font-size:1.05rem;color:#fff;">${escapeHtml(match.title)}</strong><br>
+              <span style="font-size:0.8rem;color:var(--accent-cyan);font-weight:600;">${match.category}</span> • 
+              <span style="font-size:0.8rem;color:var(--text-muted);">${match.building} (${escapeHtml(match.specificLocation)})</span><br>
+              <small style="font-size:0.75rem;color:var(--text-secondary);">Lost Date: ${new Date(match.dateOccurred).toLocaleDateString()}</small>
+            </div>
+          </div>
+
+          <!-- OWNER DETAILS BOX -->
+          <div class="owner-details-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);padding-bottom:0.5rem;">
+              <strong style="color:var(--accent-cyan);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Owner Contact Details</strong>
+              <span style="font-size:0.72rem;background:rgba(56,189,248,0.15);color:#7dd3fc;padding:0.2rem 0.5rem;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Verified Campus Reporter</span>
+            </div>
+
+            <div class="owner-info-row">
+              <span style="color:var(--text-muted);">Owner Name:</span>
+              <strong style="color:#fff;">${escapeHtml(owner.name || 'Anonymous Student')}</strong>
+            </div>
+
+            <div class="owner-info-row">
+              <span style="color:var(--text-muted);">Department / Role:</span>
+              <span style="color:#cbd5e1;text-transform:capitalize;">${escapeHtml(owner.role || 'Student')}</span>
+            </div>
+
+            <div class="owner-info-row">
+              <span style="color:var(--text-muted);">Sai University Email:</span>
+              <a href="mailto:${owner.email}?subject=Found Item: ${encodeURIComponent(match.title)}" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">${escapeHtml(owner.email || 'N/A')}</a>
+            </div>
+
+            <div class="owner-info-row">
+              <span style="color:var(--text-muted);">Contact Phone:</span>
+              <a href="tel:${owner.phone}" style="color:#34d399;text-decoration:none;font-weight:600;">${escapeHtml(owner.phone || 'N/A')}</a>
+            </div>
+
+            <div class="owner-actions-row">
+              <a href="mailto:${owner.email}?subject=Found Your Lost Item: ${encodeURIComponent(match.title)}&body=Hello ${encodeURIComponent(owner.name || 'Student')}, I found your item on campus at ${encodeURIComponent(building)}. Please get in touch to collect it!" class="btn btn-primary btn-sm" style="flex:1;">
+                ✉️ Email Owner Directly
+              </a>
+              ${owner.phone && owner.phone !== 'N/A' ? `
+                <a href="tel:${owner.phone}" class="btn btn-secondary btn-sm" style="flex:1;">
+                  📞 Call Owner
+                </a>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      resultsArea.innerHTML = `
+        <div class="no-match-box">
+          <span style="font-size:2rem;">🔍</span>
+          <strong style="color:#ffffff;">No Matching Lost Reports Found</strong>
+          <p style="font-size:0.85rem;color:var(--text-secondary);max-width:440px;">
+            The student who lost this has not reported it yet. You can list it as a <strong>Found Item</strong> right now so they can discover and claim it!
+          </p>
+          <button type="button" class="btn btn-primary btn-sm" onclick="prefillFoundReport('${escapeHtml(queryText)}', '${building}', '${category}')">
+            ✨ List as Found Item in 1-Click
+          </button>
+        </div>
+      `;
+    }
+  } catch (err) {
+    resultsArea.innerHTML = `<p style="color:var(--danger);text-align:center;">Error communicating with server during scan.</p>`;
+  }
+}
+
+window.prefillFoundReport = function(title, building, category) {
+  closeScannerModal();
+  if (!authToken) {
+    showToast('Please sign in to list this found item.');
+    openAuthModal();
+    return;
+  }
+
+  // Pre-fill report form
+  document.getElementById('reportType').value = 'found';
+  document.getElementById('reportTitle').value = title;
+  if (category && category !== 'all') document.getElementById('reportCategory').value = category;
+  if (building && building !== 'all') document.getElementById('reportBuilding').value = building;
+  
+  if (scannedPhotoData) {
+    document.getElementById('reportImage').value = scannedPhotoData;
+  }
+
+  reportModal.classList.remove('hidden');
+  showToast('Form pre-filled with scanned item details!');
+};
+
 // Menu Open Blur Transition Controls
 window.openMenu = function() {
   if (menuBlurDrawer) menuBlurDrawer.classList.add('open');
@@ -219,6 +481,36 @@ function setupEventListeners() {
       }
     });
   }
+
+  // Scanner Modal Triggers
+  const btnOpenScannerHero = document.getElementById('btnOpenScannerHero');
+  const btnOpenScannerNav = document.getElementById('btnOpenScannerNav');
+  const btnBottomScan = document.getElementById('btnBottomScan');
+  const drawerScanLink = document.getElementById('drawerScanLink');
+  const btnCloseScanner = document.getElementById('btnCloseScanner');
+
+  if (btnOpenScannerHero) btnOpenScannerHero.addEventListener('click', openScannerModal);
+  if (btnOpenScannerNav) btnOpenScannerNav.addEventListener('click', openScannerModal);
+  if (btnBottomScan) btnBottomScan.addEventListener('click', openScannerModal);
+  if (drawerScanLink) {
+    drawerScanLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenu();
+      openScannerModal();
+    });
+  }
+  if (btnCloseScanner) btnCloseScanner.addEventListener('click', closeScannerModal);
+
+  // Scanner Actions
+  const btnToggleCamera = document.getElementById('btnToggleCamera');
+  const btnCapturePhoto = document.getElementById('btnCapturePhoto');
+  const scanFileInput = document.getElementById('scanFileInput');
+  const btnExecuteScan = document.getElementById('btnExecuteScan');
+
+  if (btnToggleCamera) btnToggleCamera.addEventListener('click', toggleCamera);
+  if (btnCapturePhoto) btnCapturePhoto.addEventListener('click', capturePhoto);
+  if (scanFileInput) scanFileInput.addEventListener('change', handleFileUpload);
+  if (btnExecuteScan) btnExecuteScan.addEventListener('click', executeScanMatch);
 
   // Search and Filters
   searchInput.addEventListener('input', () => {
