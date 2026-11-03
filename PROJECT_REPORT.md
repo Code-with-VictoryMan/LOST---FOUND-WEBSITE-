@@ -81,7 +81,7 @@ This project delivers a responsive, full-stack, database-driven **Campus Lost an
 ## 4. Custom Features Implemented
 In accordance with Section 5 of the project syllabus:
 1. **Interactive Administrative Dashboard Charts:** Integrated Chart.js to render real-time bar charts of campus building distribution and donut charts of category frequency.
-2. **Campus Building & Specific Location Filter:** Specialized taxonomy covering official Sai University facilities (Academic Blocks A/B, Central Library, Dining Hall, Sports Complex, CS Labs, Innovation Studio).
+2. **Campus Building & Specific Location Filter:** Specialized taxonomy covering official Sai University facilities (Academic Blocks A/B, Library, Dining Hall, Sports Complex, CS Labs, Auditorium, Campus Grounds).
 3. **Automated Duplicate Match Alert:** Client triggers an asynchronous pre-flight check upon title entry. If an item in the same category was reported in that building, a warning badge alerts the student before duplicate submission.
 
 ---

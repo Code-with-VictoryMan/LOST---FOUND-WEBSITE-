@@ -133,7 +133,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": \"Postman API Test Flash Drive (Sandisk 64GB)\",\n  \"type\": \"found\",\n  \"category\": \"Electronics & Gadgets\",\n  \"building\": \"Central Library\",\n  \"specificLocation\": \"Reading Desk 12\",\n  \"dateOccurred\": \"2026-10-20\",\n  \"description\": \"Red and black swivel flash drive found on desk.\"\n}"
+          "raw": "{\n  \"title\": \"Postman API Test Flash Drive (Sandisk 64GB)\",\n  \"type\": \"found\",\n  \"category\": \"Electronics & Gadgets\",\n  \"building\": \"Library\",\n  \"specificLocation\": \"Reading Desk 12\",\n  \"dateOccurred\": \"2026-10-20\",\n  \"description\": \"Red and black swivel flash drive found on desk.\"\n}"
         },
         "url": { "raw": "{{baseUrl}}/api/items", "host": ["{{baseUrl}}"], "path": ["api", "items"] }
       },

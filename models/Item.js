@@ -37,11 +37,10 @@ const itemSchema = new mongoose.Schema({
     enum: [
       'Academic Block A',
       'Academic Block B',
-      'Central Library',
+      'Library',
       'Student Dining & Cafeteria',
       'Sports Complex & Gymnasium',
       'Computer Science Labs',
-      'Innovation & Design Studio',
       'Auditorium',
       'Campus Grounds / Lawn'
     ]

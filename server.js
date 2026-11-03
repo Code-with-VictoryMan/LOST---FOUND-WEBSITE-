@@ -45,11 +45,25 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`=================================================`);
-  console.log(`Sai University Lost & Found Portal is running!`);
-  console.log(`Local Access: http://localhost:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`=================================================`);
-});
+let PORT = parseInt(process.env.PORT, 10) || 5000;
+
+function startServer(portToTry) {
+  const server = app.listen(portToTry, () => {
+    console.log(`=================================================`);
+    console.log(`Sai University Lost & Found Portal is running!`);
+    console.log(`Local Access: http://localhost:${portToTry}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`=================================================`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`[Port Warning]: Port ${portToTry} is in use, trying port ${portToTry + 1}...`);
+      startServer(portToTry + 1);
+    } else {
+      console.error('[Server Error]:', err);
+    }
+  });
+}
+
+startServer(PORT);
