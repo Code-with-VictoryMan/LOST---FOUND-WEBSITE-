@@ -102,6 +102,23 @@ body::after {
   text-decoration: none;
 }
 
+.brand-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  display: block;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.brand-logo-img:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.25);
+}
+
 .brand-badge {
   font-size: 0.72rem;
   font-weight: 700;
