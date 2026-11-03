@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Dashboard | Sai University</title>
+  <title>STUDIO SAI | Campus Management Dashboard</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,20 +15,22 @@
   <!-- Navigation Header -->
   <header class="navbar">
     <div class="nav-container">
-      <div class="brand-group">
-        <div class="brand-logo">🎓</div>
+      <a href="index.html" class="brand-group">
+        <span class="brand-badge">STUDIO</span>
         <div>
-          <h1 class="brand-title">Sai University</h1>
-          <span class="brand-subtitle">Campus Management Console</span>
+          <h1 class="brand-title">SAI UNIVERSITY</h1>
+          <span class="brand-subtitle">CAMPUS CONSOLE &amp; ANALYTICS</span>
         </div>
+      </a>
+      <div class="nav-actions">
+        <nav class="desktop-nav-links">
+          <a href="index.html">← Back to Portal</a>
+          <div class="user-badge">
+            <span id="dashUserDisplay">Loading...</span>
+            <button id="dashLogout" class="btn-icon" title="Logout" style="background:none;border:none;cursor:pointer;color:#fff;">🚪</button>
+          </div>
+        </nav>
       </div>
-      <nav class="nav-links">
-        <a href="index.html">← Back to Portal</a>
-        <div class="user-badge">
-          <span id="dashUserDisplay">Loading...</span>
-          <button id="dashLogout" class="btn-icon" title="Logout">🚪</button>
-        </div>
-      </nav>
     </div>
   </header>
 
@@ -37,10 +39,13 @@
     <section id="adminAnalyticsSection" class="hidden">
       <div class="dash-section-header">
         <div>
-          <h2>Campus Analytics & Overview</h2>
-          <p class="section-desc">Real-time statistics on recovery rate, incident buildings, and categories.</p>
+          <h2 style="font-size:1.8rem;font-weight:800;color:#fff;">Campus Analytics &amp; Recovery Metrics</h2>
+          <p class="section-desc">Real-time statistics across Sai University campus buildings and categories.</p>
         </div>
-        <div class="badge-pill admin-badge">Admin Privileges Active</div>
+        <div class="studio-pill-tag">
+          <span class="live-dot"></span>
+          <span>Admin Console Active</span>
+        </div>
       </div>
 
       <!-- Stat Counters -->
@@ -80,11 +85,11 @@
     <section class="dashboard-block">
       <div class="dash-section-header">
         <div>
-          <h3>My Reported Items</h3>
-          <p class="section-desc">Manage items you reported as lost or found and view received claims.</p>
+          <h3 style="font-size:1.4rem;font-weight:700;color:#fff;">My Reported Items</h3>
+          <p class="section-desc">Manage items you reported and inspect incoming ownership verification claims.</p>
         </div>
       </div>
-      <div id="myItemsTableContainer" class="table-container">
+      <div id="myItemsTableContainer" class="table-container" style="overflow-x:auto;">
         <table class="styled-table">
           <thead>
             <tr>
@@ -97,7 +102,7 @@
             </tr>
           </thead>
           <tbody id="myItemsBody">
-            <tr><td colspan="6" class="text-center">Loading your reports...</td></tr>
+            <tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);">Loading your reports...</td></tr>
           </tbody>
         </table>
       </div>
@@ -107,11 +112,11 @@
     <section class="dashboard-block">
       <div class="dash-section-header">
         <div>
-          <h3>My Claims & Recovery Requests</h3>
-          <p class="section-desc">Track status of items you have claimed.</p>
+          <h3 style="font-size:1.4rem;font-weight:700;color:#fff;">My Claims &amp; Recovery Requests</h3>
+          <p class="section-desc">Track status and verification feedback on items you have claimed.</p>
         </div>
       </div>
-      <div id="myClaimsTableContainer" class="table-container">
+      <div id="myClaimsTableContainer" class="table-container" style="overflow-x:auto;">
         <table class="styled-table">
           <thead>
             <tr>
@@ -123,12 +128,32 @@
             </tr>
           </thead>
           <tbody id="myClaimsBody">
-            <tr><td colspan="5" class="text-center">Loading claims...</td></tr>
+            <tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);">Loading claims...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
   </main>
+
+  <!-- FIXED BOTTOM BLUR (Frosted Glass Floating Dock) -->
+  <aside class="fixed-bottom-blur">
+    <div class="bottom-blur-container">
+      <a href="index.html" class="bottom-action-btn">
+        <span class="btn-icon">🔍</span>
+        <span>Browse Feed</span>
+      </a>
+
+      <a href="index.html" class="bottom-action-btn bottom-action-primary">
+        <span class="btn-icon">➕</span>
+        <span>Report Item</span>
+      </a>
+
+      <a href="dashboard.html" class="bottom-action-btn active">
+        <span class="btn-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+    </div>
+  </aside>
 
   <!-- Modal: Review Received Claims -->
   <div id="reviewClaimsModal" class="modal-overlay hidden">

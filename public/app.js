@@ -14,7 +14,8 @@ const filterCategory = document.getElementById('filterCategory');
 const filterBuilding = document.getElementById('filterBuilding');
 const filterSort = document.getElementById('filterSort');
 
-// Modals
+// Modals & Drawers
+const menuBlurDrawer = document.getElementById('menuBlurDrawer');
 const reportModal = document.getElementById('reportModal');
 const claimModal = document.getElementById('claimModal');
 const authModal = document.getElementById('authModal');
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showToast(message) {
+  if (!toastEl) return;
   toastEl.textContent = message;
   toastEl.classList.remove('hidden');
   setTimeout(() => toastEl.classList.add('hidden'), 3500);
@@ -42,16 +44,23 @@ function setupNavbar() {
   const userBadge = document.getElementById('userBadge');
   const navDashboard = document.getElementById('navDashboard');
   const userNameDisplay = document.getElementById('userNameDisplay');
+  const floatingUserLabel = document.getElementById('floatingUserLabel');
+  const drawerAuthText = document.getElementById('drawerAuthText');
 
   if (authToken && currentUser) {
-    authActions.classList.add('hidden');
-    userBadge.classList.remove('hidden');
-    navDashboard.classList.remove('hidden');
-    userNameDisplay.textContent = currentUser.name.split(' ')[0] + (currentUser.role === 'admin' ? ' (Admin)' : '');
+    if (authActions) authActions.classList.add('hidden');
+    if (userBadge) userBadge.classList.remove('hidden');
+    if (navDashboard) navDashboard.classList.remove('hidden');
+    const firstName = currentUser.name.split(' ')[0];
+    if (userNameDisplay) userNameDisplay.textContent = firstName + (currentUser.role === 'admin' ? ' (Admin)' : '');
+    if (floatingUserLabel) floatingUserLabel.textContent = `${firstName} (${currentUser.role})`;
+    if (drawerAuthText) drawerAuthText.textContent = `Sign Out (${firstName})`;
   } else {
-    authActions.classList.remove('hidden');
-    userBadge.classList.add('hidden');
-    navDashboard.classList.add('hidden');
+    if (authActions) authActions.classList.remove('hidden');
+    if (userBadge) userBadge.classList.add('hidden');
+    if (navDashboard) navDashboard.classList.add('hidden');
+    if (floatingUserLabel) floatingUserLabel.textContent = 'Sign In';
+    if (drawerAuthText) drawerAuthText.textContent = 'Sign In / Register';
   }
 }
 
@@ -73,7 +82,7 @@ async function fetchItems() {
     if (data.success) {
       currentItems = data.data;
       renderItems(currentItems);
-      resultsCount.textContent = `${currentItems.length} active listings found`;
+      resultsCount.textContent = `${currentItems.length} active listings`;
     }
   } catch (error) {
     console.error('Failed to retrieve items:', error);
@@ -85,8 +94,8 @@ async function fetchItems() {
 function renderItems(items) {
   if (items.length === 0) {
     itemsGrid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: #64748b;">
-        <h3>No matching items found</h3>
+      <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: #64748b;">
+        <h3 style="color:#ffffff;margin-bottom:0.5rem;font-weight:700;">No matching items found</h3>
         <p>Try modifying your search criteria or report a new lost/found item.</p>
       </div>`;
     return;
@@ -114,7 +123,7 @@ function renderItems(items) {
               Claim This Item
             </button>
           ` : `
-            <button class="btn btn-secondary btn-sm" disabled style="width: 100%;">
+            <button class="btn btn-secondary btn-sm" disabled style="width: 100%;opacity:0.65;">
               ${item.status === 'claimed' ? 'Verification In Progress' : 'Resolved & Returned'}
             </button>
           `}
@@ -154,8 +163,63 @@ async function checkForDuplicates() {
   alertBox.classList.add('hidden');
 }
 
+// Menu Open Blur Transition Controls
+window.openMenu = function() {
+  if (menuBlurDrawer) menuBlurDrawer.classList.add('open');
+};
+
+window.closeMenu = function() {
+  if (menuBlurDrawer) menuBlurDrawer.classList.remove('open');
+};
+
 // Event Listeners
 function setupEventListeners() {
+  // Menu Open Blur Button (メニュー)
+  const btnOpenMenu = document.getElementById('btnOpenMenu');
+  const btnCloseMenu = document.getElementById('btnCloseMenu');
+  if (btnOpenMenu) btnOpenMenu.addEventListener('click', openMenu);
+  if (btnCloseMenu) btnCloseMenu.addEventListener('click', closeMenu);
+
+  // Drawer Action Shortcuts
+  const drawerReportLink = document.getElementById('drawerReportLink');
+  if (drawerReportLink) {
+    drawerReportLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenu();
+      if (!authToken) {
+        showToast('Please sign in to report a lost or found item.');
+        openAuthModal();
+        return;
+      }
+      reportModal.classList.remove('hidden');
+    });
+  }
+
+  const drawerAuthLink = document.getElementById('drawerAuthLink');
+  if (drawerAuthLink) {
+    drawerAuthLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenu();
+      if (authToken) {
+        handleLogout();
+      } else {
+        openAuthModal();
+      }
+    });
+  }
+
+  // Floating Corner User Widget
+  const floatingUserWidget = document.getElementById('floatingUserWidget');
+  if (floatingUserWidget) {
+    floatingUserWidget.addEventListener('click', () => {
+      if (authToken) {
+        window.location.href = 'dashboard.html';
+      } else {
+        openAuthModal();
+      }
+    });
+  }
+
   // Search and Filters
   searchInput.addEventListener('input', () => {
     clearTimeout(searchDebounceTimer);
@@ -171,14 +235,17 @@ function setupEventListeners() {
   document.getElementById('reportBuilding').addEventListener('change', checkForDuplicates);
 
   // Modal Open/Close Controls
-  document.getElementById('btnOpenReport').addEventListener('click', () => {
-    if (!authToken) {
-      showToast('Please sign in to report a lost or found item.');
-      openAuthModal();
-      return;
-    }
-    reportModal.classList.remove('hidden');
-  });
+  const btnOpenReport = document.getElementById('btnOpenReport');
+  if (btnOpenReport) {
+    btnOpenReport.addEventListener('click', () => {
+      if (!authToken) {
+        showToast('Please sign in to report a lost or found item.');
+        openAuthModal();
+        return;
+      }
+      reportModal.classList.remove('hidden');
+    });
+  }
 
   document.getElementById('btnCloseReport').addEventListener('click', () => reportModal.classList.add('hidden'));
   document.getElementById('btnCancelReport').addEventListener('click', () => reportModal.classList.add('hidden'));
@@ -186,17 +253,21 @@ function setupEventListeners() {
   document.getElementById('btnCloseClaim').addEventListener('click', () => claimModal.classList.add('hidden'));
   document.getElementById('btnCancelClaim').addEventListener('click', () => claimModal.classList.add('hidden'));
 
-  document.getElementById('btnOpenAuth').addEventListener('click', openAuthModal);
+  const btnOpenAuth = document.getElementById('btnOpenAuth');
+  if (btnOpenAuth) btnOpenAuth.addEventListener('click', openAuthModal);
   document.getElementById('btnCloseAuth').addEventListener('click', () => authModal.classList.add('hidden'));
 
-  document.getElementById('btnLogout').addEventListener('click', () => {
+  const btnLogout = document.getElementById('btnLogout');
+  if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+
+  function handleLogout() {
     localStorage.removeItem('sai_portal_token');
     localStorage.removeItem('sai_portal_user');
     authToken = null;
     currentUser = null;
     setupNavbar();
     showToast('Logged out successfully.');
-  });
+  }
 
   // Toggle Auth Register/Login
   document.getElementById('authToggleLink').addEventListener('click', (e) => {
@@ -346,7 +417,7 @@ window.openClaimModal = function(itemId) {
   document.getElementById('claimItemId').value = item._id;
   document.getElementById('claimItemSummary').innerHTML = `
     <strong>Claiming:</strong> ${escapeHtml(item.title)} (${item.category})<br>
-    <small>Reported at: ${item.building} — ${escapeHtml(item.specificLocation)}</small>
+    <small style="color:var(--text-secondary);">Reported at: ${item.building} — ${escapeHtml(item.specificLocation)}</small>
   `;
   claimModal.classList.remove('hidden');
 };

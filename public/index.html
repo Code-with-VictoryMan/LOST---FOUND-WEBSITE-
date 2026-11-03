@@ -3,69 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sai University | Campus Lost & Found Portal</title>
+  <title>STUDIO SAI | Campus Lost & Found Portal</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Navigation Header -->
+  <!-- Top Minimalist Studio Navigation -->
   <header class="navbar">
     <div class="nav-container">
-      <div class="brand-group">
-        <div class="brand-logo">🎓</div>
+      <!-- Studio Brand Mark (STUDIO seijiro style) -->
+      <a href="index.html" class="brand-group">
+        <span class="brand-badge">STUDIO</span>
         <div>
-          <h1 class="brand-title">Sai University</h1>
-          <span class="brand-subtitle">Campus Lost & Found Portal</span>
+          <h1 class="brand-title">SAI UNIVERSITY</h1>
+          <span class="brand-subtitle">CAMPUS LOST &amp; FOUND | 2026 OFFICIAL PORTAL</span>
         </div>
-      </div>
+      </a>
 
-      <nav class="nav-links">
-        <a href="index.html" class="active">Browse Items</a>
-        <a href="dashboard.html" id="navDashboard" class="hidden">My Dashboard</a>
-        <button id="btnOpenReport" class="btn btn-primary">+ Report Item</button>
-        <div id="authActions">
-          <button id="btnOpenAuth" class="btn btn-outline">Sign In / Register</button>
-        </div>
-        <div id="userBadge" class="user-badge hidden">
-          <span id="userNameDisplay">Student</span>
-          <button id="btnLogout" class="btn-icon" title="Logout">🚪</button>
-        </div>
-      </nav>
+      <!-- Desktop Nav & Menu Toggle Button -->
+      <div class="nav-actions">
+        <nav class="desktop-nav-links">
+          <a href="index.html" class="active">Browse Items</a>
+          <a href="dashboard.html" id="navDashboard" class="hidden">Dashboard</a>
+          <div id="authActions">
+            <button id="btnOpenAuth" class="btn btn-outline btn-sm">Sign In</button>
+          </div>
+          <div id="userBadge" class="user-badge hidden">
+            <span id="userNameDisplay">Student</span>
+            <button id="btnLogout" class="btn-icon" title="Logout" style="background:none;border:none;cursor:pointer;color:#fff;">🚪</button>
+          </div>
+        </nav>
+
+        <!-- Japanese Minimalist "メニュー" (Menu) Button -->
+        <button id="btnOpenMenu" class="menu-toggle-pill" aria-label="Open Navigation Menu">
+          <span class="menu-icon">☰</span>
+          <span>メニュー</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- Hero & Search Section -->
+  <!-- Menu Open Blur Transition Drawer -->
+  <div id="menuBlurDrawer" class="menu-blur-drawer">
+    <div class="drawer-header">
+      <div class="drawer-brand">STUDIO SAI / MENU</div>
+      <button id="btnCloseMenu" class="drawer-close-btn" aria-label="Close Menu">✕</button>
+    </div>
+
+    <nav class="drawer-nav-list">
+      <a href="index.html" class="drawer-link" onclick="closeMenu()">
+        <span class="link-index">01</span>
+        <span>Browse Active Listings</span>
+      </a>
+      <a href="dashboard.html" class="drawer-link" onclick="closeMenu()">
+        <span class="link-index">02</span>
+        <span>Personal &amp; Admin Dashboard</span>
+      </a>
+      <a href="#" class="drawer-link" id="drawerReportLink">
+        <span class="link-index">03</span>
+        <span>Report Lost / Found Belonging</span>
+      </a>
+      <a href="#" class="drawer-link" id="drawerAuthLink">
+        <span class="link-index">04</span>
+        <span id="drawerAuthText">Sign In / Register</span>
+      </a>
+    </nav>
+
+    <div class="drawer-footer">
+      <span>Sai University • Web Technology &amp; Internet Programming Project</span>
+      <span>Academic Year 2026–2027</span>
+    </div>
+  </div>
+
+  <!-- Atmospheric Studio Hero & Search -->
   <section class="hero-section">
     <div class="hero-content">
-      <div class="badge-pill">Official Campus Community Service</div>
-      <h2>Reuniting Sai University Students with Lost Belongings</h2>
-      <p>Report misplaced or found items across campus, search active listings, and verify ownership claims seamlessly.</p>
+      <div class="studio-pill-tag">
+        <span class="live-dot"></span>
+        <span>Sai University Community Hub</span>
+      </div>
+      <h2 class="hero-title">Campus Lost &amp; Found Portal</h2>
+      <p class="hero-subtitle">An atmospheric, database-driven community directory reuniting Sai University students and faculty with misplaced personal belongings.</p>
       
-      <!-- Interactive Filter Bar -->
+      <!-- Translucent Frosted Glass Filter Card -->
       <div class="search-filter-card">
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Search keywords (e.g. calculator, Dell, ID card, hydro flask)...">
+          <input type="text" id="searchInput" placeholder="Search keywords (e.g. Dell XPS, calculator, lanyard, AirPods, Hydro Flask)...">
         </div>
 
         <div class="filter-controls-grid">
           <select id="filterType">
-            <option value="all">All Listings (Lost & Found)</option>
+            <option value="all">All Listings (Lost &amp; Found)</option>
             <option value="lost">Lost Items Only</option>
             <option value="found">Found Items Only</option>
           </select>
 
           <select id="filterCategory">
             <option value="all">All Categories</option>
-            <option value="Electronics & Gadgets">Electronics & Gadgets</option>
-            <option value="Student ID & Cards">Student ID & Cards</option>
-            <option value="Books & Stationery">Books & Stationery</option>
-            <option value="Wallets & Bags">Wallets & Bags</option>
-            <option value="Clothing & Accessories">Clothing & Accessories</option>
-            <option value="Keys & Access Cards">Keys & Access Cards</option>
-            <option value="Water Bottles & Flasks">Water Bottles & Flasks</option>
+            <option value="Electronics &amp; Gadgets">Electronics &amp; Gadgets</option>
+            <option value="Student ID &amp; Cards">Student ID &amp; Cards</option>
+            <option value="Books &amp; Stationery">Books &amp; Stationery</option>
+            <option value="Wallets &amp; Bags">Wallets &amp; Bags</option>
+            <option value="Clothing &amp; Accessories">Clothing &amp; Accessories</option>
+            <option value="Keys &amp; Access Cards">Keys &amp; Access Cards</option>
+            <option value="Water Bottles &amp; Flasks">Water Bottles &amp; Flasks</option>
             <option value="Other Belongings">Other Belongings</option>
           </select>
 
@@ -74,10 +118,10 @@
             <option value="Academic Block A">Academic Block A</option>
             <option value="Academic Block B">Academic Block B</option>
             <option value="Central Library">Central Library</option>
-            <option value="Student Dining & Cafeteria">Student Dining & Cafeteria</option>
-            <option value="Sports Complex & Gymnasium">Sports Complex & Gymnasium</option>
+            <option value="Student Dining &amp; Cafeteria">Student Dining &amp; Cafeteria</option>
+            <option value="Sports Complex &amp; Gymnasium">Sports Complex &amp; Gymnasium</option>
             <option value="Computer Science Labs">Computer Science Labs</option>
-            <option value="Innovation & Design Studio">Innovation & Design Studio</option>
+            <option value="Innovation &amp; Design Studio">Innovation &amp; Design Studio</option>
             <option value="Auditorium">Auditorium</option>
             <option value="Campus Grounds / Lawn">Campus Grounds / Lawn</option>
           </select>
@@ -96,27 +140,53 @@
   <main class="main-container">
     <div class="feed-header">
       <div>
-        <h3 class="section-title">Active Campus Listings</h3>
-        <p class="section-desc">Showing items actively reported across Sai University campus.</p>
+        <h3 class="section-title">Current Campus Listings</h3>
+        <p class="section-desc">Real-time reports across Sai University buildings.</p>
       </div>
-      <div id="resultsCount" class="results-tag">Loading records...</div>
+      <div id="resultsCount" class="results-tag">Loading listings...</div>
     </div>
 
     <!-- Dynamic Item Cards Grid -->
     <div id="itemsGrid" class="items-grid"></div>
   </main>
 
-  <!-- Modal: Report Item -->
+  <!-- FIXED BOTTOM BLUR (Frosted Glass Floating Dock) -->
+  <aside class="fixed-bottom-blur">
+    <div class="bottom-blur-container">
+      <a href="index.html" class="bottom-action-btn active">
+        <span class="btn-icon">🔍</span>
+        <span>Browse</span>
+      </a>
+
+      <button id="btnOpenReport" class="bottom-action-btn bottom-action-primary">
+        <span class="btn-icon">➕</span>
+        <span>Report Item</span>
+      </button>
+
+      <a href="dashboard.html" class="bottom-action-btn">
+        <span class="btn-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Floating Corner Profile Widget (Matches bottom-right of studio screenshot) -->
+  <div id="floatingUserWidget" class="floating-corner-widget" title="Current Session">
+    <span>🎓</span>
+    <span id="floatingUserLabel">Sign In</span>
+  </div>
+
+  <!-- Modal: Report Item (With Blur Backdrop) -->
   <div id="reportModal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>Report a Lost or Found Item</h3>
+        <h3>Report Lost or Found Belonging</h3>
         <button class="modal-close" id="btnCloseReport">&times;</button>
       </div>
       <form id="reportForm" class="modal-form">
         <!-- Live Duplicate Alert Container -->
         <div id="duplicateAlertBox" class="duplicate-alert hidden">
-          ⚠️ <strong>Possible Duplicate Match:</strong> An item matching this description was recently reported in this building. Please check existing listings before proceeding!
+          ⚠️ <strong>Possible Duplicate Match:</strong> An item matching this description was recently reported in this building.
         </div>
 
         <div class="form-row">
@@ -130,13 +200,13 @@
           <div class="form-group">
             <label for="reportCategory">Category *</label>
             <select id="reportCategory" required>
-              <option value="Electronics & Gadgets">Electronics & Gadgets</option>
-              <option value="Student ID & Cards">Student ID & Cards</option>
-              <option value="Books & Stationery">Books & Stationery</option>
-              <option value="Wallets & Bags">Wallets & Bags</option>
-              <option value="Clothing & Accessories">Clothing & Accessories</option>
-              <option value="Keys & Access Cards">Keys & Access Cards</option>
-              <option value="Water Bottles & Flasks">Water Bottles & Flasks</option>
+              <option value="Electronics &amp; Gadgets">Electronics &amp; Gadgets</option>
+              <option value="Student ID &amp; Cards">Student ID &amp; Cards</option>
+              <option value="Books &amp; Stationery">Books &amp; Stationery</option>
+              <option value="Wallets &amp; Bags">Wallets &amp; Bags</option>
+              <option value="Clothing &amp; Accessories">Clothing &amp; Accessories</option>
+              <option value="Keys &amp; Access Cards">Keys &amp; Access Cards</option>
+              <option value="Water Bottles &amp; Flasks">Water Bottles &amp; Flasks</option>
               <option value="Other Belongings">Other Belongings</option>
             </select>
           </div>
@@ -154,10 +224,10 @@
               <option value="Academic Block A">Academic Block A</option>
               <option value="Academic Block B">Academic Block B</option>
               <option value="Central Library">Central Library</option>
-              <option value="Student Dining & Cafeteria">Student Dining & Cafeteria</option>
-              <option value="Sports Complex & Gymnasium">Sports Complex & Gymnasium</option>
+              <option value="Student Dining &amp; Cafeteria">Student Dining &amp; Cafeteria</option>
+              <option value="Sports Complex &amp; Gymnasium">Sports Complex &amp; Gymnasium</option>
               <option value="Computer Science Labs">Computer Science Labs</option>
-              <option value="Innovation & Design Studio">Innovation & Design Studio</option>
+              <option value="Innovation &amp; Design Studio">Innovation &amp; Design Studio</option>
               <option value="Auditorium">Auditorium</option>
               <option value="Campus Grounds / Lawn">Campus Grounds / Lawn</option>
             </select>
@@ -184,7 +254,7 @@
           <small class="form-hint">Leave blank to use an automated category stock photo.</small>
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:0.75rem;">
           <button type="button" class="btn btn-secondary" id="btnCancelReport">Cancel</button>
           <button type="submit" class="btn btn-primary" id="btnSubmitReport">Submit Campus Report</button>
         </div>
@@ -201,7 +271,7 @@
       </div>
       <form id="claimForm" class="modal-form">
         <input type="hidden" id="claimItemId">
-        <div class="claim-item-summary" id="claimItemSummary"></div>
+        <div class="claim-item-summary" id="claimItemSummary" style="color:var(--accent-cyan);font-size:0.9rem;"></div>
 
         <div class="form-group">
           <label for="claimProof">Verification Proof *</label>
@@ -213,7 +283,7 @@
           <input type="tel" id="claimPhone" placeholder="+91 98840 XXXXX" required>
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:0.75rem;">
           <button type="button" class="btn btn-secondary" id="btnCancelClaim">Cancel</button>
           <button type="submit" class="btn btn-primary">Submit Claim Request</button>
         </div>
@@ -253,10 +323,10 @@
           <input type="password" id="authPassword" placeholder="••••••••" required minlength="6">
         </div>
 
-        <div class="modal-footer">
-          <span class="auth-toggle-text">
+        <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+          <span class="auth-toggle-text" style="font-size:0.82rem;color:var(--text-secondary);">
             <span id="authTogglePrompt">New here?</span>
-            <a href="#" id="authToggleLink">Create an account</a>
+            <a href="#" id="authToggleLink" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">Create an account</a>
           </span>
           <button type="submit" class="btn btn-primary" id="btnAuthSubmit">Sign In</button>
         </div>

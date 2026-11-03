@@ -69,12 +69,25 @@ function renderBuildingChart(buildingStats) {
       datasets: [{
         label: 'Items Reported',
         data: buildingStats.map(b => b.count),
-        backgroundColor: '#3b82f6'
+        backgroundColor: '#38bdf8',
+        borderRadius: 8
       }]
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } }
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#94a3b8' },
+          grid: { color: 'rgba(255, 255, 255, 0.05)' }
+        },
+        y: {
+          ticks: { color: '#94a3b8', stepSize: 1 },
+          grid: { color: 'rgba(255, 255, 255, 0.05)' }
+        }
+      }
     }
   });
 }
@@ -89,12 +102,19 @@ function renderCategoryChart(categoryStats) {
       labels: categoryStats.map(c => c._id),
       datasets: [{
         data: categoryStats.map(c => c.count),
-        backgroundColor: ['#1e3a8a', '#3b82f6', '#d97706', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#64748b']
+        backgroundColor: ['#38bdf8', '#818cf8', '#fbbf24', '#34d399', '#f87171', '#c084fc', '#f472b6', '#94a3b8'],
+        borderWidth: 2,
+        borderColor: '#0a0d13'
       }]
     },
     options: {
       responsive: true,
-      plugins: { legend: { position: 'right' } }
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#cbd5e1', boxWidth: 12, padding: 12 }
+        }
+      }
     }
   });
 }
@@ -115,13 +135,13 @@ async function loadMyReportedItems() {
       : data.data.filter(item => item.reportedBy && (item.reportedBy._id === currentUser.id || item.reportedBy === currentUser.id));
 
     if (!items || items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center">You have not reported any items yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);">You have not reported any items yet.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = items.map(item => `
       <tr>
-        <td><strong>${item.title}</strong><br><small>${item.category}</small></td>
+        <td><strong>${item.title}</strong><br><small style="color:var(--accent-cyan);">${item.category}</small></td>
         <td><span class="badge-tag tag-${item.type}">${item.type}</span></td>
         <td>${item.building}</td>
         <td>${new Date(item.dateOccurred).toLocaleDateString()}</td>
@@ -134,7 +154,7 @@ async function loadMyReportedItems() {
       </tr>
     `).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Failed to load reports.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);">Failed to load reports.</td></tr>`;
   }
 }
 
@@ -148,7 +168,7 @@ async function loadMyClaims() {
     const data = await res.json();
 
     if (!data.data || data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center">You have not submitted any claims yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);">You have not submitted any claims yet.</td></tr>`;
       return;
     }
 
@@ -162,7 +182,7 @@ async function loadMyClaims() {
       </tr>
     `).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="5" class="text-center">Failed to load claims.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="text-align:center;color:var(--text-muted);">Failed to load claims.</td></tr>`;
   }
 }
 
@@ -179,26 +199,26 @@ window.reviewClaims = async function(itemId) {
     const data = await res.json();
 
     if (!data.data || data.data.length === 0) {
-      container.innerHTML = '<p>No claims have been submitted for this item yet.</p>';
+      container.innerHTML = '<p style="color:var(--text-secondary);">No claims have been submitted for this item yet.</p>';
       return;
     }
 
     container.innerHTML = data.data.map(claim => `
-      <div style="border: 1px solid #e2e8f0; padding: 1rem; border-radius: 8px; margin-bottom: 0.8rem; background: #fafafa;">
+      <div style="border: 1px solid var(--border-subtle); padding: 1.25rem; border-radius: 12px; margin-bottom: 0.8rem; background: rgba(10, 13, 19, 0.7);">
         <p><strong>Claimant Name:</strong> ${claim.claimant ? claim.claimant.name : 'Unknown'} (${claim.claimant ? claim.claimant.email : 'N/A'})</p>
         <p><strong>Contact Phone:</strong> ${claim.contactPhone}</p>
         <p><strong>Ownership Proof Description:</strong> ${claim.proofDescription}</p>
-        <p><strong>Current Claim Status:</strong> <span class="status-badge status-${claim.status}">${claim.status.toUpperCase()}</span></p>
+        <p style="margin-top:0.4rem;"><strong>Current Claim Status:</strong> <span class="status-badge status-${claim.status}">${claim.status.toUpperCase()}</span></p>
         ${claim.status === 'pending' ? `
-          <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
             <button class="btn btn-success btn-sm" onclick="decideClaim('${claim._id}', 'approved')">Approve & Handover</button>
             <button class="btn btn-danger btn-sm" onclick="decideClaim('${claim._id}', 'rejected')">Reject Claim</button>
           </div>
-        ` : `<p><small>Decision finalized: ${claim.reviewNotes}</small></p>`}
+        ` : `<p style="margin-top:0.5rem;"><small style="color:var(--text-muted);">Decision finalized: ${claim.reviewNotes}</small></p>`}
       </div>
     `).join('');
   } catch (err) {
-    container.innerHTML = '<p>Error retrieving claims.</p>';
+    container.innerHTML = '<p style="color:var(--danger);">Error retrieving claims.</p>';
   }
 };
 
