@@ -134,6 +134,24 @@ router.get('/my-claims', protect, async (req, res) => {
 // @route   GET /api/claims/item/:itemId (Item reporter or Admin reviews claims)
 router.get('/item/:itemId', protect, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const item = offlineStore.items.find(i => i._id.toString() === req.params.itemId.toString());
+      if (!item) {
+        return res.status(404).json({ success: false, message: 'Item not found' });
+      }
+      const reporterId = item.reportedBy?._id ? item.reportedBy._id.toString() : item.reportedBy.toString();
+      if (reporterId !== req.user._id.toString() && req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Unauthorized to view claims for this item' });
+      }
+      const claims = offlineStore.claims
+        .filter(c => c.item.toString() === req.params.itemId.toString())
+        .map(c => {
+          const claimant = offlineStore.users.find(u => u._id.toString() === c.claimant.toString());
+          return { ...c, claimant: claimant ? { name: claimant.name, email: claimant.email, phone: claimant.phone } : null };
+        });
+      return res.status(200).json({ success: true, count: claims.length, data: claims });
+    }
+
     const item = await Item.findById(req.params.itemId);
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item not found' });
@@ -159,6 +177,33 @@ router.put('/:id/status', protect, async (req, res) => {
     const { status, reviewNotes } = req.body;
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Status must be approved or rejected' });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      const claim = offlineStore.claims.find(c => c._id.toString() === req.params.id.toString());
+      if (!claim) {
+        return res.status(404).json({ success: false, message: 'Claim not found' });
+      }
+      const item = offlineStore.items.find(i => i._id.toString() === claim.item.toString());
+      if (!item) {
+        return res.status(404).json({ success: false, message: 'Associated item not found' });
+      }
+      const reporterId = item.reportedBy?._id ? item.reportedBy._id.toString() : item.reportedBy.toString();
+      if (reporterId !== req.user._id.toString() && req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Only the item reporter or admin can review this claim' });
+      }
+
+      claim.status = status;
+      claim.reviewNotes = reviewNotes || (status === 'approved' ? 'Claim verified and item returned' : 'Proof insufficient');
+
+      if (status === 'approved') {
+        item.status = 'resolved';
+      } else {
+        const remainingPending = offlineStore.claims.find(c => c.item.toString() === item._id.toString() && c.status === 'pending' && c._id.toString() !== req.params.id.toString());
+        item.status = remainingPending ? 'claimed' : 'open';
+      }
+
+      return res.status(200).json({ success: true, message: `Claim ${status} successfully`, data: claim });
     }
 
     const claim = await Claim.findById(req.params.id).populate('item');
