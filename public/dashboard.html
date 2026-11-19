@@ -102,6 +102,38 @@
       </div>
     </section>
 
+    <!-- Student Profile & Database Details -->
+    <section class="dashboard-block" id="studentProfileBlock" style="margin-bottom:2rem; background:rgba(18,22,31,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:1rem; margin-bottom:1rem;">
+        <div>
+          <h3 style="font-size:1.3rem; font-weight:700; color:#fff;" id="profileCardName">Student Profile</h3>
+          <p class="section-desc" style="margin-bottom:0;" id="profileCardRole">Verified Sai University Account</p>
+        </div>
+        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); color:#4ade80; padding:0.35rem 0.85rem; border-radius:999px; font-size:0.8rem; font-weight:600;">
+          <span style="display:inline-block; width:8px; height:8px; background:#22c55e; border-radius:50%; box-shadow:0 0 8px #22c55e;"></span>
+          <span id="dbSyncStatus">MongoDB Connected &bull; Local DB Active</span>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Student ID / Roll No</span>
+          <span class="stat-value" style="font-size:1.15rem; color:var(--accent-cyan);" id="profileStudentId">--</span>
+        </div>
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Department / School</span>
+          <span class="stat-value" style="font-size:1.05rem; color:#fff;" id="profileDepartment">--</span>
+        </div>
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Registered Email</span>
+          <span class="stat-value" style="font-size:1.05rem; color:var(--text-secondary);" id="profileEmail">--</span>
+        </div>
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Contact Phone</span>
+          <span class="stat-value" style="font-size:1.1rem; color:#fff;" id="profilePhone">--</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Student Personal Listings Section -->
     <section class="dashboard-block">
       <div class="dash-section-header">

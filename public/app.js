@@ -667,6 +667,9 @@ function setupEventListeners() {
     if (isRegisterMode) {
       payload.name = document.getElementById('authName').value.trim();
       payload.role = document.getElementById('authRole').value;
+      payload.studentId = document.getElementById('authStudentId')?.value.trim() || undefined;
+      payload.department = document.getElementById('authDepartment')?.value.trim() || undefined;
+      payload.phone = document.getElementById('authPhone')?.value.trim() || undefined;
     }
 
     try {

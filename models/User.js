@@ -26,6 +26,21 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'faculty', 'admin'],
     default: 'student'
   },
+  studentId: {
+    type: String,
+    trim: true,
+    default: 'N/A'
+  },
+  department: {
+    type: String,
+    trim: true,
+    default: 'School of Computing & Data Science'
+  },
+  yearOfStudy: {
+    type: String,
+    trim: true,
+    default: '3rd Year B.Tech'
+  },
   phone: {
     type: String,
     default: 'N/A'

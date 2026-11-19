@@ -156,7 +156,9 @@ const seedData = async () => {
       email: 'admin@saiuniversity.edu.in',
       password: 'AdminPassword123',
       role: 'admin',
-      phone: '+91 98401 22334'
+      phone: '+91 98401 22334',
+      department: 'Campus Security & Administration',
+      studentId: 'ADMIN-01'
     });
 
     // Create Student Users
@@ -165,7 +167,10 @@ const seedData = async () => {
       email: 'saisravan@saiuniversity.edu.in',
       password: 'StudentPassword123',
       role: 'student',
-      phone: '+91 98840 55667'
+      phone: '+91 98840 55667',
+      studentId: 'SAIU2024CS001',
+      department: 'School of Computing & Data Science',
+      yearOfStudy: '3rd Year B.Tech'
     });
 
     const student2 = await User.create({
@@ -173,7 +178,10 @@ const seedData = async () => {
       email: 'aditi.sharma@saiuniversity.edu.in',
       password: 'StudentPassword123',
       role: 'student',
-      phone: '+91 97711 33445'
+      phone: '+91 97711 33445',
+      studentId: 'SAIU2024CS015',
+      department: 'School of Computing & Data Science',
+      yearOfStudy: '3rd Year B.Tech'
     });
 
     console.log('Created Demo Users:');

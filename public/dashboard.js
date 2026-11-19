@@ -84,6 +84,21 @@ function setupDashboardView() {
     `;
   }
 
+  // Populate Student Profile Details
+  const elProfileName = document.getElementById('profileCardName');
+  const elProfileRole = document.getElementById('profileCardRole');
+  const elProfileId = document.getElementById('profileStudentId');
+  const elProfileDept = document.getElementById('profileDepartment');
+  const elProfileEmail = document.getElementById('profileEmail');
+  const elProfilePhone = document.getElementById('profilePhone');
+
+  if (elProfileName) elProfileName.textContent = currentUser.name;
+  if (elProfileRole) elProfileRole.innerHTML = `${currentUser.role.toUpperCase()} &bull; Sai University Academic Profile`;
+  if (elProfileId) elProfileId.textContent = currentUser.studentId || (currentUser.role === 'admin' ? 'ADMIN-CONSOLE' : 'SAIU2024CS001');
+  if (elProfileDept) elProfileDept.textContent = currentUser.department || (currentUser.role === 'admin' ? 'Campus Administration' : 'School of Computing & Data Science');
+  if (elProfileEmail) elProfileEmail.textContent = currentUser.email;
+  if (elProfilePhone) elProfilePhone.textContent = currentUser.phone || 'N/A';
+
   if (currentUser.role === 'admin') {
     if (adminSection) adminSection.classList.remove('hidden');
     loadAdminStats();
