@@ -19,6 +19,64 @@ document.addEventListener('DOMContentLoaded', () => {
     quickLoginStudent.addEventListener('click', () => performQuickLogin('saisravan@saiuniversity.edu.in', 'StudentPassword123'));
   }
 
+  // Manual Dashboard Auth Form
+  const dashDirectAuthForm = document.getElementById('dashDirectAuthForm');
+  if (dashDirectAuthForm) {
+    dashDirectAuthForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('dashInputEmail')?.value.trim();
+      const password = document.getElementById('dashInputPassword')?.value;
+      const alertBox = document.getElementById('dashAuthAlert');
+      const alertText = document.getElementById('dashAuthAlertText');
+      const submitBtn = document.getElementById('btnDashSubmit');
+
+      if (!email || !password) return;
+      if (alertBox) alertBox.classList.add('hidden');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="auth-btn-spinner"></span> Authenticating...';
+      }
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          authToken = data.token;
+          currentUser = data.user;
+          localStorage.setItem('sai_portal_token', data.token);
+          localStorage.setItem('sai_portal_user', JSON.stringify(data.user));
+          setupDashboardView();
+        } else {
+          if (alertBox) alertBox.classList.remove('hidden');
+          if (alertText) alertText.textContent = data.message || 'Invalid credentials';
+        }
+      } catch (err) {
+        if (alertBox) alertBox.classList.remove('hidden');
+        if (alertText) alertText.textContent = 'Server connection error';
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In with Credentials';
+        }
+      }
+    });
+  }
+
+  // Dashboard Password Toggle
+  const btnToggleDashPassword = document.getElementById('btnToggleDashPassword');
+  const dashInputPassword = document.getElementById('dashInputPassword');
+  if (btnToggleDashPassword && dashInputPassword) {
+    btnToggleDashPassword.addEventListener('click', () => {
+      const isPwd = dashInputPassword.type === 'password';
+      dashInputPassword.type = isPwd ? 'text' : 'password';
+      btnToggleDashPassword.textContent = isPwd ? '🙈' : '👁️';
+    });
+  }
+
   const dashLogout = document.getElementById('dashLogout');
   if (dashLogout) {
     dashLogout.addEventListener('click', () => {

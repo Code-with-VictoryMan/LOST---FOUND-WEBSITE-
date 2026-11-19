@@ -380,25 +380,59 @@
     </div>
   </div>
 
-  <!-- Modal: Authentication (Login / Register) -->
+  <!-- Modal: Authentication (Optimized Login & Registration) -->
   <div id="authModal" class="modal-overlay hidden">
-    <div class="modal-box modal-box-sm">
+    <div class="modal-box auth-modal-box">
       <div class="modal-header">
-        <h3 id="authModalTitle">Sign In</h3>
-        <button class="modal-close" id="btnCloseAuth">&times;</button>
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <span style="font-size:1.3rem;">🔐</span>
+          <h3 id="authModalTitle" style="font-size:1.2rem;font-weight:700;color:#fff;">Sign In to SAIU Portal</h3>
+        </div>
+        <button class="modal-close" id="btnCloseAuth" aria-label="Close">&times;</button>
       </div>
-      <form id="authForm" class="modal-form">
+
+      <div style="padding:1.5rem 1.75rem 0.5rem 1.75rem;">
+        <!-- Top Segmented Tabs -->
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab-btn active" id="tabSignIn">
+            <span>🔑</span> Sign In
+          </button>
+          <button type="button" class="auth-tab-btn" id="tabRegister">
+            <span>📝</span> Register Student
+          </button>
+        </div>
+
+        <!-- Quick-Fill Demo Bar (Speedy Viva Evaluation) -->
+        <div class="auth-quick-fill-bar" id="authQuickFillBar">
+          <span class="auth-quick-fill-label">⚡ 1-Click Fill:</span>
+          <button type="button" class="auth-chip" id="chipFillStudent">
+            🎓 Student (Sai Sravan)
+          </button>
+          <button type="button" class="auth-chip" id="chipFillAdmin">
+            🛡️ Admin (Security)
+          </button>
+        </div>
+
+        <!-- Inline Alert / Error Notice -->
+        <div id="authAlert" class="auth-alert hidden">
+          <span id="authAlertIcon">⚠️</span>
+          <span id="authAlertText">Authentication message</span>
+        </div>
+      </div>
+
+      <form id="authForm" class="modal-form" style="padding-top:0.5rem;">
+        <!-- Registration Specific Fields -->
         <div id="registerFields" class="hidden">
           <div class="form-group">
-            <label for="authName">Full Name *</label>
-            <input type="text" id="authName" placeholder="Sai Sravan V">
+            <label for="authName">Full Student / Staff Name *</label>
+            <input type="text" id="authName" placeholder="e.g. Sai Sravan V">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="authRole">Account Type</label>
+              <label for="authRole">Account Role</label>
               <select id="authRole">
-                <option value="student">Student</option>
-                <option value="faculty">Faculty / Staff</option>
+                <option value="student">Student (B.Tech / UG / PG)</option>
+                <option value="faculty">Faculty / Staff Member</option>
               </select>
             </div>
             <div class="form-group">
@@ -408,37 +442,56 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="authDepartment">Department</label>
+              <label for="authDepartment">School / Department</label>
               <select id="authDepartment">
-                <option value="School of Computing & Data Science">Computing &amp; Data Science</option>
-                <option value="School of Arts & Sciences">Arts &amp; Sciences</option>
+                <option value="School of Computing & Data Science">School of Computing &amp; Data Science</option>
+                <option value="School of Arts & Sciences">School of Arts &amp; Sciences</option>
                 <option value="School of Law">School of Law</option>
                 <option value="School of Business">School of Business</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="authPhone">Contact Phone</label>
-              <input type="text" id="authPhone" placeholder="+91 98765 43210">
+              <label for="authPhone">Contact Phone Number</label>
+              <input type="tel" id="authPhone" placeholder="+91 98840 55667">
             </div>
           </div>
         </div>
 
+        <!-- Shared Credentials -->
         <div class="form-group">
-          <label for="authEmail">Sai University Email *</label>
-          <input type="email" id="authEmail" placeholder="student@saiuniversity.edu.in" required>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label for="authEmail">Sai University Email *</label>
+            <span id="emailDomainHint" class="email-domain-hint hidden">+ @saiuniversity.edu.in</span>
+          </div>
+          <input type="email" id="authEmail" placeholder="student@saiuniversity.edu.in" required autocomplete="email">
         </div>
 
         <div class="form-group">
           <label for="authPassword">Password *</label>
-          <input type="password" id="authPassword" placeholder="••••••••" required minlength="6">
+          <div class="password-input-wrap">
+            <input type="password" id="authPassword" placeholder="••••••••" required minlength="6" autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" id="btnTogglePassword" aria-label="Toggle password visibility" title="Show/Hide password">👁️</button>
+          </div>
+          <!-- Live Password Strength (Active during registration) -->
+          <div id="authStrengthContainer" class="hidden">
+            <div class="auth-strength-meter">
+              <div class="auth-strength-bar" id="strBar1"></div>
+              <div class="auth-strength-bar" id="strBar2"></div>
+              <div class="auth-strength-bar" id="strBar3"></div>
+              <div class="auth-strength-bar" id="strBar4"></div>
+            </div>
+            <div class="auth-strength-text" id="authStrengthText">Password strength: Minimum 6 characters</div>
+          </div>
         </div>
 
-        <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+        <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;">
           <span class="auth-toggle-text" style="font-size:0.82rem;color:var(--text-secondary);">
-            <span id="authTogglePrompt">New here?</span>
-            <a href="#" id="authToggleLink" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">Create an account</a>
+            <span id="authTogglePrompt">New student?</span>
+            <a href="#" id="authToggleLink" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">Create account</a>
           </span>
-          <button type="submit" class="btn btn-primary" id="btnAuthSubmit">Sign In</button>
+          <button type="submit" class="btn btn-primary" id="btnAuthSubmit" style="min-width:130px;justify-content:center;">
+            <span id="authSubmitText">Sign In</span>
+          </button>
         </div>
       </form>
     </div>

@@ -128,9 +128,21 @@ router.post('/login', async (req, res) => {
     }
 
     // Query MongoDB
-    const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password credentials' });
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: cleanEmail }).select('+password');
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'No account found with this email. Please verify your email or click Register.'
+      });
+    }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect password entered. Please try again.'
+      });
     }
 
     const token = generateToken(user._id);

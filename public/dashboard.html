@@ -52,7 +52,25 @@
           ← Return to Browse Feed
         </a>
       </div>
-      <p style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem;">Sai University Evaluation Mode &bull; Instant 1-Click Access</p>
+
+      <!-- Or Manual Email/Password Login -->
+      <div style="margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid rgba(255,255,255,0.08); text-align:left; max-width:380px; margin-left:auto; margin-right:auto;">
+        <div id="dashAuthAlert" class="auth-alert hidden" style="margin-bottom:0.8rem;">
+          <span>⚠️</span><span id="dashAuthAlertText"></span>
+        </div>
+        <form id="dashDirectAuthForm" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <input type="email" id="dashInputEmail" placeholder="student@saiuniversity.edu.in" required style="width:100%; padding:0.75rem 1rem; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:0.88rem;">
+          <div class="password-input-wrap">
+            <input type="password" id="dashInputPassword" placeholder="Password" required minlength="6" style="width:100%; padding:0.75rem 1rem; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:0.88rem;">
+            <button type="button" class="password-toggle-btn" id="btnToggleDashPassword">👁️</button>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnDashSubmit" style="justify-content:center; padding:0.75rem; font-weight:700;">
+            Sign In with Credentials
+          </button>
+        </form>
+      </div>
+
+      <p style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem;">Sai University Evaluation Mode &bull; Persistent MongoDB Storage</p>
     </section>
 
     <div id="dashboardContent">

@@ -561,30 +561,173 @@ function setupEventListeners() {
     showToast('Logged out successfully.');
   }
 
-  // Toggle Auth Register/Login
-  document.getElementById('authToggleLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    isRegisterMode = !isRegisterMode;
-    const registerFields = document.getElementById('registerFields');
-    const authModalTitle = document.getElementById('authModalTitle');
-    const btnAuthSubmit = document.getElementById('btnAuthSubmit');
-    const authTogglePrompt = document.getElementById('authTogglePrompt');
-    const authToggleLink = document.getElementById('authToggleLink');
+  // --- Optimized Auth Modal State & Validation ---
+  const tabSignIn = document.getElementById('tabSignIn');
+  const tabRegister = document.getElementById('tabRegister');
+  const authToggleLink = document.getElementById('authToggleLink');
+  const authTogglePrompt = document.getElementById('authTogglePrompt');
+  const authModalTitle = document.getElementById('authModalTitle');
+  const registerFields = document.getElementById('registerFields');
+  const authQuickFillBar = document.getElementById('authQuickFillBar');
+  const authStrengthContainer = document.getElementById('authStrengthContainer');
+  const btnAuthSubmit = document.getElementById('btnAuthSubmit');
+  const authSubmitText = document.getElementById('authSubmitText');
+  const authAlert = document.getElementById('authAlert');
+  const authAlertText = document.getElementById('authAlertText');
+  const authAlertIcon = document.getElementById('authAlertIcon');
+  const authEmailInput = document.getElementById('authEmail');
+  const authPasswordInput = document.getElementById('authPassword');
+  const emailDomainHint = document.getElementById('emailDomainHint');
+  const btnTogglePassword = document.getElementById('btnTogglePassword');
+
+  function showAuthAlert(msg, isSuccess = false) {
+    if (!authAlert) return;
+    authAlert.classList.remove('hidden', 'auth-alert-error', 'auth-alert-success');
+    authAlert.classList.add(isSuccess ? 'auth-alert-success' : 'auth-alert-error');
+    if (authAlertText) authAlertText.textContent = msg;
+    if (authAlertIcon) authAlertIcon.textContent = isSuccess ? '✅' : '⚠️';
+  }
+
+  function hideAuthAlert() {
+    if (authAlert) authAlert.classList.add('hidden');
+  }
+
+  function setAuthMode(register) {
+    isRegisterMode = register;
+    hideAuthAlert();
 
     if (isRegisterMode) {
-      registerFields.classList.remove('hidden');
-      authModalTitle.textContent = 'Create Student Account';
-      btnAuthSubmit.textContent = 'Register Account';
-      authTogglePrompt.textContent = 'Already registered?';
-      authToggleLink.textContent = 'Sign In';
+      if (tabRegister) tabRegister.classList.add('active');
+      if (tabSignIn) tabSignIn.classList.remove('active');
+      if (registerFields) registerFields.classList.remove('hidden');
+      if (authQuickFillBar) authQuickFillBar.classList.add('hidden');
+      if (authStrengthContainer) authStrengthContainer.classList.remove('hidden');
+      if (authModalTitle) authModalTitle.textContent = 'Register Student Account';
+      if (authSubmitText) authSubmitText.textContent = 'Create Account';
+      if (authTogglePrompt) authTogglePrompt.textContent = 'Already have an account?';
+      if (authToggleLink) authToggleLink.textContent = 'Sign In';
+      const nameInput = document.getElementById('authName');
+      if (nameInput) nameInput.focus();
     } else {
-      registerFields.classList.add('hidden');
-      authModalTitle.textContent = 'Sign In';
-      btnAuthSubmit.textContent = 'Sign In';
-      authTogglePrompt.textContent = 'New here?';
-      authToggleLink.textContent = 'Create an account';
+      if (tabSignIn) tabSignIn.classList.add('active');
+      if (tabRegister) tabRegister.classList.remove('active');
+      if (registerFields) registerFields.classList.add('hidden');
+      if (authQuickFillBar) authQuickFillBar.classList.remove('hidden');
+      if (authStrengthContainer) authStrengthContainer.classList.add('hidden');
+      if (authModalTitle) authModalTitle.textContent = 'Sign In to SAIU Portal';
+      if (authSubmitText) authSubmitText.textContent = 'Sign In';
+      if (authTogglePrompt) authTogglePrompt.textContent = 'New student?';
+      if (authToggleLink) authToggleLink.textContent = 'Create account';
+      if (authEmailInput) authEmailInput.focus();
     }
-  });
+  }
+
+  if (tabSignIn) tabSignIn.addEventListener('click', () => setAuthMode(false));
+  if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode(true));
+  if (authToggleLink) {
+    authToggleLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      setAuthMode(!isRegisterMode);
+    });
+  }
+
+  // Quick-Fill Demo Account Buttons
+  const chipFillStudent = document.getElementById('chipFillStudent');
+  if (chipFillStudent) {
+    chipFillStudent.addEventListener('click', () => {
+      if (authEmailInput) authEmailInput.value = 'saisravan@saiuniversity.edu.in';
+      if (authPasswordInput) authPasswordInput.value = 'StudentPassword123';
+      hideAuthAlert();
+      showToast('Loaded Student: saisravan@saiuniversity.edu.in');
+    });
+  }
+
+  const chipFillAdmin = document.getElementById('chipFillAdmin');
+  if (chipFillAdmin) {
+    chipFillAdmin.addEventListener('click', () => {
+      if (authEmailInput) authEmailInput.value = 'admin@saiuniversity.edu.in';
+      if (authPasswordInput) authPasswordInput.value = 'AdminPassword123';
+      hideAuthAlert();
+      showToast('Loaded Campus Admin: admin@saiuniversity.edu.in');
+    });
+  }
+
+  // Password Visibility Toggle
+  if (btnTogglePassword && authPasswordInput) {
+    btnTogglePassword.addEventListener('click', () => {
+      const isPassword = authPasswordInput.type === 'password';
+      authPasswordInput.type = isPassword ? 'text' : 'password';
+      btnTogglePassword.textContent = isPassword ? '🙈' : '👁️';
+    });
+  }
+
+  // Email Domain Hint
+  if (authEmailInput && emailDomainHint) {
+    authEmailInput.addEventListener('input', () => {
+      const val = authEmailInput.value.trim();
+      if (val.length > 2 && !val.includes('@')) {
+        emailDomainHint.classList.remove('hidden');
+      } else {
+        emailDomainHint.classList.add('hidden');
+      }
+    });
+
+    emailDomainHint.addEventListener('click', () => {
+      const val = authEmailInput.value.trim();
+      if (!val.includes('@')) {
+        authEmailInput.value = val + '@saiuniversity.edu.in';
+        emailDomainHint.classList.add('hidden');
+        if (authPasswordInput) authPasswordInput.focus();
+      }
+    });
+  }
+
+  // Live Password Strength Calculation
+  if (authPasswordInput) {
+    authPasswordInput.addEventListener('input', () => {
+      if (!isRegisterMode) return;
+      const pwd = authPasswordInput.value;
+      const b1 = document.getElementById('strBar1');
+      const b2 = document.getElementById('strBar2');
+      const b3 = document.getElementById('strBar3');
+      const b4 = document.getElementById('strBar4');
+      const label = document.getElementById('authStrengthText');
+
+      let score = 0;
+      if (pwd.length >= 6) score++;
+      if (pwd.length >= 10) score++;
+      if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+      if (/[0-9]/.test(pwd) || /[^A-Za-z0-9]/.test(pwd)) score++;
+
+      const resetBars = () => [b1, b2, b3, b4].forEach(b => { if (b) b.style.backgroundColor = 'rgba(255,255,255,0.1)'; });
+      resetBars();
+
+      if (pwd.length === 0) {
+        if (label) label.textContent = 'Password strength: Minimum 6 characters';
+        return;
+      }
+
+      if (score === 1) {
+        if (b1) b1.style.backgroundColor = '#ef4444';
+        if (label) { label.textContent = 'Weak (add numbers & symbols)'; label.style.color = '#f87171'; }
+      } else if (score === 2) {
+        if (b1) b1.style.backgroundColor = '#f59e0b';
+        if (b2) b2.style.backgroundColor = '#f59e0b';
+        if (label) { label.textContent = 'Fair (make it 8+ chars)'; label.style.color = '#fbbf24'; }
+      } else if (score === 3) {
+        if (b1) b1.style.backgroundColor = '#38bdf8';
+        if (b2) b2.style.backgroundColor = '#38bdf8';
+        if (b3) b3.style.backgroundColor = '#38bdf8';
+        if (label) { label.textContent = 'Good (secure password)'; label.style.color = '#38bdf8'; }
+      } else if (score >= 4) {
+        if (b1) b1.style.backgroundColor = '#22c55e';
+        if (b2) b2.style.backgroundColor = '#22c55e';
+        if (b3) b3.style.backgroundColor = '#22c55e';
+        if (b4) b4.style.backgroundColor = '#22c55e';
+        if (label) { label.textContent = 'Strong (excellent protection)'; label.style.color = '#4ade80'; }
+      }
+    });
+  }
 
   // Submit Report Form
   document.getElementById('reportForm').addEventListener('submit', async (e) => {
@@ -658,8 +801,27 @@ function setupEventListeners() {
   // Auth Form Submit
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    hideAuthAlert();
+
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
+
+    if (!email || !password) {
+      showAuthAlert('Please enter your email and password.');
+      return;
+    }
+
+    if (isRegisterMode) {
+      const name = document.getElementById('authName').value.trim();
+      if (!name) {
+        showAuthAlert('Please provide your full student / staff name.');
+        return;
+      }
+      if (password.length < 6) {
+        showAuthAlert('Password must be at least 6 characters long.');
+        return;
+      }
+    }
 
     const endpoint = isRegisterMode ? '/api/auth/register' : '/api/auth/login';
     const payload = { email, password };
@@ -672,6 +834,12 @@ function setupEventListeners() {
       payload.phone = document.getElementById('authPhone')?.value.trim() || undefined;
     }
 
+    // Set Loading State
+    if (btnAuthSubmit) btnAuthSubmit.disabled = true;
+    if (authSubmitText) {
+      authSubmitText.innerHTML = `<span class="auth-btn-spinner"></span> ${isRegisterMode ? 'Creating Account...' : 'Signing in...'}`;
+    }
+
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -679,25 +847,41 @@ function setupEventListeners() {
         body: JSON.stringify(payload)
       });
       const data = await res.json();
+
       if (data.success) {
+        showAuthAlert(isRegisterMode ? 'Account registered successfully! Logging you in...' : 'Verified! Access granted.', true);
         authToken = data.token;
         currentUser = data.user;
         localStorage.setItem('sai_portal_token', authToken);
         localStorage.setItem('sai_portal_user', JSON.stringify(currentUser));
         setupNavbar();
-        authModal.classList.add('hidden');
-        showToast(`Welcome, ${currentUser.name}!`);
+
+        setTimeout(() => {
+          authModal.classList.add('hidden');
+          showToast(`Welcome to SAIU Portal, ${currentUser.name}!`);
+          if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+          if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+          document.getElementById('authForm').reset();
+          hideAuthAlert();
+        }, 700);
       } else {
-        alert(data.message || 'Authentication failed');
+        if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+        if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+        showAuthAlert(data.message || 'Authentication failed. Please check your credentials.');
       }
     } catch (err) {
-      alert('Network error during authentication');
+      if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+      if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+      showAuthAlert('Connection error with MongoDB authentication server.');
     }
   });
 }
 
 function openAuthModal() {
+  hideAuthAlert();
   authModal.classList.remove('hidden');
+  const emailInput = document.getElementById('authEmail');
+  if (emailInput) setTimeout(() => emailInput.focus(), 150);
 }
 
 window.openClaimModal = function(itemId) {
