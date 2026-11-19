@@ -43,6 +43,13 @@ function showToast(message) {
 }
 
 function setupNavbar() {
+  authToken = localStorage.getItem('sai_portal_token') || null;
+  try {
+    currentUser = JSON.parse(localStorage.getItem('sai_portal_user')) || null;
+  } catch (e) {
+    currentUser = null;
+  }
+
   const authActions = document.getElementById('authActions');
   const userBadge = document.getElementById('userBadge');
   const navDashboard = document.getElementById('navDashboard');

@@ -29,7 +29,7 @@
           <button id="btnOpenScannerNav" class="btn btn-outline btn-sm" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">📷 Scan Found</button>
           <a href="dashboard.html" id="navDashboard" class="hidden">Dashboard</a>
           <div id="authActions">
-            <button id="btnOpenAuth" class="btn btn-outline btn-sm">Sign In</button>
+            <a href="login.html" id="btnOpenAuth" class="btn btn-outline btn-sm" style="text-decoration:none;border-color:var(--accent-cyan);color:var(--accent-cyan);">🔐 Sign In</a>
           </div>
           <div id="userBadge" class="user-badge hidden">
             <span id="userNameDisplay">Student</span>
@@ -70,7 +70,7 @@
         <span class="link-index">04</span>
         <span>Report Lost / Found Belonging</span>
       </a>
-      <a href="#" class="drawer-link" id="drawerAuthLink">
+      <a href="login.html" class="drawer-link" id="drawerAuthLink">
         <span class="link-index">05</span>
         <span id="drawerAuthText">Sign In / Register</span>
       </a>
@@ -464,6 +464,9 @@
         <div style="display:flex;align-items:center;gap:0.6rem;">
           <span style="font-size:1.3rem;">🔐</span>
           <h3 id="authModalTitle" style="font-size:1.2rem;font-weight:700;color:#fff;">Sign In to SAIU Portal</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;margin-right:0.8rem;">
+          <a href="login.html" style="font-size:0.75rem;color:var(--accent-cyan);text-decoration:none;border:1px solid rgba(56,189,248,0.3);padding:0.25rem 0.55rem;border-radius:6px;">Fullscreen Portal ↗</a>
         </div>
         <button class="modal-close" id="btnCloseAuth" aria-label="Close">&times;</button>
       </div>

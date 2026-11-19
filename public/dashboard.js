@@ -118,6 +118,13 @@ async function performQuickLogin(email, password) {
 }
 
 function setupDashboardView() {
+  authToken = localStorage.getItem('sai_portal_token');
+  try {
+    currentUser = JSON.parse(localStorage.getItem('sai_portal_user'));
+  } catch (e) {
+    currentUser = null;
+  }
+
   const dashAuthPrompt = document.getElementById('dashAuthPrompt');
   const dashboardContent = document.getElementById('dashboardContent');
   const dashUserDisplay = document.getElementById('dashUserDisplay');

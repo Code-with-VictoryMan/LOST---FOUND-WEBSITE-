@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAIU PROJECTS | Campus Authentication Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .portal-wrapper {
+      min-height: calc(100vh - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .portal-card {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(18, 23, 33, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 2.5rem 2.2rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(56, 189, 248, 0.12);
+      backdrop-filter: blur(24px) saturate(190%);
+      transition: all 0.3s ease;
+    }
+
+    .portal-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .portal-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+
+    .portal-logo-wrap img {
+      height: 70px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 16px rgba(56, 189, 248, 0.35));
+    }
+
+    .portal-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .portal-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .portal-db-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 0.75rem;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .portal-quick-bar {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .portal-quick-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .portal-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .quick-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      padding: 0.35rem 0.7rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .quick-chip:hover {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .active-session-banner {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .portal-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .portal-tab-btn {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .portal-tab-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .portal-form-group {
+      margin-bottom: 1.15rem;
+      text-align: left;
+    }
+
+    .portal-form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.45rem;
+    }
+
+    .portal-form-group input,
+    .portal-form-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .portal-form-group input:focus,
+    .portal-form-group select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .portal-form-group select option {
+      background: #121721;
+      color: #ffffff;
+    }
+
+    .form-options-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.3rem;
+      font-size: 0.82rem;
+    }
+
+    .remember-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .remember-check input[type="checkbox"] {
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .submit-portal-btn {
+      width: 100%;
+      padding: 0.95rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+      transition: all 0.25s ease;
+    }
+
+    .btn-student-submit {
+      background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+      color: #03101d;
+    }
+    .btn-student-submit:hover {
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .btn-admin-submit {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #1a0f00;
+    }
+    .btn-admin-submit:hover {
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .portal-footer-nav {
+      margin-top: 1.8rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .portal-footer-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .portal-footer-nav a:hover {
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-group">
+        <img src="sai-university-logo.png" alt="Sai University Logo" class="brand-logo-img">
+        <div>
+          <h1 class="brand-title">SAIU PROJECTS</h1>
+          <span class="brand-subtitle">CAMPUS LOGIN &amp; IDENTITY</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <nav class="desktop-nav-links">
+          <a href="index.html">← Browse Feed</a>
+          <a href="dashboard.html">📊 Dashboard</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="portal-wrapper">
+    <div class="portal-card">
+      <!-- Portal Header -->
+      <div class="portal-header">
+        <div class="portal-logo-wrap">
+          <img src="sai-university-logo.png" alt="Sai University Crest">
+        </div>
+        <h2 class="portal-title">Sai University Portal</h2>
+        <p class="portal-subtitle">Secure Academic Single Sign-On &amp; Campus Verification</p>
+        <div class="portal-db-pill">
+          <span style="width:8px; height:8px; border-radius:50%; background:#22c55e; display:inline-block; box-shadow:0 0 8px #22c55e;"></span>
+          <span>MongoDB Live &bull; campus_lost_found</span>
+        </div>
+      </div>
+
+      <!-- Active Session Banner (Shown if already signed in) -->
+      <div id="activeSessionBlock" class="active-session-banner hidden">
+        <span style="font-size:2rem; display:block; margin-bottom:0.4rem;">👋</span>
+        <h4 style="color:#fff; font-size:1.15rem; margin-bottom:0.2rem;" id="activeSessionName">Signed In Student</h4>
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;" id="activeSessionMeta">student@saiuniversity.edu.in</p>
+        <div style="display:flex; flex-direction:column; gap:0.6rem;">
+          <a href="dashboard.html" class="btn btn-primary" style="justify-content:center; padding:0.75rem;">
+            📊 Go to Personal Dashboard
+          </a>
+          <a href="index.html" class="btn btn-outline" style="justify-content:center; padding:0.75rem; border-color:rgba(255,255,255,0.15); color:#fff;">
+            🔍 Browse Lost &amp; Found Feed
+          </a>
+          <button id="btnSwitchAccount" class="btn btn-outline" style="justify-content:center; padding:0.75rem; border-color:rgba(248,113,113,0.3); color:#f87171;">
+            🚪 Sign Out &amp; Switch Account
+          </button>
+        </div>
+      </div>
+
+      <!-- Authentication Container -->
+      <div id="authFormsContainer">
+        <!-- 1-Click Evaluation Credentials -->
+        <div class="portal-quick-bar">
+          <div class="portal-quick-label">
+            <span>⚡ 1-Click Demo Credentials</span>
+            <span style="color:var(--accent-cyan); font-size:0.7rem;">Click to Autofill</span>
+          </div>
+          <div class="portal-quick-chips">
+            <button type="button" class="quick-chip" id="chipStudent1">
+              🎓 Sai Sravan (Student)
+            </button>
+            <button type="button" class="quick-chip" id="chipStudent2">
+              🎓 Aditi Sharma (Student)
+            </button>
+            <button type="button" class="quick-chip" id="chipAdmin">
+              🛡️ Campus Security (Admin)
+            </button>
+          </div>
+        </div>
+
+        <!-- Segmented Tab Navigation -->
+        <div class="portal-tabs">
+          <button type="button" class="portal-tab-btn active" id="tabBtnStudent">Student Sign In</button>
+          <button type="button" class="portal-tab-btn" id="tabBtnAdmin">Admin Console</button>
+          <button type="button" class="portal-tab-btn" id="tabBtnRegister">New Registration</button>
+        </div>
+
+        <!-- Global Alert Notification -->
+        <div id="portalAlert" class="auth-alert hidden">
+          <span id="portalAlertIcon">⚠️</span>
+          <span id="portalAlertText"></span>
+        </div>
+
+        <!-- 1. STUDENT LOGIN FORM -->
+        <form id="studentLoginForm">
+          <div class="portal-form-group">
+            <label for="studentEmail">Sai University Email</label>
+            <input type="email" id="studentEmail" placeholder="saisravan@saiuniversity.edu.in" required autocomplete="email">
+            <span class="email-domain-hint" id="hintStudentDomain">+ Add @saiuniversity.edu.in</span>
+          </div>
+
+          <div class="portal-form-group">
+            <label for="studentPassword">Password</label>
+            <div class="password-input-wrap">
+              <input type="password" id="studentPassword" placeholder="Enter your password" required autocomplete="current-password" minlength="6">
+              <button type="button" class="password-toggle-btn" id="toggleStudentPassword" tabindex="-1">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-options-row">
+            <label class="remember-check">
+              <input type="checkbox" id="rememberStudent" checked>
+              <span>Remember my session</span>
+            </label>
+            <span class="forgot-link" id="btnForgotStudent">Forgot password?</span>
+          </div>
+
+          <button type="submit" class="submit-portal-btn btn-student-submit" id="btnStudentSubmit">
+            🎓 Sign In to Student Portal
+          </button>
+        </form>
+
+        <!-- 2. ADMIN LOGIN FORM (Hidden initially) -->
+        <form id="adminLoginForm" class="hidden">
+          <div class="portal-form-group">
+            <label for="adminEmail">Security Admin Email</label>
+            <input type="email" id="adminEmail" placeholder="admin@saiuniversity.edu.in" required autocomplete="email">
+          </div>
+
+          <div class="portal-form-group">
+            <label for="adminPassword">Master Security Password</label>
+            <div class="password-input-wrap">
+              <input type="password" id="adminPassword" placeholder="Admin password" required autocomplete="current-password">
+              <button type="button" class="password-toggle-btn" id="toggleAdminPassword" tabindex="-1">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-options-row">
+            <label class="remember-check">
+              <input type="checkbox" id="rememberAdmin" checked>
+              <span>Keep admin session active</span>
+            </label>
+            <span class="forgot-link" id="btnForgotAdmin">Help / Security PIN</span>
+          </div>
+
+          <button type="submit" class="submit-portal-btn btn-admin-submit" id="btnAdminSubmit">
+            🛡️ Access Campus Security Console
+          </button>
+        </form>
+
+        <!-- 3. STUDENT REGISTRATION FORM (Hidden initially) -->
+        <form id="studentRegisterForm" class="hidden">
+          <div class="portal-form-group">
+            <label for="regName">Full Legal Name</label>
+            <input type="text" id="regName" placeholder="e.g. Vikramaditya Sundaram" required autocomplete="name">
+          </div>
+
+          <div class="portal-form-group">
+            <label for="regEmail">Sai University Student Email</label>
+            <input type="email" id="regEmail" placeholder="name.surname@saiuniversity.edu.in" required autocomplete="email">
+            <span class="email-domain-hint" id="hintRegDomain">+ Add @saiuniversity.edu.in</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+            <div class="portal-form-group">
+              <label for="regStudentId">Student ID / Roll No</label>
+              <input type="text" id="regStudentId" placeholder="SAIU2024CS099" required>
+            </div>
+            <div class="portal-form-group">
+              <label for="regPhone">Mobile Phone</label>
+              <input type="tel" id="regPhone" placeholder="+91 98840 00000" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+            <div class="portal-form-group">
+              <label for="regDept">Department / School</label>
+              <select id="regDept" required>
+                <option value="School of Computing & Data Science">School of Computing &amp; Data Science</option>
+                <option value="School of Arts & Sciences">School of Arts &amp; Sciences</option>
+                <option value="School of Law">School of Law</option>
+                <option value="School of Management">School of Management</option>
+              </select>
+            </div>
+            <div class="portal-form-group">
+              <label for="regYear">Year of Study</label>
+              <select id="regYear" required>
+                <option value="1st Year B.Tech">1st Year B.Tech</option>
+                <option value="2nd Year B.Tech">2nd Year B.Tech</option>
+                <option value="3rd Year B.Tech" selected>3rd Year B.Tech</option>
+                <option value="4th Year B.Tech">4th Year B.Tech</option>
+                <option value="Postgraduate / Master">Postgraduate / Master</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="portal-form-group">
+            <label for="regPassword">Create Account Password</label>
+            <div class="password-input-wrap">
+              <input type="password" id="regPassword" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
+              <button type="button" class="password-toggle-btn" id="toggleRegPassword" tabindex="-1">👁️</button>
+            </div>
+            <!-- Live Password Strength Meter -->
+            <div class="auth-strength-meter">
+              <div class="auth-strength-bar" id="regStrBar1"></div>
+              <div class="auth-strength-bar" id="regStrBar2"></div>
+              <div class="auth-strength-bar" id="regStrBar3"></div>
+            </div>
+            <span class="auth-strength-text" id="regStrengthText">Enter a secure password</span>
+          </div>
+
+          <button type="submit" class="submit-portal-btn btn-student-submit" id="btnRegisterSubmit">
+            ✨ Register &amp; Save to MongoDB
+          </button>
+        </form>
+      </div> <!-- /#authFormsContainer -->
+
+      <!-- Footer Navigation Links -->
+      <div class="portal-footer-nav">
+        <a href="index.html">← Return to Lost &amp; Found Feed</a> &bull;
+        <a href="dashboard.html">Campus Dashboard</a> &bull;
+        <a href="javascript:void(0)" id="btnHelpModalTrigger">Need Help?</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: Password Reset & Help -->
+  <div id="resetModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h3>Self-Service Password Reset</h3>
+        <button class="modal-close" id="btnCloseReset">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:1.25rem;">
+          Enter your registered Sai University student or admin email and set your new password. Changes are immediately updated in MongoDB.
+        </p>
+
+        <div id="resetAlert" class="auth-alert hidden">
+          <span>⚠️</span><span id="resetAlertText"></span>
+        </div>
+
+        <form id="resetPasswordForm">
+          <div class="portal-form-group">
+            <label for="resetEmail">Registered Email</label>
+            <input type="email" id="resetEmail" placeholder="student@saiuniversity.edu.in" required>
+          </div>
+          <div class="portal-form-group">
+            <label for="resetNewPassword">New Password</label>
+            <input type="password" id="resetNewPassword" placeholder="At least 6 characters" minlength="6" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnResetSubmit" style="width:100%; justify-content:center; padding:0.85rem; font-weight:700;">
+            🔄 Update Password in Database
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="login.js"></script>
+</body>
+</html>
