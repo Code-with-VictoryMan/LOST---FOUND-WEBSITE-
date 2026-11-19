@@ -89,7 +89,7 @@ router.get('/all-items', protect, adminOnly, async (req, res) => {
       return res.status(200).json({ success: true, count: offlineStore.items.length, data: offlineStore.items });
     }
     const items = await Item.find()
-      .populate('reportedBy', 'name email')
+      .populate('reportedBy', 'name email phone studentId department')
       .sort({ createdAt: -1 });
     return res.status(200).json({ success: true, count: items.length, data: items });
   } catch (error) {

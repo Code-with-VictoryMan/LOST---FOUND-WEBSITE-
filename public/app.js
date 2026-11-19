@@ -100,12 +100,15 @@ function renderItems(items) {
       <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: #64748b;">
         <h3 style="color:#ffffff;margin-bottom:0.5rem;font-weight:700;">No matching items found</h3>
         <p>Try modifying your search criteria or report a new lost/found item.</p>
+        <button class="btn btn-primary btn-sm" onclick="openReportModal()" style="margin-top:1rem;">
+          ➕ Report an Item
+        </button>
       </div>`;
     return;
   }
 
   itemsGrid.innerHTML = items.map(item => `
-    <div class="item-card">
+    <div class="item-card" onclick="openItemDetails('${item._id}')" title="Click to view complete details, location and contacts">
       <div class="item-img-wrap">
         <img src="${item.imageUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
         <span class="badge-tag tag-${item.type}">${item.type}</span>
@@ -120,7 +123,7 @@ function renderItems(items) {
           <span>📅 <strong>Date:</strong> ${new Date(item.dateOccurred).toLocaleDateString()}</span>
           <span>👤 <strong>Reported by:</strong> ${item.reportedBy ? escapeHtml(item.reportedBy.name) : 'Anonymous'}</span>
         </div>
-        <div class="item-actions">
+        <div class="item-actions" onclick="event.stopPropagation()">
           ${item.status === 'open' ? `
             <button class="btn btn-primary btn-sm" onclick="openClaimModal('${item._id}')" style="width: 100%;">
               Claim This Item
@@ -142,6 +145,147 @@ function escapeHtml(text) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
   });
 }
+
+// Workable Feature: Rich Item Details Modal Inspection & Quick Contact
+window.openItemDetails = function(itemId) {
+  const item = currentItems.find(i => String(i._id) === String(itemId));
+  if (!item) return;
+
+  const modal = document.getElementById('itemDetailsModal');
+  if (!modal) return;
+
+  document.getElementById('modalDetailTitle').textContent = item.title;
+  document.getElementById('modalDetailImg').src = item.imageUrl || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80';
+  document.getElementById('modalDetailCategory').textContent = item.category;
+  document.getElementById('modalDetailBuilding').textContent = item.building;
+  document.getElementById('modalDetailLocation').textContent = item.specificLocation;
+  document.getElementById('modalDetailDesc').textContent = item.description;
+  document.getElementById('modalDetailDate').textContent = 'Reported on ' + new Date(item.dateOccurred).toLocaleDateString();
+
+  const typeTag = document.getElementById('modalDetailTypeTag');
+  if (typeTag) {
+    typeTag.textContent = item.type.toUpperCase();
+    typeTag.className = `badge-tag tag-${item.type}`;
+  }
+
+  const statusBadge = document.getElementById('modalDetailStatusBadge');
+  if (statusBadge) {
+    statusBadge.textContent = item.status.toUpperCase();
+    statusBadge.className = `status-badge status-${item.status}`;
+  }
+
+  const reporterName = item.reportedBy?.name || 'Sai University Student';
+  const reporterRole = item.reportedBy?.role || 'student';
+  const reporterPhone = item.reportedBy?.phone || '';
+  const reporterEmail = item.reportedBy?.email || '';
+
+  document.getElementById('modalDetailReporterName').textContent = reporterName;
+  document.getElementById('modalDetailReporterRole').textContent = `${reporterRole.toUpperCase()} • Verified Sai University Account`;
+
+  const contactLinks = document.getElementById('modalDetailContactLinks');
+  if (contactLinks) {
+    contactLinks.innerHTML = `
+      ${reporterPhone && reporterPhone !== 'N/A' ? `
+        <a href="tel:${reporterPhone.replace(/\s+/g, '')}" class="contact-btn contact-btn-tel">
+          📞 Call (${reporterPhone})
+        </a>
+        <a href="https://wa.me/${reporterPhone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(reporterName)},%20I%20am%20contacting%20you%20regarding%20the%20lost%20and%20found%20listing:%20${encodeURIComponent(item.title)}" target="_blank" rel="noopener" class="contact-btn contact-btn-wa">
+          💬 WhatsApp
+        </a>
+      ` : ''}
+      ${reporterEmail ? `
+        <a href="mailto:${reporterEmail}?subject=Regarding%20Sai%20University%20Lost%20and%20Found:%20${encodeURIComponent(item.title)}" class="contact-btn contact-btn-mail">
+          ✉️ Email (${reporterEmail})
+        </a>
+      ` : ''}
+    `;
+  }
+
+  const actionButtons = document.getElementById('modalDetailActionButtons');
+  const isReporter = currentUser && (
+    (item.reportedBy?._id && String(item.reportedBy._id) === String(currentUser.id)) ||
+    (typeof item.reportedBy === 'string' && item.reportedBy === String(currentUser.id)) ||
+    currentUser.role === 'admin'
+  );
+
+  if (actionButtons) {
+    if (isReporter) {
+      actionButtons.innerHTML = `
+        ${item.status !== 'resolved' ? `
+          <button class="btn btn-success btn-sm" onclick="markItemResolvedFromModal('${item._id}')" style="justify-content:center;">
+            ✓ Mark as Resolved
+          </button>
+        ` : `
+          <button class="btn btn-secondary btn-sm" disabled style="opacity:0.7;justify-content:center;">
+            ✓ Resolved & Handed Over
+          </button>
+        `}
+        <button class="btn btn-danger btn-sm" onclick="deleteItemFromModal('${item._id}')" style="justify-content:center;">
+          🗑️ Delete Listing
+        </button>
+      `;
+    } else {
+      actionButtons.innerHTML = `
+        ${item.status === 'open' ? `
+          <button class="btn btn-primary" onclick="closeItemDetails(); openClaimModal('${item._id}')" style="width:100%;justify-content:center;">
+            ✋ Submit Ownership Claim
+          </button>
+        ` : `
+          <button class="btn btn-secondary" disabled style="width:100%;justify-content:center;opacity:0.7;">
+            ${item.status === 'claimed' ? 'Verification In Progress' : 'Resolved & Returned to Owner'}
+          </button>
+        `}
+      `;
+    }
+  }
+
+  modal.classList.remove('hidden');
+};
+
+window.closeItemDetails = function() {
+  const modal = document.getElementById('itemDetailsModal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.markItemResolvedFromModal = async function(itemId) {
+  if (!confirm('Mark this listing as resolved and handed over?')) return;
+  try {
+    const res = await fetch(`/api/items/${itemId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ status: 'resolved' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Item marked as resolved in MongoDB!');
+      closeItemDetails();
+      fetchItems();
+    }
+  } catch (err) {
+    alert('Failed to update status');
+  }
+};
+
+window.deleteItemFromModal = async function(itemId) {
+  if (!confirm('Are you sure you want to permanently delete this listing?')) return;
+  try {
+    const res = await fetch(`/api/items/${itemId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Listing deleted from database.');
+      closeItemDetails();
+      fetchItems();
+    }
+  } catch (err) {
+    alert('Failed to delete item listing');
+  }
+};
 
 // Custom Feature: Check Duplicate Items Before Submitting
 async function checkForDuplicates() {
@@ -729,9 +873,68 @@ function setupEventListeners() {
     });
   }
 
+  let selectedReportPhotoBase64 = '';
+  const reportImageFile = document.getElementById('reportImageFile');
+  const reportPhotoPreviewWrap = document.getElementById('reportPhotoPreviewWrap');
+  const reportPhotoPreview = document.getElementById('reportPhotoPreview');
+  const reportPhotoSize = document.getElementById('reportPhotoSize');
+  const btnRemoveReportPhoto = document.getElementById('btnRemoveReportPhoto');
+
+  if (reportImageFile) {
+    reportImageFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        selectedReportPhotoBase64 = event.target.result;
+        if (reportPhotoPreview) reportPhotoPreview.src = selectedReportPhotoBase64;
+        if (reportPhotoPreviewWrap) reportPhotoPreviewWrap.classList.remove('hidden');
+        if (reportPhotoSize) reportPhotoSize.textContent = `${(file.size / 1024).toFixed(0)} KB • Photo attached to report`;
+        showToast('Photo attached from your device!');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (btnRemoveReportPhoto) {
+    btnRemoveReportPhoto.addEventListener('click', () => {
+      selectedReportPhotoBase64 = '';
+      if (reportImageFile) reportImageFile.value = '';
+      if (reportPhotoPreviewWrap) reportPhotoPreviewWrap.classList.add('hidden');
+    });
+  }
+
+  // Quick Filter Chips Listener
+  const quickFilterChips = document.getElementById('quickFilterChips');
+  if (quickFilterChips) {
+    quickFilterChips.addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      quickFilterChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      if (chip.dataset.type) {
+        filterType.value = chip.dataset.type;
+      }
+      if (chip.dataset.cat) {
+        filterCategory.value = chip.dataset.cat;
+      }
+      fetchItems();
+    });
+  }
+
+  // Item Details Modal Close Button
+  document.getElementById('btnCloseItemDetails')?.addEventListener('click', closeItemDetails);
+
   // Submit Report Form
   document.getElementById('reportForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!authToken) {
+      showToast('Please sign in first to report an item.');
+      openAuthModal();
+      return;
+    }
+
     const payload = {
       title: document.getElementById('reportTitle').value.trim(),
       type: document.getElementById('reportType').value,
@@ -740,7 +943,7 @@ function setupEventListeners() {
       specificLocation: document.getElementById('reportLocation').value.trim(),
       dateOccurred: document.getElementById('reportDate').value,
       description: document.getElementById('reportDescription').value.trim(),
-      imageUrl: document.getElementById('reportImage').value.trim()
+      imageUrl: selectedReportPhotoBase64 || document.getElementById('reportImage').value.trim()
     };
 
     try {
@@ -754,9 +957,12 @@ function setupEventListeners() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Report submitted to campus portal!');
+        showToast('Report submitted to campus portal and saved in MongoDB!');
         reportModal.classList.add('hidden');
         document.getElementById('reportForm').reset();
+        selectedReportPhotoBase64 = '';
+        if (reportImageFile) reportImageFile.value = '';
+        if (reportPhotoPreviewWrap) reportPhotoPreviewWrap.classList.add('hidden');
         fetchItems();
       } else {
         alert(data.message || 'Submission error');

@@ -136,6 +136,19 @@
             <option value="oldest">Incident Date: Oldest First</option>
           </select>
         </div>
+
+        <!-- Quick Filter Category & Type Chips -->
+        <div class="quick-filter-chips" id="quickFilterChips" style="margin-top:0.85rem;">
+          <button type="button" class="chip active" data-type="all" data-cat="all">✨ All Listings</button>
+          <button type="button" class="chip" data-type="lost" data-cat="all">🚨 Lost Only</button>
+          <button type="button" class="chip" data-type="found" data-cat="all">📦 Found Only</button>
+          <button type="button" class="chip" data-cat="Electronics &amp; Gadgets">📱 Electronics</button>
+          <button type="button" class="chip" data-cat="Student ID &amp; Cards">🪪 ID Cards</button>
+          <button type="button" class="chip" data-cat="Wallets &amp; Bags">🎒 Bags &amp; Wallets</button>
+          <button type="button" class="chip" data-cat="Water Bottles &amp; Flasks">💧 Bottles</button>
+          <button type="button" class="chip" data-cat="Books &amp; Stationery">📚 Stationery</button>
+          <button type="button" class="chip" data-cat="Keys &amp; Access Cards">🔑 Keys</button>
+        </div>
       </div>
     </div>
   </section>
@@ -338,9 +351,23 @@
         </div>
 
         <div class="form-group">
-          <label for="reportImage">Image Web Link (Optional)</label>
-          <input type="url" id="reportImage" placeholder="https://example.com/item-photo.jpg">
-          <small class="form-hint">Leave blank to use an automated category stock photo.</small>
+          <label>Item Photograph (Upload from Device, Camera, or Web URL)</label>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
+            <label for="reportImageFile" class="btn btn-outline btn-sm" style="cursor:pointer;margin:0;font-size:0.8rem;border-color:var(--accent-cyan);color:var(--accent-cyan);">
+              📁 Choose Photo
+            </label>
+            <input type="file" id="reportImageFile" accept="image/*" style="display:none;">
+            <input type="url" id="reportImage" placeholder="Or paste image web URL..." style="flex:1;min-width:180px;">
+          </div>
+          <!-- Live Preview Thumbnail -->
+          <div id="reportPhotoPreviewWrap" class="hidden" style="margin-top:0.6rem;display:flex;align-items:center;gap:0.8rem;padding:0.6rem;background:rgba(255,255,255,0.05);border-radius:10px;border:1px solid rgba(255,255,255,0.1);">
+            <img id="reportPhotoPreview" src="" alt="Item Preview" style="width:55px;height:55px;object-fit:cover;border-radius:8px;">
+            <div style="flex:1;">
+              <span style="font-size:0.82rem;color:#fff;font-weight:600;display:block;">Photo attached</span>
+              <span id="reportPhotoSize" style="font-size:0.74rem;color:var(--text-muted);">Ready to store into MongoDB</span>
+            </div>
+            <button type="button" id="btnRemoveReportPhoto" class="btn-icon" style="color:#ef4444;background:none;border:none;cursor:pointer;font-size:1.1rem;" title="Remove Photo">✕</button>
+          </div>
         </div>
 
         <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:0.75rem;">
@@ -377,6 +404,56 @@
           <button type="submit" class="btn btn-primary">Submit Claim Request</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: Item Details (High-Res Inspection, Contact Reporter & Instant Claim) -->
+  <div id="itemDetailsModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-lg" style="max-width:740px;">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <span id="modalDetailTypeTag" class="badge-tag" style="position:static;">FOUND</span>
+          <h3 id="modalDetailTitle" style="font-size:1.25rem;font-weight:700;color:#fff;margin:0;">Item Title</h3>
+        </div>
+        <button class="modal-close" id="btnCloseItemDetails" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem 1.75rem;">
+        <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:1.5rem;align-items:start;">
+          <div>
+            <div style="position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);max-height:270px;background:#05070a;">
+              <img id="modalDetailImg" src="" alt="Item photo" style="width:100%;height:270px;object-fit:cover;display:block;">
+              <span id="modalDetailStatusBadge" class="status-badge" style="position:absolute;top:10px;right:10px;">OPEN</span>
+            </div>
+            <div style="margin-top:0.85rem;display:flex;align-items:center;justify-content:space-between;">
+              <span id="modalDetailCategory" style="font-size:0.75rem;font-weight:700;color:var(--accent-cyan);text-transform:uppercase;letter-spacing:1px;"></span>
+              <span id="modalDetailDate" style="font-size:0.75rem;color:var(--text-muted);"></span>
+            </div>
+          </div>
+          <div>
+            <h4 style="font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.4rem;">Description &amp; Identifying Details</h4>
+            <p id="modalDetailDesc" style="font-size:0.92rem;color:#cbd5e1;line-height:1.5;margin-bottom:1.15rem;background:rgba(255,255,255,0.03);padding:0.8rem;border-radius:10px;border:1px solid rgba(255,255,255,0.06);"></p>
+
+            <h4 style="font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.4rem;">Location Reported</h4>
+            <div style="margin-bottom:1.15rem;display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color:#fff;">
+              <span>🏛️</span> <strong id="modalDetailBuilding"></strong> &bull; <span id="modalDetailLocation" style="color:var(--accent-cyan);"></span>
+            </div>
+
+            <h4 style="font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.4rem;">Reported By</h4>
+            <div style="padding:0.8rem 1rem;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.08);margin-bottom:1.25rem;">
+              <div style="font-weight:600;color:#fff;font-size:0.95rem;" id="modalDetailReporterName">Reporter Name</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary);" id="modalDetailReporterRole">Sai University Member</div>
+              <div id="modalDetailContactLinks" style="display:flex;gap:0.6rem;margin-top:0.6rem;flex-wrap:wrap;">
+                <!-- Call / WhatsApp / Email links injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Dynamic Action Buttons -->
+            <div id="modalDetailActionButtons" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+              <!-- Claim button or Manage button -->
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

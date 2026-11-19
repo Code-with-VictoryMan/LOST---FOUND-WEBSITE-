@@ -118,7 +118,10 @@ router.get('/my-claims', protect, async (req, res) => {
     }
 
     const claims = await Claim.find({ claimant: req.user._id })
-      .populate('item')
+      .populate({
+        path: 'item',
+        populate: { path: 'reportedBy', select: 'name email phone studentId department' }
+      })
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -162,7 +165,7 @@ router.get('/item/:itemId', protect, async (req, res) => {
     }
 
     const claims = await Claim.find({ item: req.params.itemId })
-      .populate('claimant', 'name email phone')
+      .populate('claimant', 'name email phone studentId department yearOfStudy')
       .sort({ createdAt: -1 });
 
     return res.status(200).json({ success: true, count: claims.length, data: claims });

@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
     if (sort === 'event_recent') sortOption = { dateOccurred: -1 };
 
     const items = await Item.find(query)
-      .populate('reportedBy', 'name email')
+      .populate('reportedBy', 'name email phone studentId department')
       .sort(sortOption);
 
     return res.status(200).json({
@@ -193,7 +193,7 @@ router.get('/:id', async (req, res) => {
       return res.status(200).json({ success: true, data: item });
     }
 
-    const item = await Item.findById(req.params.id).populate('reportedBy', 'name email phone');
+    const item = await Item.findById(req.params.id).populate('reportedBy', 'name email phone studentId department role');
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item listing not found' });
     }
@@ -263,6 +263,23 @@ router.post('/', protect, async (req, res) => {
 // @route   PUT /api/items/:id (Protected: Reporter or Admin)
 router.put('/:id', protect, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const item = offlineStore.items.find(i => i._id.toString() === req.params.id.toString());
+      if (!item) {
+        return res.status(404).json({ success: false, message: 'Item listing not found' });
+      }
+      const reporterId = item.reportedBy?._id ? item.reportedBy._id.toString() : item.reportedBy.toString();
+      if (reporterId !== req.user._id.toString() && req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Unauthorized: You can only edit your own listings' });
+      }
+      Object.assign(item, req.body);
+      return res.status(200).json({
+        success: true,
+        message: 'Item updated successfully',
+        data: item
+      });
+    }
+
     let item = await Item.findById(req.params.id);
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item listing not found' });
@@ -290,6 +307,20 @@ router.put('/:id', protect, async (req, res) => {
 // @route   DELETE /api/items/:id (Protected: Reporter or Admin)
 router.delete('/:id', protect, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const idx = offlineStore.items.findIndex(i => i._id.toString() === req.params.id.toString());
+      if (idx === -1) {
+        return res.status(404).json({ success: false, message: 'Item listing not found' });
+      }
+      const item = offlineStore.items[idx];
+      const reporterId = item.reportedBy?._id ? item.reportedBy._id.toString() : item.reportedBy.toString();
+      if (reporterId !== req.user._id.toString() && req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Unauthorized: You can only delete your own listings' });
+      }
+      offlineStore.items.splice(idx, 1);
+      return res.status(200).json({ success: true, message: 'Item listing deleted successfully' });
+    }
+
     const item = await Item.findById(req.params.id);
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item listing not found' });
