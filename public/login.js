@@ -43,29 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     switchTab('login');
   }
 
-  // 3. 1-Click Evaluation Chips (All autofill into the single unified login form)
-  document.getElementById('chipStudent1')?.addEventListener('click', () => {
-    switchTab('login');
-    document.getElementById('loginEmail').value = 'saisravan@saiuniversity.edu.in';
-    document.getElementById('loginPassword').value = 'StudentPassword123';
-    showAlert('Loaded credentials for Sai Sravan V', 'success');
-  });
-
-  document.getElementById('chipStudent2')?.addEventListener('click', () => {
-    switchTab('login');
-    document.getElementById('loginEmail').value = 'aditi.sharma@saiuniversity.edu.in';
-    document.getElementById('loginPassword').value = 'StudentPassword123';
-    showAlert('Loaded credentials for Aditi Sharma', 'success');
-  });
-
-  document.getElementById('chipAdmin')?.addEventListener('click', () => {
-    switchTab('login');
-    document.getElementById('loginEmail').value = 'admin@saiuniversity.edu.in';
-    document.getElementById('loginPassword').value = 'AdminPassword123';
-    showAlert('Loaded credentials for Campus Security', 'success');
-  });
-
-  // 4. Password Visibility Toggles
+  // 3. Password Visibility Toggles
   setupPasswordToggle('toggleLoginPassword', 'loginPassword');
   setupPasswordToggle('toggleRegPassword', 'regPassword');
 
