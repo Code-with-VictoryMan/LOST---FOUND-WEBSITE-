@@ -165,7 +165,7 @@ function setupDashboardView() {
     if (currentUser.lastLogin) {
       elProfileLastLogin.textContent = new Date(currentUser.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
     } else {
-      elProfileLastLogin.textContent = 'Active (MongoDB)';
+      elProfileLastLogin.textContent = 'Active Now';
     }
   }
 
@@ -325,7 +325,7 @@ async function loadMyReportedItems() {
     if (!items || items.length === 0) {
       tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);padding:2.5rem 1rem;">
         <span style="font-size:2rem; display:block; margin-bottom:0.5rem;">📋</span>
-        <p style="margin-bottom:0.5rem;">You have not reported any items yet in MongoDB.</p>
+        <p style="margin-bottom:0.5rem;">You have not reported any items yet.</p>
         <a href="index.html" class="btn btn-primary btn-sm">➕ Report Lost or Found Item</a>
       </td></tr>`;
       return;
