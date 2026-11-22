@@ -7,14 +7,14 @@ const Claim = require('./models/Claim');
 
 const sampleItems = [
   {
-    title: 'Blue Hydro Flask Water Bottle (1 Litre)',
+    title: 'Red Plastic Water Bottle (750ml)',
     type: 'found',
     category: 'Water Bottles & Flasks',
-    description: 'Stainless steel insulated blue bottle with a slight dent on the base and a NASA sticker.',
+    description: 'Translucent red plastic water bottle with black sipper cap and white measurement lines.',
     building: 'Library',
     specificLocation: 'Silent Reading Zone, 2nd Floor, Table 14',
     dateOccurred: new Date('2026-10-15'),
-    imageUrl: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80',
     status: 'open'
   },
   {
