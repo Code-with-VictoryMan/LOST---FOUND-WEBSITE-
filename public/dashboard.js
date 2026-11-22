@@ -139,17 +139,16 @@ function setupDashboardView() {
 
   if (dashAuthPrompt) dashAuthPrompt.classList.add('hidden');
   if (dashboardContent) dashboardContent.classList.remove('hidden');
+  const isAdmin = currentUser.role === 'admin';
+
   if (dashUserDisplay) {
     dashUserDisplay.innerHTML = `
-      <span>${currentUser.name} (${currentUser.role.toUpperCase()})</span>
-      ${currentUser.role !== 'admin' 
-        ? `<button onclick="performQuickLogin('admin@saiuniversity.edu.in','AdminPassword123')" class="btn btn-outline btn-sm" style="margin-left:0.6rem;padding:0.25rem 0.6rem;font-size:0.75rem;border-color:var(--accent-cyan);color:var(--accent-cyan);">Switch to Admin View</button>`
-        : `<button onclick="performQuickLogin('saisravan@saiuniversity.edu.in','StudentPassword123')" class="btn btn-outline btn-sm" style="margin-left:0.6rem;padding:0.25rem 0.6rem;font-size:0.75rem;border-color:rgba(255,255,255,0.2);color:#fff;">Switch to Student View</button>`
-      }
+      <span>${currentUser.name} <span class="badge-tag ${isAdmin ? 'tag-lost' : 'tag-found'}" style="margin-left:0.4rem;font-size:0.75rem;">${isAdmin ? '🛡️ ADMIN CONSOLE' : '🎓 STUDENT'}</span></span>
+      <a href="login.html" class="btn btn-outline btn-sm" style="margin-left:0.6rem;padding:0.22rem 0.55rem;font-size:0.75rem;border-color:rgba(255,255,255,0.2);color:#fff;text-decoration:none;">Switch Account</a>
     `;
   }
 
-  // Populate Student Profile Details
+  // Populate Profile Details
   const elProfileName = document.getElementById('profileCardName');
   const elProfileRole = document.getElementById('profileCardRole');
   const elProfileId = document.getElementById('profileStudentId');
@@ -158,9 +157,6 @@ function setupDashboardView() {
   const elProfilePhone = document.getElementById('profilePhone');
 
   if (elProfileName) elProfileName.textContent = currentUser.name;
-  if (elProfileRole) elProfileRole.innerHTML = `${currentUser.role.toUpperCase()} &bull; Sai University Academic Profile`;
-  if (elProfileId) elProfileId.textContent = currentUser.studentId || (currentUser.role === 'admin' ? 'ADMIN-CONSOLE' : 'SAIU2024CS001');
-  if (elProfileDept) elProfileDept.textContent = currentUser.department || (currentUser.role === 'admin' ? 'Campus Administration' : 'School of Computing & Data Science');
   if (elProfileEmail) elProfileEmail.textContent = currentUser.email;
   if (elProfilePhone) elProfilePhone.textContent = currentUser.phone || 'N/A';
 
@@ -188,11 +184,28 @@ function setupDashboardView() {
     })
     .catch(() => {});
 
-  if (currentUser.role === 'admin') {
+  // Segregate Dashboard Presentation: Admin View vs Student View based on credentials
+  if (isAdmin) {
     if (adminSection) adminSection.classList.remove('hidden');
     loadAdminStats();
+    if (elProfileRole) elProfileRole.innerHTML = `🛡️ Campus Security Administrator &bull; Sai University Administration`;
+    if (elProfileId) elProfileId.textContent = currentUser.studentId || 'ADMIN-CONSOLE';
+    if (elProfileDept) elProfileDept.textContent = currentUser.department || 'Campus Safety & Administration';
+
+    const reportsHeader = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('h3');
+    if (reportsHeader) reportsHeader.textContent = 'Campus-Wide Reported Items (Admin Fleet Control)';
+    const reportsDesc = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('p');
+    if (reportsDesc) reportsDesc.textContent = 'Full administrative control across all lost and found listings on Sai University campus.';
   } else {
     if (adminSection) adminSection.classList.add('hidden');
+    if (elProfileRole) elProfileRole.innerHTML = `🎓 Verified Student Account &bull; Sai University Academic Profile`;
+    if (elProfileId) elProfileId.textContent = currentUser.studentId || 'SAIU2024CS001';
+    if (elProfileDept) elProfileDept.textContent = currentUser.department || 'School of Computing & Data Science';
+
+    const reportsHeader = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('h3');
+    if (reportsHeader) reportsHeader.textContent = 'My Reported Items';
+    const reportsDesc = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('p');
+    if (reportsDesc) reportsDesc.textContent = 'Manage items you reported and inspect incoming ownership verification claims.';
   }
 
   loadMyReportedItems();

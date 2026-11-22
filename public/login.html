@@ -84,10 +84,9 @@
         <a href="index.html" class="neo-close-btn" title="Back to Feed">&times;</a>
       </div>
 
-      <!-- Segmented Sub-Tabs -->
+      <!-- Segmented Sub-Tabs (Unified: No split between student/admin) -->
       <div class="neo-tab-strip">
-        <button type="button" class="neo-tab-item active" id="tabBtnStudent">STUDENT SIGN IN</button>
-        <button type="button" class="neo-tab-item" id="tabBtnAdmin">ADMIN CONSOLE</button>
+        <button type="button" class="neo-tab-item active" id="tabBtnLogin">SIGN IN</button>
         <button type="button" class="neo-tab-item" id="tabBtnRegister">NEW REGISTRATION</button>
       </div>
 
@@ -108,8 +107,8 @@
           <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
             <span style="font-size: 1.4rem;">👋</span>
             <div>
-              <div style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;" id="activeSessionName">Signed In Student</div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;" id="activeSessionMeta">student@saiuniversity.edu.in</div>
+              <div style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;" id="activeSessionName">Signed In User</div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;" id="activeSessionMeta">user@saiuniversity.edu.in</div>
             </div>
           </div>
           <div style="display: flex; gap: 8px; margin-top: 12px; width: 100%; flex-wrap: wrap;">
@@ -124,9 +123,9 @@
           <!-- 1-Click Evaluation Credentials -->
           <div class="neo-quick-chips-wrap">
             <span class="neo-quick-label">⚡ 1-CLICK:</span>
-            <button type="button" class="neo-chip-btn" id="chipStudent1">🎓 SAI SRAVAN</button>
-            <button type="button" class="neo-chip-btn" id="chipStudent2">🎓 ADITI SHARMA</button>
-            <button type="button" class="neo-chip-btn" id="chipAdmin">🛡️ ADMIN (SECURITY)</button>
+            <button type="button" class="neo-chip-btn" id="chipStudent1">SAI SRAVAN</button>
+            <button type="button" class="neo-chip-btn" id="chipStudent2">ADITI SHARMA</button>
+            <button type="button" class="neo-chip-btn" id="chipAdmin">CAMPUS SECURITY</button>
           </div>
 
           <!-- Alert Notification -->
@@ -135,23 +134,23 @@
             <span id="portalAlertText"></span>
           </div>
 
-          <!-- 1. STUDENT LOGIN FORM -->
-          <form id="studentLoginForm">
+          <!-- UNIFIED CAMPUS SIGN IN FORM (Determines Student or Admin from Login Details) -->
+          <form id="unifiedLoginForm">
             <div class="neo-field-group">
-              <label for="studentEmail" class="neo-label">UNIVERSITY EMAIL <span class="neo-req">*</span></label>
-              <input type="email" id="studentEmail" class="neo-input neo-input-highlight" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
+              <label for="loginEmail" class="neo-label">CAMPUS / UNIVERSITY EMAIL <span class="neo-req">*</span></label>
+              <input type="email" id="loginEmail" class="neo-input neo-input-highlight" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
             </div>
 
             <div class="neo-field-group">
-              <label for="studentPassword" class="neo-label">PASSWORD <span class="neo-req">*</span></label>
+              <label for="loginPassword" class="neo-label">PASSWORD <span class="neo-req">*</span></label>
               <div class="neo-password-wrap">
-                <input type="password" id="studentPassword" class="neo-input" placeholder="At least 8 characters, letter + number" required minlength="6" autocomplete="current-password">
-                <button type="button" class="neo-pwd-toggle" id="toggleStudentPassword" tabindex="-1">👁️</button>
+                <input type="password" id="loginPassword" class="neo-input" placeholder="Enter your password" required minlength="6" autocomplete="current-password">
+                <button type="button" class="neo-pwd-toggle" id="toggleLoginPassword" tabindex="-1">👁️</button>
               </div>
             </div>
 
             <div class="neo-actions-row">
-              <button type="submit" class="neo-btn-primary" id="btnStudentSubmit">
+              <button type="submit" class="neo-btn-primary" id="btnLoginSubmit">
                 SIGN IN
               </button>
               <button type="button" class="neo-btn-secondary" id="btnToggleToRegister">
@@ -160,32 +159,7 @@
             </div>
           </form>
 
-          <!-- 2. ADMIN LOGIN FORM (Hidden initially) -->
-          <form id="adminLoginForm" class="hidden">
-            <div class="neo-field-group">
-              <label for="adminEmail" class="neo-label">SECURITY ADMIN EMAIL <span class="neo-req">*</span></label>
-              <input type="email" id="adminEmail" class="neo-input" placeholder="admin@saiuniversity.edu.in" required autocomplete="email">
-            </div>
-
-            <div class="neo-field-group">
-              <label for="adminPassword" class="neo-label">MASTER PASSWORD <span class="neo-req">*</span></label>
-              <div class="neo-password-wrap">
-                <input type="password" id="adminPassword" class="neo-input" placeholder="At least 8 characters" required autocomplete="current-password">
-                <button type="button" class="neo-pwd-toggle" id="toggleAdminPassword" tabindex="-1">👁️</button>
-              </div>
-            </div>
-
-            <div class="neo-actions-row">
-              <button type="submit" class="neo-btn-primary" id="btnAdminSubmit" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                ACCESS CONSOLE
-              </button>
-              <button type="button" class="neo-btn-secondary" id="btnBackToStudent">
-                BACK TO STUDENT
-              </button>
-            </div>
-          </form>
-
-          <!-- 3. STUDENT REGISTRATION FORM (Hidden initially) -->
+          <!-- NEW REGISTRATION FORM (Hidden initially) -->
           <form id="studentRegisterForm" class="hidden">
             <div class="neo-field-group">
               <label for="regName" class="neo-label">FULL LEGAL NAME <span class="neo-req">*</span></label>

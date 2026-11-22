@@ -5,95 +5,71 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Session Check & State Management
   checkExistingSession();
 
-  // 2. Tab Navigation
-  const tabBtnStudent = document.getElementById('tabBtnStudent');
-  const tabBtnAdmin = document.getElementById('tabBtnAdmin');
+  // 2. Unified Tab Navigation (No separate student vs admin sign in)
+  const tabBtnLogin = document.getElementById('tabBtnLogin');
   const tabBtnRegister = document.getElementById('tabBtnRegister');
 
-  const studentLoginForm = document.getElementById('studentLoginForm');
-  const adminLoginForm = document.getElementById('adminLoginForm');
+  const unifiedLoginForm = document.getElementById('unifiedLoginForm');
   const studentRegisterForm = document.getElementById('studentRegisterForm');
 
   function switchTab(activeTab) {
     hideAlert();
-    [tabBtnStudent, tabBtnAdmin, tabBtnRegister].forEach(b => b.classList.remove('active'));
-    [studentLoginForm, adminLoginForm, studentRegisterForm].forEach(f => f.classList.add('hidden'));
+    [tabBtnLogin, tabBtnRegister].forEach(b => { if (b) b.classList.remove('active'); });
+    [unifiedLoginForm, studentRegisterForm].forEach(f => { if (f) f.classList.add('hidden'); });
 
     const portalHeaderTitle = document.getElementById('portalHeaderTitle');
 
-    if (activeTab === 'student') {
-      tabBtnStudent.classList.add('active');
-      studentLoginForm.classList.remove('hidden');
+    if (activeTab === 'login') {
+      if (tabBtnLogin) tabBtnLogin.classList.add('active');
+      if (unifiedLoginForm) unifiedLoginForm.classList.remove('hidden');
       if (portalHeaderTitle) portalHeaderTitle.textContent = 'SIGN IN TO CAMPUS';
-    } else if (activeTab === 'admin') {
-      tabBtnAdmin.classList.add('active');
-      adminLoginForm.classList.remove('hidden');
-      if (portalHeaderTitle) portalHeaderTitle.textContent = 'CAMPUS SECURITY CONSOLE';
     } else if (activeTab === 'register') {
-      tabBtnRegister.classList.add('active');
-      studentRegisterForm.classList.remove('hidden');
+      if (tabBtnRegister) tabBtnRegister.classList.add('active');
+      if (studentRegisterForm) studentRegisterForm.classList.remove('hidden');
       if (portalHeaderTitle) portalHeaderTitle.textContent = 'REGISTER TO CAMPUS';
     }
   }
 
-  tabBtnStudent.addEventListener('click', () => switchTab('student'));
-  tabBtnAdmin.addEventListener('click', () => switchTab('admin'));
-  tabBtnRegister.addEventListener('click', () => switchTab('register'));
+  tabBtnLogin?.addEventListener('click', () => switchTab('login'));
+  tabBtnRegister?.addEventListener('click', () => switchTab('register'));
 
   document.getElementById('btnToggleToRegister')?.addEventListener('click', () => switchTab('register'));
-  document.getElementById('btnToggleToLogin')?.addEventListener('click', () => switchTab('student'));
-  document.getElementById('btnBackToStudent')?.addEventListener('click', () => switchTab('student'));
+  document.getElementById('btnToggleToLogin')?.addEventListener('click', () => switchTab('login'));
 
   // Check URL tab query param (e.g. ?tab=register)
   if (urlParams.get('tab') === 'register') {
     switchTab('register');
-  } else if (urlParams.get('tab') === 'admin') {
-    switchTab('admin');
+  } else {
+    switchTab('login');
   }
 
-  // 3. 1-Click Evaluation Chips
+  // 3. 1-Click Evaluation Chips (All autofill into the single unified login form)
   document.getElementById('chipStudent1')?.addEventListener('click', () => {
-    switchTab('student');
-    document.getElementById('studentEmail').value = 'saisravan@saiuniversity.edu.in';
-    document.getElementById('studentPassword').value = 'StudentPassword123';
-    showAlert('Autofilled demo student: Sai Sravan V', 'success');
+    switchTab('login');
+    document.getElementById('loginEmail').value = 'saisravan@saiuniversity.edu.in';
+    document.getElementById('loginPassword').value = 'StudentPassword123';
+    showAlert('Loaded credentials for Sai Sravan V', 'success');
   });
 
   document.getElementById('chipStudent2')?.addEventListener('click', () => {
-    switchTab('student');
-    document.getElementById('studentEmail').value = 'aditi.sharma@saiuniversity.edu.in';
-    document.getElementById('studentPassword').value = 'StudentPassword123';
-    showAlert('Autofilled demo student: Aditi Sharma', 'success');
+    switchTab('login');
+    document.getElementById('loginEmail').value = 'aditi.sharma@saiuniversity.edu.in';
+    document.getElementById('loginPassword').value = 'StudentPassword123';
+    showAlert('Loaded credentials for Aditi Sharma', 'success');
   });
 
   document.getElementById('chipAdmin')?.addEventListener('click', () => {
-    switchTab('admin');
-    document.getElementById('adminEmail').value = 'admin@saiuniversity.edu.in';
-    document.getElementById('adminPassword').value = 'AdminPassword123';
-    showAlert('Autofilled demo admin: Campus Security Admin', 'success');
+    switchTab('login');
+    document.getElementById('loginEmail').value = 'admin@saiuniversity.edu.in';
+    document.getElementById('loginPassword').value = 'AdminPassword123';
+    showAlert('Loaded credentials for Campus Security', 'success');
   });
 
-  // 4. Domain Hint Helpers
-  document.getElementById('hintStudentDomain')?.addEventListener('click', () => {
-    const input = document.getElementById('studentEmail');
-    if (!input.value.includes('@')) {
-      input.value += '@saiuniversity.edu.in';
-    }
-  });
-
-  document.getElementById('hintRegDomain')?.addEventListener('click', () => {
-    const input = document.getElementById('regEmail');
-    if (!input.value.includes('@')) {
-      input.value += '@saiuniversity.edu.in';
-    }
-  });
-
-  // 5. Password Visibility Toggles
-  setupPasswordToggle('toggleStudentPassword', 'studentPassword');
-  setupPasswordToggle('toggleAdminPassword', 'adminPassword');
+  // 4. Password Visibility Toggles
+  setupPasswordToggle('toggleLoginPassword', 'loginPassword');
   setupPasswordToggle('toggleRegPassword', 'regPassword');
 
-  // 6. Live Password Strength Meter for Registration
+  // 5. Live Password Strength Meter for Registration
   const regPassword = document.getElementById('regPassword');
   const bar1 = document.getElementById('regStrBar1');
   const bar2 = document.getElementById('regStrBar2');
@@ -128,15 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 7. Student Sign-In Submission
-  studentLoginForm?.addEventListener('submit', async (e) => {
+  // 6. Single Unified Sign-In Submission (Automatically segregates Student vs Admin View based on credentials)
+  unifiedLoginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('studentEmail').value.trim();
-    const password = document.getElementById('studentPassword').value;
-    const submitBtn = document.getElementById('btnStudentSubmit');
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const submitBtn = document.getElementById('btnLoginSubmit');
 
     hideAlert();
-    setButtonLoading(submitBtn, 'Signing In...');
+    setButtonLoading(submitBtn, 'Authenticating...');
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -148,55 +124,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         saveSession(data.token, data.user);
-        showAlert(`Welcome back, ${data.user.name}! Redirecting...`, 'success');
+        
+        // Segregate feedback and dashboard view based on user role from MongoDB
+        if (data.user.role === 'admin') {
+          showAlert(`🛡️ Security Administrator authenticated (${data.user.name}). Loading Admin Console...`, 'success');
+        } else {
+          showAlert(`🎓 Welcome back, ${data.user.name}! Loading Student Portal...`, 'success');
+        }
+
         setTimeout(() => {
           window.location.href = redirectTarget;
-        }, 1200);
+        }, 1100);
       } else {
         showAlert(data.message || 'Invalid email or password', 'error');
-        resetButton(submitBtn, '🎓 Sign In to Student Portal');
+        resetButton(submitBtn, 'SIGN IN');
       }
     } catch (err) {
       showAlert('Could not connect to authentication server. Please check your connection.', 'error');
-      resetButton(submitBtn, '🎓 Sign In to Student Portal');
-    }
-  });
-
-  // 8. Admin Sign-In Submission
-  adminLoginForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('adminEmail').value.trim();
-    const password = document.getElementById('adminPassword').value;
-    const submitBtn = document.getElementById('btnAdminSubmit');
-
-    hideAlert();
-    setButtonLoading(submitBtn, 'Verifying Admin Authority...');
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        if (data.user.role !== 'admin') {
-          showAlert('This account is registered as a student. Switching you to the student dashboard...', 'success');
-        } else {
-          showAlert('Security Admin credentials authenticated! Loading console...', 'success');
-        }
-        saveSession(data.token, data.user);
-        setTimeout(() => {
-          window.location.href = redirectTarget;
-        }, 1200);
-      } else {
-        showAlert(data.message || 'Invalid administrator credentials', 'error');
-        resetButton(submitBtn, '🛡️ Access Campus Security Console');
-      }
-    } catch (err) {
-      showAlert('Server connection error. Please verify server status.', 'error');
-      resetButton(submitBtn, '🛡️ Access Campus Security Console');
+      resetButton(submitBtn, 'SIGN IN');
     }
   });
 
