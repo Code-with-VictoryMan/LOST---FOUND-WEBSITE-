@@ -2,18 +2,32 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   const localUri = 'mongodb://127.0.0.1:27017/campus_lost_found';
+  const atlasUri = process.env.MONGODB_ATLAS_URI;
   const primaryUri = process.env.MONGODB_URI || localUri;
 
   try {
     const conn = await mongoose.connect(primaryUri, {
-      serverSelectionTimeoutMS: 3000
+      serverSelectionTimeoutMS: 4000
     });
-    console.log(`[MongoDB Connected]: ${conn.connection.host}:${conn.connection.port || '27017'} (DB: ${conn.connection.name})`);
+    const isAtlas = conn.connection.host.includes('mongodb.net');
+    console.log(`[MongoDB Connected]: ${conn.connection.host} (${isAtlas ? 'MongoDB Atlas Cloud' : 'Local Instance'}, DB: ${conn.connection.name})`);
     return conn;
   } catch (primaryError) {
-    console.warn(`[MongoDB Warning]: Primary database (${primaryUri}) connection failed: ${primaryError.message}`);
+    console.warn(`[MongoDB Warning]: Primary database connection failed: ${primaryError.message}`);
 
-    // If primary was not local, try local MongoDB fallback
+    // If primary failed and was not Atlas, try Atlas if configured
+    if (primaryUri !== atlasUri && atlasUri) {
+      try {
+        console.log('[MongoDB Fallback]: Connecting to MongoDB Atlas Cloud Cluster...');
+        const atlasConn = await mongoose.connect(atlasUri, { serverSelectionTimeoutMS: 6000 });
+        console.log(`[MongoDB Connected]: Atlas Cloud active at ${atlasConn.connection.host} (DB: ${atlasConn.connection.name})`);
+        return atlasConn;
+      } catch (atlasErr) {
+        console.warn(`[Atlas Fallback Error]: ${atlasErr.message}`);
+      }
+    }
+
+    // Try local fallback if not already tried
     if (primaryUri !== localUri) {
       try {
         console.log(`[MongoDB Fallback]: Connecting to local MongoDB server (${localUri})...`);

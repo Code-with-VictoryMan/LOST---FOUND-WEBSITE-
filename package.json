@@ -7,6 +7,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "seed": "node seed.js",
+    "seed:atlas": "node seed.js --atlas",
+    "check:atlas": "node check-atlas.js",
     "test:postman": "newman run postman_collection.json -e postman_environment.json"
   },
   "keywords": [

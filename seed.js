@@ -131,8 +131,11 @@ const sampleItems = [
 
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/campus_lost_found');
-    console.log('MongoDB connected for seeding...');
+    const isAtlas = process.argv.includes('--atlas');
+    const targetUri = isAtlas ? process.env.MONGODB_ATLAS_URI : (process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/campus_lost_found');
+    console.log(`Connecting to ${isAtlas ? 'MongoDB Atlas (Cloud Cluster)' : 'Local MongoDB'} for seeding...`);
+    await mongoose.connect(targetUri);
+    console.log(`MongoDB connected (${isAtlas ? 'Atlas Cloud' : 'Local Instance'})...`);
 
     await User.deleteMany();
     await Item.deleteMany();
