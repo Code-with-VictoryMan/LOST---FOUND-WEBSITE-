@@ -145,6 +145,20 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    // Persist Login Activity Details into MongoDB
+    user.lastLogin = new Date();
+    user.loginCount = (user.loginCount || 0) + 1;
+    if (!user.loginHistory) user.loginHistory = [];
+    user.loginHistory.unshift({
+      timestamp: new Date(),
+      ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1',
+      userAgent: req.headers['user-agent'] || 'Web Client'
+    });
+    if (user.loginHistory.length > 20) {
+      user.loginHistory = user.loginHistory.slice(0, 20);
+    }
+    await user.save();
+
     const token = generateToken(user._id);
     return res.status(200).json({
       success: true,
@@ -158,7 +172,9 @@ router.post('/login', async (req, res) => {
         phone: user.phone || 'N/A',
         studentId: user.studentId || 'N/A',
         department: user.department || 'School of Computing & Data Science',
-        yearOfStudy: user.yearOfStudy || '3rd Year B.Tech'
+        yearOfStudy: user.yearOfStudy || '3rd Year B.Tech',
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount
       }
     });
   } catch (error) {
@@ -239,6 +255,30 @@ router.put('/profile', protect, async (req, res) => {
       success: true,
       message: 'Student profile updated in MongoDB',
       user: updatedUser
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// @route   GET /api/auth/login-history (View user's persistent login logs)
+router.get('/login-history', protect, async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json({
+        success: true,
+        loginCount: 1,
+        lastLogin: new Date(),
+        history: [{ timestamp: new Date(), ipAddress: '127.0.0.1', userAgent: 'Local Session' }]
+      });
+    }
+
+    const user = await User.findById(req.user._id).select('lastLogin loginCount loginHistory name email studentId');
+    return res.status(200).json({
+      success: true,
+      loginCount: user?.loginCount || 1,
+      lastLogin: user?.lastLogin || new Date(),
+      history: user?.loginHistory || []
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

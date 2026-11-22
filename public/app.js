@@ -6,6 +6,7 @@ let isRegisterMode = false;
 let searchDebounceTimer = null;
 let cameraStream = null;
 let scannedPhotoData = null;
+let activeUserFilter = null;
 
 // DOM Elements
 const itemsGrid = document.getElementById('itemsGrid');
@@ -56,6 +57,7 @@ function setupNavbar() {
   const userNameDisplay = document.getElementById('userNameDisplay');
   const floatingUserLabel = document.getElementById('floatingUserLabel');
   const drawerAuthText = document.getElementById('drawerAuthText');
+  const chipMyReports = document.getElementById('chipMyReports');
 
   if (authToken && currentUser) {
     if (authActions) authActions.classList.add('hidden');
@@ -65,25 +67,40 @@ function setupNavbar() {
     if (userNameDisplay) userNameDisplay.textContent = firstName + (currentUser.role === 'admin' ? ' (Admin)' : '');
     if (floatingUserLabel) floatingUserLabel.textContent = `${firstName} (${currentUser.role})`;
     if (drawerAuthText) drawerAuthText.textContent = `Sign Out (${firstName})`;
+    if (chipMyReports) {
+      chipMyReports.classList.remove('hidden');
+    }
   } else {
     if (authActions) authActions.classList.remove('hidden');
     if (userBadge) userBadge.classList.add('hidden');
     if (navDashboard) navDashboard.classList.add('hidden');
     if (floatingUserLabel) floatingUserLabel.textContent = 'Sign In';
     if (drawerAuthText) drawerAuthText.textContent = 'Sign In / Register';
+    if (chipMyReports) {
+      chipMyReports.classList.add('hidden');
+      if (activeUserFilter === 'me') {
+        activeUserFilter = null;
+      }
+    }
   }
 }
 
-// Fetch Items with Query Parameters
+// Fetch Items with Query Parameters (supporting MongoDB user filter)
 async function fetchItems() {
   try {
-    const query = new URLSearchParams({
+    const queryParams = {
       search: searchInput.value.trim(),
       type: filterType.value,
       category: filterCategory.value,
       building: filterBuilding.value,
       sort: filterSort.value
-    });
+    };
+
+    if (activeUserFilter === 'me' && currentUser) {
+      queryParams.user = currentUser.id || currentUser._id;
+    }
+
+    const query = new URLSearchParams(queryParams);
 
     resultsCount.textContent = 'Searching...';
     const res = await fetch(`/api/items?${query}`);
@@ -92,7 +109,9 @@ async function fetchItems() {
     if (data.success) {
       currentItems = data.data;
       renderItems(currentItems);
-      resultsCount.textContent = `${currentItems.length} active listings`;
+      resultsCount.textContent = activeUserFilter === 'me' 
+        ? `${currentItems.length} of your reported items` 
+        : `${currentItems.length} active listings`;
     }
   } catch (error) {
     console.error('Failed to retrieve items:', error);
@@ -106,7 +125,7 @@ function renderItems(items) {
     itemsGrid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: #64748b;">
         <h3 style="color:#ffffff;margin-bottom:0.5rem;font-weight:700;">No matching items found</h3>
-        <p>Try modifying your search criteria or report a new lost/found item.</p>
+        <p>${activeUserFilter === 'me' ? 'You have not reported any items matching these criteria yet.' : 'Try modifying your search criteria or report a new lost/found item.'}</p>
         <button class="btn btn-primary btn-sm" onclick="openReportModal()" style="margin-top:1rem;">
           ➕ Report an Item
         </button>
@@ -114,36 +133,48 @@ function renderItems(items) {
     return;
   }
 
-  itemsGrid.innerHTML = items.map(item => `
-    <div class="item-card" onclick="openItemDetails('${item._id}')" title="Click to view complete details, location and contacts">
-      <div class="item-img-wrap">
-        <img src="${item.imageUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
-        <span class="badge-tag tag-${item.type}">${item.type}</span>
-        <span class="status-badge status-${item.status}">${item.status.toUpperCase()}</span>
-      </div>
-      <div class="item-body">
-        <span class="item-category">${item.category}</span>
-        <h4 class="item-title">${escapeHtml(item.title)}</h4>
-        <p class="item-desc">${escapeHtml(item.description)}</p>
-        <div class="item-meta">
-          <span>🏛️ <strong>Building:</strong> ${item.building} (${escapeHtml(item.specificLocation)})</span>
-          <span>📅 <strong>Date:</strong> ${new Date(item.dateOccurred).toLocaleDateString()}</span>
-          <span>👤 <strong>Reported by:</strong> ${item.reportedBy ? escapeHtml(item.reportedBy.name) : 'Anonymous'}</span>
+  const currentUserId = currentUser ? String(currentUser.id || currentUser._id) : null;
+
+  itemsGrid.innerHTML = items.map(item => {
+    const repId = item.reportedBy?._id ? String(item.reportedBy._id) : (item.reportedBy ? String(item.reportedBy) : '');
+    const isMyReport = currentUserId && repId && currentUserId === repId;
+
+    return `
+      <div class="item-card" onclick="openItemDetails('${item._id}')" title="Click to view complete details, location and contacts" style="${isMyReport ? 'border-color: rgba(245, 158, 11, 0.45); box-shadow: 0 6px 24px rgba(245,158,11,0.12);' : ''}">
+        <div class="item-img-wrap">
+          <img src="${item.imageUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
+          <span class="badge-tag tag-${item.type}">${item.type}</span>
+          <span class="status-badge status-${item.status}">${item.status.toUpperCase()}</span>
+          ${isMyReport ? `<span class="badge-tag" style="position:absolute; bottom:8px; left:8px; background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-weight:700; z-index:3; border:1px solid rgba(255,255,255,0.4); box-shadow:0 2px 8px rgba(0,0,0,0.4);">⭐ Your Report</span>` : ''}
         </div>
-        <div class="item-actions" onclick="event.stopPropagation()">
-          ${item.status === 'open' ? `
-            <button class="btn btn-primary btn-sm" onclick="openClaimModal('${item._id}')" style="width: 100%;">
-              Claim This Item
-            </button>
-          ` : `
-            <button class="btn btn-secondary btn-sm" disabled style="width: 100%;opacity:0.65;">
-              ${item.status === 'claimed' ? 'Verification In Progress' : 'Resolved & Returned'}
-            </button>
-          `}
+        <div class="item-body">
+          <span class="item-category">${item.category}</span>
+          <h4 class="item-title">${escapeHtml(item.title)}</h4>
+          <p class="item-desc">${escapeHtml(item.description)}</p>
+          <div class="item-meta">
+            <span>🏛️ <strong>Building:</strong> ${item.building} (${escapeHtml(item.specificLocation)})</span>
+            <span>📅 <strong>Date:</strong> ${new Date(item.dateOccurred).toLocaleDateString()}</span>
+            <span>👤 <strong>Reported by:</strong> ${isMyReport ? '<strong style="color:var(--accent-amber);">You (Your Account)</strong>' : (item.reportedBy ? escapeHtml(item.reportedBy.name) : 'Anonymous')}</span>
+          </div>
+          <div class="item-actions" onclick="event.stopPropagation()">
+            ${isMyReport ? `
+              <a href="dashboard.html" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; border-color:var(--accent-amber); color:var(--accent-amber); text-decoration:none; display:flex; align-items:center; gap:0.4rem;">
+                ⚙️ Manage Your Report
+              </a>
+            ` : (item.status === 'open' ? `
+              <button class="btn btn-primary btn-sm" onclick="openClaimModal('${item._id}')" style="width: 100%;">
+                Claim This Item
+              </button>
+            ` : `
+              <button class="btn btn-secondary btn-sm" disabled style="width: 100%;opacity:0.65;">
+                ${item.status === 'claimed' ? 'Verification In Progress' : 'Resolved & Returned'}
+              </button>
+            `)}
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function escapeHtml(text) {
@@ -209,27 +240,53 @@ window.openItemDetails = function(itemId) {
   }
 
   const actionButtons = document.getElementById('modalDetailActionButtons');
-  const isReporter = currentUser && (
-    (item.reportedBy?._id && String(item.reportedBy._id) === String(currentUser.id)) ||
-    (typeof item.reportedBy === 'string' && item.reportedBy === String(currentUser.id)) ||
-    currentUser.role === 'admin'
-  );
+  const repId = item.reportedBy?._id ? String(item.reportedBy._id) : (item.reportedBy ? String(item.reportedBy) : '');
+  const curId = currentUser ? String(currentUser.id || currentUser._id) : '';
+  const isReporter = Boolean(curId && repId && curId === repId);
+  const isAdmin = currentUser && currentUser.role === 'admin';
 
   if (actionButtons) {
     if (isReporter) {
       actionButtons.innerHTML = `
-        ${item.status !== 'resolved' ? `
-          <button class="btn btn-success btn-sm" onclick="markItemResolvedFromModal('${item._id}')" style="justify-content:center;">
-            ✓ Mark as Resolved
+        <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.75rem; color:#fde68a; font-size:0.85rem; width:100%;">
+          ⭐ <strong>You reported this item.</strong> You can review claims, update status, or manage it in your Student Dashboard.
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; width:100%;">
+          <a href="dashboard.html" class="btn btn-primary" style="justify-content:center; text-decoration:none; background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-weight:700;">
+            📊 Open Student Dashboard
+          </a>
+          <div style="display:flex; gap:0.5rem; width:100%;">
+            ${item.status !== 'resolved' ? `
+              <button class="btn btn-success btn-sm" onclick="markItemResolvedFromModal('${item._id}')" style="flex:1; justify-content:center;">
+                ✓ Mark Resolved
+              </button>
+            ` : `
+              <button class="btn btn-secondary btn-sm" disabled style="flex:1; opacity:0.7; justify-content:center;">
+                ✓ Resolved
+              </button>
+            `}
+            <button class="btn btn-danger btn-sm" onclick="deleteItemFromModal('${item._id}')" style="flex:1; justify-content:center;">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (isAdmin) {
+      actionButtons.innerHTML = `
+        <div style="display:flex; gap:0.5rem; width:100%;">
+          ${item.status !== 'resolved' ? `
+            <button class="btn btn-success btn-sm" onclick="markItemResolvedFromModal('${item._id}')" style="flex:1; justify-content:center;">
+              ✓ Mark Resolved (Admin)
+            </button>
+          ` : `
+            <button class="btn btn-secondary btn-sm" disabled style="flex:1; opacity:0.7; justify-content:center;">
+              ✓ Resolved & Handed Over
+            </button>
+          `}
+          <button class="btn btn-danger btn-sm" onclick="deleteItemFromModal('${item._id}')" style="flex:1; justify-content:center;">
+            🗑️ Delete Listing
           </button>
-        ` : `
-          <button class="btn btn-secondary btn-sm" disabled style="opacity:0.7;justify-content:center;">
-            ✓ Resolved & Handed Over
-          </button>
-        `}
-        <button class="btn btn-danger btn-sm" onclick="deleteItemFromModal('${item._id}')" style="justify-content:center;">
-          🗑️ Delete Listing
-        </button>
+        </div>
       `;
     } else {
       actionButtons.innerHTML = `
@@ -921,7 +978,7 @@ function setupEventListeners() {
     });
   }
 
-  // Quick Filter Chips Listener
+  // Quick Filter Chips Listener (Includes 'My Reported Items' filter)
   const quickFilterChips = document.getElementById('quickFilterChips');
   if (quickFilterChips) {
     quickFilterChips.addEventListener('click', (e) => {
@@ -930,11 +987,18 @@ function setupEventListeners() {
       quickFilterChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
 
-      if (chip.dataset.type) {
-        filterType.value = chip.dataset.type;
-      }
-      if (chip.dataset.cat) {
-        filterCategory.value = chip.dataset.cat;
+      if (chip.dataset.userFilter === 'me') {
+        activeUserFilter = 'me';
+        filterType.value = 'all';
+        filterCategory.value = 'all';
+      } else {
+        activeUserFilter = null;
+        if (chip.dataset.type) {
+          filterType.value = chip.dataset.type;
+        }
+        if (chip.dataset.cat) {
+          filterCategory.value = chip.dataset.cat;
+        }
       }
       fetchItems();
     });

@@ -164,6 +164,30 @@ function setupDashboardView() {
   if (elProfileEmail) elProfileEmail.textContent = currentUser.email;
   if (elProfilePhone) elProfilePhone.textContent = currentUser.phone || 'N/A';
 
+  const elProfileLastLogin = document.getElementById('profileLastLogin');
+  if (elProfileLastLogin) {
+    if (currentUser.lastLogin) {
+      elProfileLastLogin.textContent = new Date(currentUser.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+    } else {
+      elProfileLastLogin.textContent = 'Active (MongoDB)';
+    }
+  }
+
+  // Fetch updated persistent login stats from MongoDB
+  fetch('/api/auth/login-history', {
+    headers: { 'Authorization': `Bearer ${authToken}` }
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success && d.lastLogin && elProfileLastLogin) {
+        elProfileLastLogin.textContent = new Date(d.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+        if (d.loginCount) {
+          elProfileLastLogin.title = `Total Logins Recorded in MongoDB: ${d.loginCount}`;
+        }
+      }
+    })
+    .catch(() => {});
+
   if (currentUser.role === 'admin') {
     if (adminSection) adminSection.classList.remove('hidden');
     loadAdminStats();
@@ -273,26 +297,22 @@ async function loadMyReportedItems() {
   const tbody = document.getElementById('myItemsBody');
   if (!tbody) return;
   const token = localStorage.getItem('sai_portal_token') || authToken;
+  const elProfileItemsCount = document.getElementById('profileItemsCount');
+
   try {
-    const endpoint = currentUser.role === 'admin' ? '/api/admin/all-items' : '/api/items?status=all';
+    const endpoint = currentUser.role === 'admin' ? '/api/admin/all-items' : '/api/items/my-items';
     const res = await fetch(endpoint, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
     
-    const allItems = data.data || [];
-    const currentUserId = currentUser.id ? String(currentUser.id) : (currentUser._id ? String(currentUser._id) : '');
-    const items = currentUser.role === 'admin' 
-      ? allItems 
-      : allItems.filter(item => {
-          const reporterId = item.reportedBy?._id ? String(item.reportedBy._id) : (item.reportedBy ? String(item.reportedBy) : '');
-          return reporterId === currentUserId;
-        });
+    const items = data.data || [];
+    if (elProfileItemsCount) elProfileItemsCount.textContent = items.length;
 
     if (!items || items.length === 0) {
       tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);padding:2.5rem 1rem;">
         <span style="font-size:2rem; display:block; margin-bottom:0.5rem;">📋</span>
-        <p style="margin-bottom:0.5rem;">You have not reported any items yet.</p>
+        <p style="margin-bottom:0.5rem;">You have not reported any items yet in MongoDB.</p>
         <a href="index.html" class="btn btn-primary btn-sm">➕ Report Lost or Found Item</a>
       </td></tr>`;
       return;

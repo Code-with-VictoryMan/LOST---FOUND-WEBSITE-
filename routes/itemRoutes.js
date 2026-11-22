@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 // @route   GET /api/items (Search, Filter, Sort)
 router.get('/', async (req, res) => {
   try {
-    const { search, type, category, building, status, sort } = req.query;
+    const { search, type, category, building, status, sort, user } = req.query;
 
     // Resilient offline fallback if MongoDB is disconnected / buffering
     if (mongoose.connection.readyState !== 1) {
@@ -20,6 +20,12 @@ router.get('/', async (req, res) => {
       if (type && type !== 'all') filtered = filtered.filter(i => i.type === type);
       if (category && category !== 'all') filtered = filtered.filter(i => i.category === category);
       if (building && building !== 'all') filtered = filtered.filter(i => i.building === building);
+      if (user && user !== 'all') {
+        filtered = filtered.filter(i => {
+          const repId = i.reportedBy?._id ? i.reportedBy._id.toString() : (i.reportedBy ? i.reportedBy.toString() : '');
+          return repId === user.toString();
+        });
+      }
       return res.status(200).json({ success: true, count: filtered.length, data: filtered });
     }
 
@@ -36,6 +42,7 @@ router.get('/', async (req, res) => {
     if (type && type !== 'all') query.type = type;
     if (category && category !== 'all') query.category = category;
     if (building && building !== 'all') query.building = building;
+    if (user && user !== 'all') query.reportedBy = user;
     if (status && status !== 'all') {
       query.status = status;
     } else {
@@ -49,6 +56,56 @@ router.get('/', async (req, res) => {
     const items = await Item.find(query)
       .populate('reportedBy', 'name email phone studentId department')
       .sort(sortOption);
+
+    return res.status(200).json({
+      success: true,
+      count: items.length,
+      data: items
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// @route   GET /api/items/my-items (List items reported by currently logged-in student)
+router.get('/my-items', protect, async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      const myItems = offlineStore.items.filter(i => {
+        const repId = i.reportedBy?._id ? i.reportedBy._id.toString() : (i.reportedBy ? i.reportedBy.toString() : '');
+        return repId === req.user._id.toString();
+      });
+      return res.status(200).json({ success: true, count: myItems.length, data: myItems });
+    }
+
+    const items = await Item.find({ reportedBy: req.user._id })
+      .populate('reportedBy', 'name email phone studentId department')
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: items.length,
+      data: items
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// @route   GET /api/items/user/:userId (List items reported by a specific user)
+router.get('/user/:userId', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      const userItems = offlineStore.items.filter(i => {
+        const repId = i.reportedBy?._id ? i.reportedBy._id.toString() : (i.reportedBy ? i.reportedBy.toString() : '');
+        return repId === req.params.userId.toString();
+      });
+      return res.status(200).json({ success: true, count: userItems.length, data: userItems });
+    }
+
+    const items = await Item.find({ reportedBy: req.params.userId })
+      .populate('reportedBy', 'name email phone studentId department')
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
