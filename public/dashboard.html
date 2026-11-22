@@ -115,6 +115,72 @@
       </div>
     </section>
 
+    <!-- Admin Student Database & Login Activity Audit Section -->
+    <section id="adminStudentLoginsSection" class="dashboard-block hidden" style="margin-bottom:2rem; background:rgba(18,22,31,0.75); border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:1.75rem;">
+      <div class="dash-section-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:1.25rem; margin-bottom:1.5rem;">
+        <div>
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.35rem; flex-wrap:wrap;">
+            <span style="font-size:1.6rem;">👥</span>
+            <h3 style="font-size:1.5rem; font-weight:800; color:#fff; margin:0;">Student Database &amp; Login Audit Trail</h3>
+            <span class="badge-tag tag-lost" style="font-size:0.75rem; letter-spacing:0.04em; background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.3); color:#fca5a5;">CONFIDENTIAL &bull; ADMIN PRIVILEGE</span>
+          </div>
+          <p class="section-desc" style="margin-bottom:0;">Full administrative MongoDB database query: Inspect all registered students, department credentials, and persistent login activity logs.</p>
+        </div>
+        <div style="display:flex; gap:0.6rem; align-items:center; margin-top:0.5rem;">
+          <button id="btnRefreshStudentLogins" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.2); color:#fff; display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.9rem; border-radius:8px;">
+            <span>🔄</span> Refresh Database
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Audit Stats Bar -->
+      <div class="stats-grid" style="margin-bottom:1.5rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Registered Students</span>
+          <span class="stat-value" id="auditTotalStudents" style="font-size:1.5rem; color:var(--accent-cyan);">0</span>
+        </div>
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Total Login Sessions</span>
+          <span class="stat-value" id="auditTotalLogins" style="font-size:1.5rem; color:#a855f7;">0</span>
+        </div>
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Database Collection</span>
+          <span class="stat-value" id="auditDbBadge" style="font-size:1.05rem; color:#4ade80;">MongoDB: users</span>
+        </div>
+        <div class="stat-card" style="padding:1rem;">
+          <span class="stat-label">Audit Operator</span>
+          <span class="stat-value" id="auditAdminName" style="font-size:1.05rem; color:#fbbf24;">SAI SRAVAN</span>
+        </div>
+      </div>
+
+      <!-- Live Search and Filter Bar -->
+      <div style="display:flex; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px; position:relative;">
+          <input type="text" id="searchStudentLoginsInput" placeholder="🔍 Search student by name, email, roll no, or department..." style="width:100%; padding:0.75rem 1rem; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:0.88rem; outline:none;">
+        </div>
+      </div>
+
+      <!-- Student Records Table -->
+      <div class="table-container" style="overflow-x:auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Student Profile</th>
+              <th>Email Address</th>
+              <th>Roll No / ID</th>
+              <th>Department</th>
+              <th>Total Logins</th>
+              <th>Last Login Session</th>
+              <th>Audit Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentLoginsTableBody">
+            <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:2rem;">Loading student database records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Student Profile & Database Details -->
     <section class="dashboard-block" id="studentProfileBlock" style="margin-bottom:2rem; background:rgba(18,22,31,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.5rem;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:1rem; margin-bottom:1rem;">
@@ -238,6 +304,25 @@
         <button class="modal-close" id="btnCloseReview">&times;</button>
       </div>
       <div class="modal-body" id="claimsReviewContent">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Student Login History Audit Detail -->
+  <div id="studentLoginHistoryModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-lg" style="max-width:720px; background:rgba(18,22,31,0.96); backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.15); border-radius:18px;">
+      <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.4rem;">📋</span>
+          <div>
+            <h3 id="modalStudentName" style="font-size:1.2rem; font-weight:700; color:#fff; margin:0;">Student Login Session History</h3>
+            <p id="modalStudentEmail" style="font-size:0.82rem; color:var(--text-secondary); margin:0;">Confidential Audit Trail from MongoDB</p>
+          </div>
+        </div>
+        <button class="modal-close" id="btnCloseStudentLoginModal" style="background:none; border:none; color:var(--text-secondary); font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="modalStudentLoginBody" style="padding:1.5rem; max-height:480px; overflow-y:auto;">
         <!-- Injected dynamically -->
       </div>
     </div>

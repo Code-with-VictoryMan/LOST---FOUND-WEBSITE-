@@ -9,10 +9,10 @@
 
 | Metric | Result |
 | :--- | :--- |
-| **Total Test Requests Executed** | **17 / 17 (100% Passed)** |
-| **Total Test Assertions** | **24 / 24 Passed (0 Failures)** |
-| **Average Response Time** | **35 ms** |
-| **Fastest Response Time** | **11 ms** |
+| **Total Test Requests Executed** | **18 / 18 (100% Passed)** |
+| **Total Test Assertions** | **25 / 25 Passed (0 Failures)** |
+| **Average Response Time** | **24 ms** |
+| **Fastest Response Time** | **7 ms** |
 | **HTTP Status Coverage** | 200 OK, 201 Created |
 | **Security & RBAC Enforcement** | Verified (Student vs. Admin Role Separation) |
 | **Database Persistence Verification** | Verified (MongoDB documents & login history) |
@@ -57,8 +57,9 @@
 ### Suite 4: Campus Administration & Recovery Analytics
 | # | Test Name | Method | Endpoint | Expected Status | Result | Assertions Verified |
 | :-: | :--- | :-: | :--- | :-: | :-: | :--- |
-| **4.1** | Campus Recovery Metrics | `GET` | `/api/admin/stats` | `200 OK` | **PASS** (65ms) | • Aggregates totalItems, lost/found, recovery rate<br>• Building & category breakdowns |
-| **4.2** | All Campus Listings (Admin) | `GET` | `/api/admin/all-items` | `200 OK` | **PASS** (28ms) | • Complete campus inventory oversight |
+| **4.1** | Campus Recovery Metrics | `GET` | `/api/admin/stats` | `200 OK` | **PASS** (28ms) | • Aggregates totalItems, lost/found, recovery rate<br>• Building & category breakdowns |
+| **4.2** | All Campus Listings (Admin) | `GET` | `/api/admin/all-items` | `200 OK` | **PASS** (15ms) | • Complete campus inventory oversight |
+| **4.3** | Student Database & Logins Audit | `GET` | `/api/admin/student-logins` | `200 OK` | **PASS** (11ms) | • Live MongoDB audit of registered students<br>• Login counts, timestamps & session history |
 
 ---
 

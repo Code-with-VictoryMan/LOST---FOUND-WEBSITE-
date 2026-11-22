@@ -142,7 +142,7 @@ const seedData = async () => {
     await Claim.deleteMany();
     console.log('Cleared existing database records.');
 
-    // Create Admin User
+    // Create Admin Users
     const adminUser = await User.create({
       name: 'Campus Security Admin',
       email: 'admin@saiuniversity.edu.in',
@@ -153,19 +153,21 @@ const seedData = async () => {
       studentId: 'ADMIN-01'
     });
 
-    // Create Student Users
-    const student1 = await User.create({
-      name: 'Sai Sravan V',
+    const saiSravanAdmin = await User.create({
+      name: 'SAI SRAVAN',
       email: 'saisravan@saiuniversity.edu.in',
-      password: 'StudentPassword123',
-      role: 'student',
+      password: 'AdminPassword123',
+      role: 'admin',
       phone: '+91 98840 55667',
-      studentId: 'SAIU2024CS001',
-      department: 'School of Computing & Data Science',
-      yearOfStudy: '3rd Year B.Tech'
+      studentId: 'SAIU-ADMIN-01',
+      department: 'Campus Administration & Security',
+      yearOfStudy: 'Executive Administrator',
+      loginCount: 15,
+      lastLogin: new Date()
     });
 
-    const student2 = await User.create({
+    // Create Student Users
+    const student1 = await User.create({
       name: 'Aditi Sharma',
       email: 'aditi.sharma@saiuniversity.edu.in',
       password: 'StudentPassword123',
@@ -173,13 +175,29 @@ const seedData = async () => {
       phone: '+91 97711 33445',
       studentId: 'SAIU2024CS015',
       department: 'School of Computing & Data Science',
-      yearOfStudy: '3rd Year B.Tech'
+      yearOfStudy: '3rd Year B.Tech',
+      loginCount: 8,
+      lastLogin: new Date(Date.now() - 3600000 * 2)
+    });
+
+    const student2 = await User.create({
+      name: 'Vikramaditya S',
+      email: 'vikram.s@saiuniversity.edu.in',
+      password: 'StudentPassword123',
+      role: 'student',
+      phone: '+91 98410 77889',
+      studentId: 'SAIU2024CS088',
+      department: 'School of Computing & Data Science',
+      yearOfStudy: '3rd Year B.Tech',
+      loginCount: 4,
+      lastLogin: new Date(Date.now() - 3600000 * 18)
     });
 
     console.log('Created Demo Users:');
-    console.log(' - Admin: admin@saiuniversity.edu.in / AdminPassword123');
-    console.log(' - Student 1: saisravan@saiuniversity.edu.in / StudentPassword123');
-    console.log(' - Student 2: aditi.sharma@saiuniversity.edu.in / StudentPassword123');
+    console.log(' - Admin 1: SAI SRAVAN (saisravan@saiuniversity.edu.in / AdminPassword123)');
+    console.log(' - Admin 2: Campus Security Admin (admin@saiuniversity.edu.in / AdminPassword123)');
+    console.log(' - Student 1: aditi.sharma@saiuniversity.edu.in / StudentPassword123');
+    console.log(' - Student 2: vikram.s@saiuniversity.edu.in / StudentPassword123');
 
     // Attach reporter references to sample items
     const itemsToInsert = sampleItems.map((item, index) => ({

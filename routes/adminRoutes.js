@@ -118,4 +118,68 @@ router.get('/all-claims', protect, adminOnly, async (req, res) => {
   }
 });
 
+// @route   GET /api/admin/student-logins (Confidential Student Database & Login Records Audit)
+router.get('/student-logins', protect, adminOnly, async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      const users = offlineStore.users.map(u => ({
+        _id: u._id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        studentId: u.studentId || 'N/A',
+        department: u.department || 'School of Computing & Data Science',
+        yearOfStudy: u.yearOfStudy || '3rd Year B.Tech',
+        phone: u.phone || 'N/A',
+        lastLogin: u.lastLogin || new Date(),
+        loginCount: u.loginCount || 1,
+        loginHistory: u.loginHistory || [
+          {
+            timestamp: new Date(),
+            ipAddress: '127.0.0.1',
+            userAgent: 'Campus Portal Session'
+          }
+        ],
+        createdAt: u.createdAt || new Date('2026-10-01')
+      }));
+
+      const totalStudents = users.filter(u => u.role === 'student').length;
+      const totalLogins = users.reduce((acc, u) => acc + (u.loginCount || 0), 0);
+
+      return res.status(200).json({
+        success: true,
+        source: 'offlineStore',
+        count: users.length,
+        summary: {
+          totalStudents,
+          totalUsers: users.length,
+          totalLogins
+        },
+        students: users
+      });
+    }
+
+    const users = await User.find()
+      .select('name email role studentId department yearOfStudy phone lastLogin loginCount loginHistory createdAt')
+      .sort({ lastLogin: -1, createdAt: -1 });
+
+    const totalStudents = users.filter(u => u.role === 'student').length;
+    const totalLogins = users.reduce((acc, u) => acc + (u.loginCount || 0), 0);
+
+    return res.status(200).json({
+      success: true,
+      source: 'mongodb',
+      count: users.length,
+      summary: {
+        totalStudents,
+        totalUsers: users.length,
+        totalLogins
+      },
+      students: users
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;

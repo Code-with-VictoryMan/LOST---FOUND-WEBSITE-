@@ -47,7 +47,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"saisravan@saiuniversity.edu.in\",\n  \"password\": \"StudentPassword123\"\n}"
+              "raw": "{\n  \"email\": \"aditi.sharma@saiuniversity.edu.in\",\n  \"password\": \"StudentPassword123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
@@ -70,6 +70,7 @@
                   "    var json = pm.response.json();",
                   "    pm.expect(json.success).to.be.true;",
                   "    pm.expect(json.user.role).to.eql('admin');",
+                  "    pm.expect(json.user.name).to.include('SAI SRAVAN');",
                   "    pm.environment.set('adminToken', json.token);",
                   "});"
                 ],
@@ -87,7 +88,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@saiuniversity.edu.in\",\n  \"password\": \"AdminPassword123\"\n}"
+              "raw": "{\n  \"email\": \"saisravan@saiuniversity.edu.in\",\n  \"password\": \"AdminPassword123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
@@ -652,6 +653,41 @@
               "raw": "{{baseUrl}}/api/admin/all-items",
               "host": ["{{baseUrl}}"],
               "path": ["api", "admin", "all-items"]
+            }
+          }
+        },
+        {
+          "name": "4.3 Audit Student Database & Login Records",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin retrieves student database records & login activity', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.students).to.be.an('array');",
+                  "    pm.expect(json.summary).to.have.property('totalLogins');",
+                  "    pm.expect(json.students[0]).to.have.property('loginHistory');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/student-logins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "student-logins"]
             }
           }
         }

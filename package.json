@@ -9,6 +9,7 @@
     "seed": "node seed.js",
     "seed:atlas": "node seed.js --atlas",
     "check:atlas": "node check-atlas.js",
+    "update:admin": "node update-admin.js",
     "test:postman": "newman run postman_collection.json -e postman_environment.json"
   },
   "keywords": [

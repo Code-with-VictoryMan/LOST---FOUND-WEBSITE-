@@ -93,6 +93,37 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('reviewClaimsModal').classList.add('hidden');
     });
   }
+
+  // Student Login History Audit Modal Controls
+  const btnCloseStudentLoginModal = document.getElementById('btnCloseStudentLoginModal');
+  if (btnCloseStudentLoginModal) {
+    btnCloseStudentLoginModal.addEventListener('click', () => {
+      document.getElementById('studentLoginHistoryModal')?.classList.add('hidden');
+    });
+  }
+
+  const studentLoginHistoryModal = document.getElementById('studentLoginHistoryModal');
+  if (studentLoginHistoryModal) {
+    studentLoginHistoryModal.addEventListener('click', (e) => {
+      if (e.target === studentLoginHistoryModal) {
+        studentLoginHistoryModal.classList.add('hidden');
+      }
+    });
+  }
+
+  const btnRefreshStudentLogins = document.getElementById('btnRefreshStudentLogins');
+  if (btnRefreshStudentLogins) {
+    btnRefreshStudentLogins.addEventListener('click', () => {
+      loadStudentLogins(true);
+    });
+  }
+
+  const searchStudentLoginsInput = document.getElementById('searchStudentLoginsInput');
+  if (searchStudentLoginsInput) {
+    searchStudentLoginsInput.addEventListener('input', (e) => {
+      filterStudentLogins(e.target.value);
+    });
+  }
 });
 
 async function performQuickLogin(email, password) {
@@ -129,6 +160,7 @@ function setupDashboardView() {
   const dashboardContent = document.getElementById('dashboardContent');
   const dashUserDisplay = document.getElementById('dashUserDisplay');
   const adminSection = document.getElementById('adminAnalyticsSection');
+  const adminStudentLoginsSection = document.getElementById('adminStudentLoginsSection');
 
   if (!authToken || !currentUser) {
     if (dashAuthPrompt) dashAuthPrompt.classList.remove('hidden');
@@ -187,10 +219,15 @@ function setupDashboardView() {
   // Segregate Dashboard Presentation: Admin View vs Student View based on credentials
   if (isAdmin) {
     if (adminSection) adminSection.classList.remove('hidden');
+    if (adminStudentLoginsSection) adminStudentLoginsSection.classList.remove('hidden');
     loadAdminStats();
+    loadStudentLogins();
     if (elProfileRole) elProfileRole.innerHTML = `🛡️ Campus Security Administrator &bull; Sai University Administration`;
-    if (elProfileId) elProfileId.textContent = currentUser.studentId || 'ADMIN-CONSOLE';
-    if (elProfileDept) elProfileDept.textContent = currentUser.department || 'Campus Safety & Administration';
+    if (elProfileId) elProfileId.textContent = currentUser.studentId || 'SAIU-ADMIN-01';
+    if (elProfileDept) elProfileDept.textContent = currentUser.department || 'Campus Administration & Security';
+
+    const auditAdminName = document.getElementById('auditAdminName');
+    if (auditAdminName) auditAdminName.textContent = currentUser.name;
 
     const reportsHeader = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('h3');
     if (reportsHeader) reportsHeader.textContent = 'Campus-Wide Reported Items (Admin Fleet Control)';
@@ -198,6 +235,7 @@ function setupDashboardView() {
     if (reportsDesc) reportsDesc.textContent = 'Full administrative control across all lost and found listings on Sai University campus.';
   } else {
     if (adminSection) adminSection.classList.add('hidden');
+    if (adminStudentLoginsSection) adminStudentLoginsSection.classList.add('hidden');
     if (elProfileRole) elProfileRole.innerHTML = `🎓 Verified Student Account &bull; Sai University Academic Profile`;
     if (elProfileId) elProfileId.textContent = currentUser.studentId || 'SAIU2024CS001';
     if (elProfileDept) elProfileDept.textContent = currentUser.department || 'School of Computing & Data Science';
@@ -620,4 +658,197 @@ window.decideClaim = async function(claimId, status) {
   } catch (err) {
     alert('Error updating claim status');
   }
+};
+
+// --- ADMIN: Student Database & Login Records Audit ---
+let allStudentLoginsCache = [];
+
+async function loadStudentLogins(showRefreshToast = false) {
+  const tableBody = document.getElementById('studentLoginsTableBody');
+  const auditTotalStudents = document.getElementById('auditTotalStudents');
+  const auditTotalLogins = document.getElementById('auditTotalLogins');
+  const auditDbBadge = document.getElementById('auditDbBadge');
+  const btnRefresh = document.getElementById('btnRefreshStudentLogins');
+
+  if (btnRefresh) {
+    btnRefresh.disabled = true;
+    btnRefresh.innerHTML = '<span>⏳</span> Querying MongoDB...';
+  }
+
+  try {
+    const res = await fetch('/api/admin/student-logins', {
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:2rem;">Failed to load student records: ${data.message}</td></tr>`;
+      }
+      return;
+    }
+
+    allStudentLoginsCache = data.students || [];
+
+    if (auditTotalStudents) auditTotalStudents.textContent = data.summary?.totalStudents || allStudentLoginsCache.filter(u => u.role === 'student').length;
+    if (auditTotalLogins) auditTotalLogins.textContent = data.summary?.totalLogins || 0;
+    if (auditDbBadge) {
+      auditDbBadge.textContent = data.source === 'mongodb' ? 'MongoDB: Live Cloud' : 'Offline In-Memory DB';
+      auditDbBadge.style.color = data.source === 'mongodb' ? '#4ade80' : '#fbbf24';
+    }
+
+    renderStudentLoginsTable(allStudentLoginsCache);
+
+    if (showRefreshToast) {
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.textContent = `✅ Queried ${allStudentLoginsCache.length} student profiles and session logs from MongoDB!`;
+        toast.className = 'toast toast-success';
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+      }
+    }
+  } catch (err) {
+    if (tableBody) {
+      tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:2rem;">Connection error querying student logins database.</td></tr>`;
+    }
+  } finally {
+    if (btnRefresh) {
+      btnRefresh.disabled = false;
+      btnRefresh.innerHTML = '<span>🔄</span> Refresh Database';
+    }
+  }
+}
+
+function renderStudentLoginsTable(users) {
+  const tableBody = document.getElementById('studentLoginsTableBody');
+  if (!tableBody) return;
+
+  if (!users || users.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">No student records found matching the query.</td></tr>`;
+    return;
+  }
+
+  tableBody.innerHTML = users.map(user => {
+    const isAdmin = user.role === 'admin';
+    const initials = (user.name || 'Student').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    const formattedLastLogin = user.lastLogin 
+      ? new Date(user.lastLogin).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : 'Never';
+
+    const loginSessionsCount = (user.loginHistory && user.loginHistory.length) || (user.loginCount || 0);
+
+    return `
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+        <td style="padding:1rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="width:36px; height:36px; border-radius:50%; background:${isAdmin ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'}; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+              ${initials}
+            </div>
+            <div>
+              <div style="font-weight:700; color:#fff; display:flex; align-items:center; gap:0.4rem;">
+                ${user.name}
+                ${isAdmin ? '<span class="badge-tag tag-lost" style="font-size:0.68rem; padding:0.1rem 0.4rem;">ADMIN</span>' : '<span class="badge-tag tag-found" style="font-size:0.68rem; padding:0.1rem 0.4rem;">STUDENT</span>'}
+              </div>
+              <small style="color:var(--text-muted); font-size:0.75rem;">Joined: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}</small>
+            </div>
+          </div>
+        </td>
+        <td style="padding:1rem; font-family:monospace; font-size:0.85rem; color:var(--text-secondary);">
+          <span style="user-select:all;">${user.email}</span>
+        </td>
+        <td style="padding:1rem;">
+          <code style="background:rgba(255,255,255,0.06); padding:0.2rem 0.45rem; border-radius:6px; font-size:0.82rem; color:var(--accent-cyan);">${user.studentId || 'N/A'}</code>
+        </td>
+        <td style="padding:1rem; font-size:0.85rem; color:#fff;">
+          <div>${user.department || 'General Academic'}</div>
+          <small style="color:var(--text-muted); font-size:0.75rem;">${user.yearOfStudy || ''}</small>
+        </td>
+        <td style="padding:1rem; text-align:center;">
+          <span style="display:inline-block; padding:0.25rem 0.7rem; border-radius:999px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:#c084fc; font-weight:700; font-size:0.82rem;">
+            ${user.loginCount || 0} logins
+          </span>
+        </td>
+        <td style="padding:1rem; font-size:0.85rem; color:#38bdf8;">
+          <div>${formattedLastLogin}</div>
+          <small style="color:var(--text-muted); font-size:0.75rem;">IP: ${user.loginHistory && user.loginHistory[0] ? user.loginHistory[0].ipAddress : '127.0.0.1'}</small>
+        </td>
+        <td style="padding:1rem;">
+          <button class="btn btn-outline btn-sm" style="font-size:0.78rem; padding:0.35rem 0.65rem; border-color:rgba(255,255,255,0.2); color:#fff; display:inline-flex; align-items:center; gap:0.35rem;" onclick="viewStudentLoginSessions('${user._id}')">
+            <span>👁️</span> Audit Sessions (${loginSessionsCount})
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterStudentLogins(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) {
+    renderStudentLoginsTable(allStudentLoginsCache);
+    return;
+  }
+  const filtered = allStudentLoginsCache.filter(u => {
+    return (u.name && u.name.toLowerCase().includes(q)) ||
+           (u.email && u.email.toLowerCase().includes(q)) ||
+           (u.studentId && u.studentId.toLowerCase().includes(q)) ||
+           (u.department && u.department.toLowerCase().includes(q));
+  });
+  renderStudentLoginsTable(filtered);
+}
+
+window.viewStudentLoginSessions = function(userId) {
+  const user = allStudentLoginsCache.find(u => u._id.toString() === userId.toString());
+  if (!user) return;
+
+  const modal = document.getElementById('studentLoginHistoryModal');
+  const modalName = document.getElementById('modalStudentName');
+  const modalEmail = document.getElementById('modalStudentEmail');
+  const modalBody = document.getElementById('modalStudentLoginBody');
+
+  if (modalName) modalName.textContent = `${user.name} - Login Audit Sessions`;
+  if (modalEmail) modalEmail.innerHTML = `<strong>${user.email}</strong> &bull; Roll No: <code>${user.studentId}</code> &bull; ${user.department}`;
+
+  if (!user.loginHistory || user.loginHistory.length === 0) {
+    modalBody.innerHTML = `
+      <div style="text-align:center; padding:2rem; color:var(--text-muted);">
+        <span style="font-size:2.5rem; display:block; margin-bottom:0.5rem;">🔒</span>
+        <p>No historical session snapshots stored yet for this profile in MongoDB.</p>
+        <p style="font-size:0.8rem;">Total Recorded Login Counter: <strong>${user.loginCount || 0}</strong></p>
+      </div>
+    `;
+  } else {
+    modalBody.innerHTML = `
+      <div style="margin-bottom:1rem; padding:0.75rem 1rem; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="color:#93c5fd; font-size:0.85rem;"><strong>MongoDB User History:</strong> Capped at last 20 verified sessions</span>
+        <span style="color:#fff; font-weight:700; font-size:0.85rem;">Total Logins: ${user.loginCount || user.loginHistory.length}</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        ${user.loginHistory.map((s, idx) => `
+          <div style="padding:0.9rem 1.1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e;"></span>
+                <strong style="color:#fff; font-size:0.9rem;">Session #${user.loginHistory.length - idx}</strong>
+                <span style="font-size:0.75rem; color:var(--accent-cyan); font-family:monospace;">IP: ${s.ipAddress || '127.0.0.1'}</span>
+              </div>
+              <div style="font-size:0.78rem; color:var(--text-muted); max-width:440px; word-break:break-all;">
+                Device / Client: ${s.userAgent || 'Web Browser'}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:0.85rem; color:#38bdf8; font-weight:600;">
+                ${new Date(s.timestamp).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  if (modal) modal.classList.remove('hidden');
 };
