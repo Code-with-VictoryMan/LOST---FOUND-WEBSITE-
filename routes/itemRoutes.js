@@ -120,7 +120,7 @@ router.get('/user/:userId', async (req, res) => {
 // @route   POST /api/items/scan-match (Scan Item & Find Owner)
 router.post('/scan-match', async (req, res) => {
   try {
-    const queryText = req.body.queryText || req.body.keyword || req.body.text || '';
+    const queryText = req.body.queryText || req.body.keyword || req.body.text || req.body.itemText || '';
     const { category, building } = req.body;
     if (!queryText || queryText.trim() === '') {
       return res.status(400).json({ success: false, message: 'Please provide scanned text or keywords' });

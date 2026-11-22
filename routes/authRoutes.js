@@ -226,6 +226,16 @@ router.post('/reset-password', async (req, res) => {
 router.get('/me', protect, async (req, res) => {
   return res.status(200).json({
     success: true,
+    data: req.user,
+    user: req.user
+  });
+});
+
+// @route   GET /api/auth/profile (Alias for /me)
+router.get('/profile', protect, async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    data: req.user,
     user: req.user
   });
 });

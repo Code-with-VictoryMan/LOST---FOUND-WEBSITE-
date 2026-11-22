@@ -1,0 +1,661 @@
+{
+  "info": {
+    "_postman_id": "7b8f9e12-4c2a-493e-90f7-saiu-lost-found",
+    "name": "Sai University Campus Lost & Found API Collection",
+    "description": "Complete automated Postman API test suite for Sai University Lost & Found system covering Auth, Items, Claims, Scanning, and Admin Observability.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication Suite",
+      "item": [
+        {
+          "name": "1.1 Student Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Login returns token and student user object', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.token).to.be.a('string');",
+                  "    pm.expect(json.user.role).to.eql('student');",
+                  "    pm.environment.set('studentToken', json.token);",
+                  "    pm.environment.set('currentUserId', json.user.id);",
+                  "});",
+                  "pm.test('Response includes persistent login tracking', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.user).to.have.property('lastLogin');",
+                  "    pm.expect(json.user).to.have.property('loginCount');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"saisravan@saiuniversity.edu.in\",\n  \"password\": \"StudentPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.2 Security Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Login returns admin authority role', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.user.role).to.eql('admin');",
+                  "    pm.environment.set('adminToken', json.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@saiuniversity.edu.in\",\n  \"password\": \"AdminPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.3 Get Authenticated Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns authenticated profile data', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.email).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "1.4 Get Persistent MongoDB Login History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns persistent login history records', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.history).to.be.an('array');",
+                  "    pm.expect(json.loginCount).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login-history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login-history"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Items Management Suite",
+      "item": [
+        {
+          "name": "2.1 Get All Active Items Feed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Items feed returns array with count', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.count).to.be.above(0);",
+                  "    var currentUserId = pm.environment.get('currentUserId');",
+                  "    var otherItem = json.data.find(function(i) {",
+                  "        var rep = i.reportedBy ? (i.reportedBy._id || i.reportedBy) : '';",
+                  "        return String(rep) !== String(currentUserId);",
+                  "    });",
+                  "    if (otherItem) {",
+                  "        pm.environment.set('targetClaimItemId', otherItem._id);",
+                  "    } else if (json.data.length > 0) {",
+                  "        pm.environment.set('targetClaimItemId', json.data[0]._id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items"]
+            }
+          }
+        },
+        {
+          "name": "2.2 Filter Items by Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Filter by category returns matching items', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    json.data.forEach(function(i) {",
+                  "        pm.expect(i.category).to.eql('Electronics & Gadgets');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/items?category=Electronics & Gadgets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Electronics & Gadgets"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.3 Get Current Student Reported Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns authenticated user reported items', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    if (json.data.length > 0) {",
+                  "        pm.environment.set('createdItemId', json.data[0]._id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/items/my-items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "my-items"]
+            }
+          }
+        },
+        {
+          "name": "2.4 Filter Items by User ID Query",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Filters items matching specified user', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/items?user={{currentUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items"],
+              "query": [
+                {
+                  "key": "user",
+                  "value": "{{currentUserId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.5 Report New Lost or Found Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Item created successfully with 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.title).to.include('Scientific Calculator');",
+                  "    pm.environment.set('createdItemId', json.data._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Casio fx-991EX Scientific Calculator\",\n  \"type\": \"lost\",\n  \"category\": \"Electronics & Gadgets\",\n  \"building\": \"Academic Block A\",\n  \"specificLocation\": \"Classroom 104, 3rd row desk\",\n  \"dateOccurred\": \"2026-11-20\",\n  \"description\": \"Black Casio ClassWiz calculator with student name initials engraved on reverse cover.\",\n  \"imageUrl\": \"https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=600&q=80\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items"]
+            }
+          }
+        },
+        {
+          "name": "2.6 Get Specific Item by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Retrieves single item document', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data._id).to.eql(pm.environment.get('createdItemId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/items/{{createdItemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "{{createdItemId}}"]
+            }
+          }
+        },
+        {
+          "name": "2.7 Smart Scanner & AI Keyword Match",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Scan match returns matching candidates', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json).to.have.property('matchFound');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemText\": \"Calculator Casio ClassWiz fx-991EX lost near classroom\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/items/scan-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "scan-match"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Ownership Verification & Claims Suite",
+      "item": [
+        {
+          "name": "3.1 Submit Ownership Claim",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Claim submitted successfully with 201 Created or 200', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    if (json.data) {",
+                  "        pm.environment.set('testClaimId', json.data._id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": \"{{targetClaimItemId}}\",\n  \"proofDescription\": \"I left this item yesterday during Data Structures lecture. My name initials are etched on the bottom.\",\n  \"contactPhone\": \"+91 98840 55667\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/claims",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "claims"]
+            }
+          }
+        },
+        {
+          "name": "3.2 Get My Submitted Claims",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Retrieves user submitted claims', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    if (json.data.length > 0) {",
+                  "        pm.environment.set('testClaimId', json.data[0]._id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/claims/my-claims",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "claims", "my-claims"]
+            }
+          }
+        },
+        {
+          "name": "3.3 Get Claims for Reported Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin or reporter retrieves claims list', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/claims/item/{{targetClaimItemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "claims", "item", "{{targetClaimItemId}}"]
+            }
+          }
+        },
+        {
+          "name": "3.4 Decide Claim (Admin Review & Handover)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Claim decision updated successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"reviewNotes\": \"Ownership verified via engraved initials. Item handed over successfully.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/claims/{{testClaimId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "claims", "{{testClaimId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Campus Administration & Analytics Suite",
+      "item": [
+        {
+          "name": "4.1 Get Campus Analytics & Recovery Rate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns aggregated campus analytics', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.stats).to.have.property('totalItems');",
+                  "    pm.expect(json.stats).to.have.property('recoveryRate');",
+                  "    pm.expect(json.buildingStats).to.be.an('array');",
+                  "    pm.expect(json.categoryStats).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "stats"]
+            }
+          }
+        },
+        {
+          "name": "4.2 Get All Campus Listings for Admin Oversight",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin retrieves full campus inventory', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/all-items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "all-items"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
