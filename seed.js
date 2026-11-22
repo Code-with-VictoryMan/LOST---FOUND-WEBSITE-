@@ -73,17 +73,6 @@ const sampleItems = [
     status: 'resolved'
   },
   {
-    title: 'Honda Activa Key with Deadpool Keychain',
-    type: 'found',
-    category: 'Keys & Access Cards',
-    description: 'Silver vehicle key attached to a rubber red Deadpool mask keychain and a small brass padlock key.',
-    building: 'Campus Grounds / Lawn',
-    specificLocation: 'Bicycle and Scooter Parking Bay 2',
-    dateOccurred: new Date('2026-10-18'),
-    imageUrl: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=600&q=80',
-    status: 'open'
-  },
-  {
     title: 'Apple AirPods Pro (2nd Gen) in White MagSafe Case',
     type: 'lost',
     category: 'Electronics & Gadgets',
