@@ -19,21 +19,30 @@ document.addEventListener('DOMContentLoaded', () => {
     [tabBtnStudent, tabBtnAdmin, tabBtnRegister].forEach(b => b.classList.remove('active'));
     [studentLoginForm, adminLoginForm, studentRegisterForm].forEach(f => f.classList.add('hidden'));
 
+    const portalHeaderTitle = document.getElementById('portalHeaderTitle');
+
     if (activeTab === 'student') {
       tabBtnStudent.classList.add('active');
       studentLoginForm.classList.remove('hidden');
+      if (portalHeaderTitle) portalHeaderTitle.textContent = 'SIGN IN TO CAMPUS';
     } else if (activeTab === 'admin') {
       tabBtnAdmin.classList.add('active');
       adminLoginForm.classList.remove('hidden');
+      if (portalHeaderTitle) portalHeaderTitle.textContent = 'CAMPUS SECURITY CONSOLE';
     } else if (activeTab === 'register') {
       tabBtnRegister.classList.add('active');
       studentRegisterForm.classList.remove('hidden');
+      if (portalHeaderTitle) portalHeaderTitle.textContent = 'REGISTER TO CAMPUS';
     }
   }
 
   tabBtnStudent.addEventListener('click', () => switchTab('student'));
   tabBtnAdmin.addEventListener('click', () => switchTab('admin'));
   tabBtnRegister.addEventListener('click', () => switchTab('register'));
+
+  document.getElementById('btnToggleToRegister')?.addEventListener('click', () => switchTab('register'));
+  document.getElementById('btnToggleToLogin')?.addEventListener('click', () => switchTab('student'));
+  document.getElementById('btnBackToStudent')?.addEventListener('click', () => switchTab('student'));
 
   // Check URL tab query param (e.g. ?tab=register)
   if (urlParams.get('tab') === 'register') {
@@ -372,7 +381,7 @@ function showAlert(message, type = 'error') {
   const alertIcon = document.getElementById('portalAlertIcon');
   if (!alertBox || !alertText) return;
 
-  alertBox.className = `auth-alert auth-alert-${type}`;
+  alertBox.className = `neo-alert neo-alert-${type}`;
   alertIcon.textContent = type === 'success' ? '✅' : '⚠️';
   alertText.textContent = message;
   alertBox.classList.remove('hidden');

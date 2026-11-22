@@ -457,123 +457,107 @@
     </div>
   </div>
 
-  <!-- Modal: Authentication (Optimized Login & Registration) -->
+  <!-- Modal: Authentication (Neo-Brutalist Campus Portal - Exact Design Match) -->
   <div id="authModal" class="modal-overlay hidden">
-    <div class="modal-box auth-modal-box">
-      <div class="modal-header">
-        <div style="display:flex;align-items:center;gap:0.6rem;">
-          <span style="font-size:1.3rem;">🔐</span>
-          <h3 id="authModalTitle" style="font-size:1.2rem;font-weight:700;color:#fff;">Sign In to SAIU Portal</h3>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;margin-right:0.8rem;">
-          <a href="login.html" style="font-size:0.75rem;color:var(--accent-cyan);text-decoration:none;border:1px solid rgba(56,189,248,0.3);padding:0.25rem 0.55rem;border-radius:6px;">Fullscreen Portal ↗</a>
-        </div>
-        <button class="modal-close" id="btnCloseAuth" aria-label="Close">&times;</button>
+    <div class="neo-brutal-modal">
+      <!-- Yellow Header Bar -->
+      <div class="neo-header">
+        <h3 id="authModalTitle" class="neo-title">SIGN IN TO CAMPUS</h3>
+        <button class="neo-close-btn" id="btnCloseAuth" aria-label="Close">&times;</button>
       </div>
 
-      <div style="padding:1.5rem 1.75rem 0.5rem 1.75rem;">
-        <!-- Top Segmented Tabs -->
-        <div class="auth-tabs">
-          <button type="button" class="auth-tab-btn active" id="tabSignIn">
-            <span>🔑</span> Sign In
-          </button>
-          <button type="button" class="auth-tab-btn" id="tabRegister">
-            <span>📝</span> Register Student
-          </button>
+      <!-- White Modal Body -->
+      <div class="neo-body">
+        <!-- Sai University Brand Row -->
+        <div class="neo-brand-row">
+          <div class="neo-logo-box">
+            <img src="sai-university-logo.png" alt="Sai University Logo" class="neo-logo-img">
+          </div>
+          <span class="neo-brand-name">SAI UNIVERSITY</span>
         </div>
 
-        <!-- Quick-Fill Demo Bar (Speedy Viva Evaluation) -->
-        <div class="auth-quick-fill-bar" id="authQuickFillBar">
-          <span class="auth-quick-fill-label">⚡ 1-Click Fill:</span>
-          <button type="button" class="auth-chip" id="chipFillStudent">
-            🎓 Student (Sai Sravan)
-          </button>
-          <button type="button" class="auth-chip" id="chipFillAdmin">
-            🛡️ Admin (Security)
-          </button>
+        <hr class="neo-divider">
+
+        <!-- Quick 1-Click Evaluation Chips for Testing -->
+        <div class="neo-quick-chips-wrap" id="authQuickFillBar">
+          <span class="neo-quick-label">⚡ 1-CLICK:</span>
+          <button type="button" class="neo-chip-btn" id="chipFillStudent">🎓 STUDENT (SAI SRAVAN)</button>
+          <button type="button" class="neo-chip-btn" id="chipFillAdmin">🛡️ ADMIN (SECURITY)</button>
         </div>
 
         <!-- Inline Alert / Error Notice -->
-        <div id="authAlert" class="auth-alert hidden">
+        <div id="authAlert" class="neo-alert hidden">
           <span id="authAlertIcon">⚠️</span>
           <span id="authAlertText">Authentication message</span>
         </div>
-      </div>
 
-      <form id="authForm" class="modal-form" style="padding-top:0.5rem;">
-        <!-- Registration Specific Fields -->
-        <div id="registerFields" class="hidden">
-          <div class="form-group">
-            <label for="authName">Full Student / Staff Name *</label>
-            <input type="text" id="authName" placeholder="e.g. Sai Sravan V">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="authRole">Account Role</label>
-              <select id="authRole">
-                <option value="student">Student (B.Tech / UG / PG)</option>
-                <option value="faculty">Faculty / Staff Member</option>
-              </select>
+        <form id="authForm" class="neo-form">
+          <!-- Registration Fields (hidden in Sign In mode) -->
+          <div id="registerFields" class="hidden">
+            <div class="neo-field-group">
+              <label for="authName" class="neo-label">FULL NAME <span class="neo-req">*</span></label>
+              <input type="text" id="authName" class="neo-input" placeholder="e.g. Sai Sravan V" autocomplete="name">
             </div>
-            <div class="form-group">
-              <label for="authStudentId">Student ID / Roll No</label>
-              <input type="text" id="authStudentId" placeholder="e.g. SAIU2024CS042">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="neo-field-group">
+                <label for="authStudentId" class="neo-label">STUDENT ID / ROLL NO <span class="neo-req">*</span></label>
+                <input type="text" id="authStudentId" class="neo-input" placeholder="SAIU2024CS001">
+              </div>
+              <div class="neo-field-group">
+                <label for="authPhone" class="neo-label">MOBILE PHONE <span class="neo-req">*</span></label>
+                <input type="tel" id="authPhone" class="neo-input" placeholder="+91 98840 55667" autocomplete="tel">
+              </div>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="authDepartment">School / Department</label>
-              <select id="authDepartment">
+
+            <div class="neo-field-group">
+              <label for="authDepartment" class="neo-label">DEPARTMENT / SCHOOL <span class="neo-req">*</span></label>
+              <select id="authDepartment" class="neo-input neo-select">
                 <option value="School of Computing & Data Science">School of Computing &amp; Data Science</option>
                 <option value="School of Arts & Sciences">School of Arts &amp; Sciences</option>
                 <option value="School of Law">School of Law</option>
                 <option value="School of Business">School of Business</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="authPhone">Contact Phone Number</label>
-              <input type="tel" id="authPhone" placeholder="+91 98840 55667">
+          </div>
+
+          <!-- University Email Field -->
+          <div class="neo-field-group">
+            <label for="authEmail" class="neo-label">UNIVERSITY EMAIL <span class="neo-req">*</span></label>
+            <input type="email" id="authEmail" class="neo-input neo-input-highlight" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
+          </div>
+
+          <!-- Password Field -->
+          <div class="neo-field-group">
+            <label for="authPassword" class="neo-label">PASSWORD <span class="neo-req">*</span></label>
+            <div class="neo-password-wrap">
+              <input type="password" id="authPassword" class="neo-input" placeholder="At least 8 characters, letter + number" required minlength="6" autocomplete="current-password">
+              <button type="button" class="neo-pwd-toggle" id="btnTogglePassword" aria-label="Toggle password visibility" title="Show/Hide password">👁️</button>
+            </div>
+            <!-- Live Password Strength (Active during registration) -->
+            <div id="authStrengthContainer" class="hidden" style="margin-top: 6px;">
+              <div class="neo-strength-meter">
+                <div class="neo-strength-bar" id="strBar1"></div>
+                <div class="neo-strength-bar" id="strBar2"></div>
+                <div class="neo-strength-bar" id="strBar3"></div>
+              </div>
+              <div class="neo-strength-text" id="authStrengthText">At least 8 characters, letter + number</div>
             </div>
           </div>
-        </div>
 
-        <!-- Shared Credentials -->
-        <div class="form-group">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <label for="authEmail">Sai University Email *</label>
-            <span id="emailDomainHint" class="email-domain-hint hidden">+ @saiuniversity.edu.in</span>
+          <!-- Button Actions Row (Neo-Brutalist: Green Submit + White Toggle) -->
+          <div class="neo-actions-row">
+            <button type="submit" class="neo-btn-primary" id="btnAuthSubmit">
+              <span id="authSubmitText">SIGN IN</span>
+            </button>
+            <button type="button" class="neo-btn-secondary" id="authToggleBtn">
+              <span id="authToggleText">NEW HERE? REGISTER</span>
+            </button>
+            <!-- Hidden fallback anchor for script compatibility -->
+            <a href="#" id="authToggleLink" class="hidden"></a>
           </div>
-          <input type="email" id="authEmail" placeholder="student@saiuniversity.edu.in" required autocomplete="email">
-        </div>
-
-        <div class="form-group">
-          <label for="authPassword">Password *</label>
-          <div class="password-input-wrap">
-            <input type="password" id="authPassword" placeholder="••••••••" required minlength="6" autocomplete="current-password">
-            <button type="button" class="password-toggle-btn" id="btnTogglePassword" aria-label="Toggle password visibility" title="Show/Hide password">👁️</button>
-          </div>
-          <!-- Live Password Strength (Active during registration) -->
-          <div id="authStrengthContainer" class="hidden">
-            <div class="auth-strength-meter">
-              <div class="auth-strength-bar" id="strBar1"></div>
-              <div class="auth-strength-bar" id="strBar2"></div>
-              <div class="auth-strength-bar" id="strBar3"></div>
-              <div class="auth-strength-bar" id="strBar4"></div>
-            </div>
-            <div class="auth-strength-text" id="authStrengthText">Password strength: Minimum 6 characters</div>
-          </div>
-        </div>
-
-        <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;">
-          <span class="auth-toggle-text" style="font-size:0.82rem;color:var(--text-secondary);">
-            <span id="authTogglePrompt">New student?</span>
-            <a href="#" id="authToggleLink" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">Create account</a>
-          </span>
-          <button type="submit" class="btn btn-primary" id="btnAuthSubmit" style="min-width:130px;justify-content:center;">
-            <span id="authSubmitText">Sign In</span>
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 

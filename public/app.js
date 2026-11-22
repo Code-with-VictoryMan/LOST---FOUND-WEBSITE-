@@ -723,6 +723,8 @@ function setupEventListeners() {
   const authStrengthContainer = document.getElementById('authStrengthContainer');
   const btnAuthSubmit = document.getElementById('btnAuthSubmit');
   const authSubmitText = document.getElementById('authSubmitText');
+  const authToggleBtn = document.getElementById('authToggleBtn');
+  const authToggleText = document.getElementById('authToggleText');
   const authAlert = document.getElementById('authAlert');
   const authAlertText = document.getElementById('authAlertText');
   const authAlertIcon = document.getElementById('authAlertIcon');
@@ -733,8 +735,8 @@ function setupEventListeners() {
 
   function showAuthAlert(msg, isSuccess = false) {
     if (!authAlert) return;
-    authAlert.classList.remove('hidden', 'auth-alert-error', 'auth-alert-success');
-    authAlert.classList.add(isSuccess ? 'auth-alert-success' : 'auth-alert-error');
+    authAlert.classList.remove('hidden', 'neo-alert-error', 'neo-alert-success', 'auth-alert-error', 'auth-alert-success');
+    authAlert.classList.add(isSuccess ? 'neo-alert-success' : 'neo-alert-error');
     if (authAlertText) authAlertText.textContent = msg;
     if (authAlertIcon) authAlertIcon.textContent = isSuccess ? '✅' : '⚠️';
   }
@@ -753,8 +755,9 @@ function setupEventListeners() {
       if (registerFields) registerFields.classList.remove('hidden');
       if (authQuickFillBar) authQuickFillBar.classList.add('hidden');
       if (authStrengthContainer) authStrengthContainer.classList.remove('hidden');
-      if (authModalTitle) authModalTitle.textContent = 'Register Student Account';
-      if (authSubmitText) authSubmitText.textContent = 'Create Account';
+      if (authModalTitle) authModalTitle.textContent = 'REGISTER STUDENT';
+      if (authSubmitText) authSubmitText.textContent = 'CREATE ACCOUNT';
+      if (authToggleText) authToggleText.textContent = 'ALREADY REGISTERED? SIGN IN';
       if (authTogglePrompt) authTogglePrompt.textContent = 'Already have an account?';
       if (authToggleLink) authToggleLink.textContent = 'Sign In';
       const nameInput = document.getElementById('authName');
@@ -765,8 +768,9 @@ function setupEventListeners() {
       if (registerFields) registerFields.classList.add('hidden');
       if (authQuickFillBar) authQuickFillBar.classList.remove('hidden');
       if (authStrengthContainer) authStrengthContainer.classList.add('hidden');
-      if (authModalTitle) authModalTitle.textContent = 'Sign In to SAIU Portal';
-      if (authSubmitText) authSubmitText.textContent = 'Sign In';
+      if (authModalTitle) authModalTitle.textContent = 'SIGN IN TO CAMPUS';
+      if (authSubmitText) authSubmitText.textContent = 'SIGN IN';
+      if (authToggleText) authToggleText.textContent = 'NEW HERE? REGISTER';
       if (authTogglePrompt) authTogglePrompt.textContent = 'New student?';
       if (authToggleLink) authToggleLink.textContent = 'Create account';
       if (authEmailInput) authEmailInput.focus();
@@ -775,6 +779,12 @@ function setupEventListeners() {
 
   if (tabSignIn) tabSignIn.addEventListener('click', () => setAuthMode(false));
   if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode(true));
+  if (authToggleBtn) {
+    authToggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      setAuthMode(!isRegisterMode);
+    });
+  }
   if (authToggleLink) {
     authToggleLink.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1073,18 +1083,18 @@ function setupEventListeners() {
           authModal.classList.add('hidden');
           showToast(`Welcome to SAIU Portal, ${currentUser.name}!`);
           if (btnAuthSubmit) btnAuthSubmit.disabled = false;
-          if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+          if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'CREATE ACCOUNT' : 'SIGN IN';
           document.getElementById('authForm').reset();
           hideAuthAlert();
         }, 700);
       } else {
         if (btnAuthSubmit) btnAuthSubmit.disabled = false;
-        if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+        if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'CREATE ACCOUNT' : 'SIGN IN';
         showAuthAlert(data.message || 'Authentication failed. Please check your credentials.');
       }
     } catch (err) {
       if (btnAuthSubmit) btnAuthSubmit.disabled = false;
-      if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+      if (authSubmitText) authSubmitText.textContent = isRegisterMode ? 'CREATE ACCOUNT' : 'SIGN IN';
       showAuthAlert('Connection error with MongoDB authentication server.');
     }
   });

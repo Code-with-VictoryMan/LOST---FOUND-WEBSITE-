@@ -3,538 +3,367 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAIU PROJECTS | Campus Authentication Portal</title>
+  <title>SAIU PROJECTS | Campus Sign In Portal</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    .portal-wrapper {
-      min-height: calc(100vh - 120px);
+    body.neo-login-page {
+      background-color: #ebebeb;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 0);
+      background-size: 24px 24px;
+      color: #000000;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 2rem;
+    }
+
+    body.neo-login-page::before,
+    body.neo-login-page::after {
+      display: none; /* Disable dark glowing spheres on neo-brutalist page */
+    }
+
+    .neo-top-banner {
+      border-bottom: 2px solid #000000;
+      background: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .neo-top-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #000000;
+    }
+
+    .neo-top-brand .logo-box {
+      width: 36px;
+      height: 36px;
+      border: 2px solid #000000;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+
+    .neo-top-brand .logo-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .neo-top-brand-text {
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .neo-top-nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .neo-nav-link {
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #000000;
+      text-decoration: none;
+      box-shadow: 2px 2px 0px #000000;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .neo-nav-link:hover {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+      background: #ffd83d;
+    }
+
+    .neo-portal-container {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2.5rem 1rem;
-      position: relative;
-      z-index: 1;
     }
 
-    .portal-card {
+    .neo-brutal-card {
       width: 100%;
-      max-width: 520px;
-      background: rgba(18, 23, 33, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      padding: 2.5rem 2.2rem;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(56, 189, 248, 0.12);
-      backdrop-filter: blur(24px) saturate(190%);
-      transition: all 0.3s ease;
-    }
-
-    .portal-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .portal-logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.2rem;
+      max-width: 580px;
+      background: #ffffff;
+      border: 3px solid #000000;
+      border-radius: 0px;
+      box-shadow: 8px 8px 0px #000000;
+      overflow: hidden;
       position: relative;
     }
 
-    .portal-logo-wrap img {
-      height: 70px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 16px rgba(56, 189, 248, 0.35));
-    }
-
-    .portal-title {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.35rem;
-    }
-
-    .portal-subtitle {
-      font-size: 0.88rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
-    }
-
-    .portal-db-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      margin-top: 0.75rem;
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #4ade80;
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .portal-quick-bar {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 14px;
-      padding: 0.85rem 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .portal-quick-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin-bottom: 0.6rem;
+    .neo-tab-strip {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      border-bottom: 2px solid #000000;
+      background: #f1f5f9;
     }
 
-    .portal-quick-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-    }
-
-    .quick-chip {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #cbd5e1;
-      padding: 0.35rem 0.7rem;
-      border-radius: 8px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .quick-chip:hover {
-      background: rgba(56, 189, 248, 0.18);
-      border-color: var(--accent-cyan);
-      color: #ffffff;
-      transform: translateY(-1px);
-    }
-
-    .active-session-banner {
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 16px;
-      padding: 1.5rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .portal-tabs {
-      display: flex;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 4px;
-      margin-bottom: 1.5rem;
-    }
-
-    .portal-tab-btn {
+    .neo-tab-item {
       flex: 1;
-      padding: 0.65rem 0.5rem;
+      padding: 10px;
       background: none;
       border: none;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 10px;
+      border-right: 2px solid #000000;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #000000;
       cursor: pointer;
-      transition: all 0.2s ease;
       text-align: center;
+      transition: background-color 0.15s;
+    }
+    .neo-tab-item:last-child {
+      border-right: none;
     }
 
-    .portal-tab-btn.active {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    .neo-tab-item.active {
+      background: #ffffff;
+      color: #000000;
+      border-bottom: 2px solid #ffffff;
+      margin-bottom: -2px;
     }
 
-    .portal-form-group {
-      margin-bottom: 1.15rem;
-      text-align: left;
-    }
-
-    .portal-form-group label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 0.45rem;
-    }
-
-    .portal-form-group input,
-    .portal-form-group select {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-    }
-
-    .portal-form-group input:focus,
-    .portal-form-group select:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .portal-form-group select option {
-      background: #121721;
-      color: #ffffff;
-    }
-
-    .form-options-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.3rem;
-      font-size: 0.82rem;
-    }
-
-    .remember-check {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      cursor: pointer;
-      color: var(--text-secondary);
-    }
-
-    .remember-check input[type="checkbox"] {
-      accent-color: var(--accent-cyan);
-      cursor: pointer;
-    }
-
-    .forgot-link {
-      color: var(--accent-cyan);
-      text-decoration: none;
-      cursor: pointer;
-      font-weight: 500;
-      transition: opacity 0.2s;
-    }
-
-    .forgot-link:hover {
-      text-decoration: underline;
-    }
-
-    .submit-portal-btn {
-      width: 100%;
-      padding: 0.95rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      border: none;
-      transition: all 0.25s ease;
-    }
-
-    .btn-student-submit {
-      background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
-      color: #03101d;
-    }
-    .btn-student-submit:hover {
-      box-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
-      transform: translateY(-2px);
-    }
-
-    .btn-admin-submit {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #1a0f00;
-    }
-    .btn-admin-submit:hover {
-      box-shadow: 0 0 24px rgba(245, 158, 11, 0.45);
-      transform: translateY(-2px);
-    }
-
-    .portal-footer-nav {
-      margin-top: 1.8rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      text-align: center;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    .portal-footer-nav a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .portal-footer-nav a:hover {
-      color: var(--accent-cyan);
+    .neo-tab-item:hover:not(.active) {
+      background: #e2e8f0;
     }
   </style>
 </head>
-<body>
-  <!-- Navigation Header -->
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="brand-group">
-        <img src="sai-university-logo.png" alt="Sai University Logo" class="brand-logo-img">
-        <div>
-          <h1 class="brand-title">SAIU PROJECTS</h1>
-          <span class="brand-subtitle">CAMPUS LOGIN &amp; IDENTITY</span>
-        </div>
-      </a>
-      <div class="nav-actions">
-        <nav class="desktop-nav-links">
-          <a href="index.html">← Browse Feed</a>
-          <a href="dashboard.html">📊 Dashboard</a>
-        </nav>
+<body class="neo-login-page">
+  <!-- Minimalist Neo-Brutalist Top Bar -->
+  <header class="neo-top-banner">
+    <a href="index.html" class="neo-top-brand">
+      <div class="logo-box">
+        <img src="sai-university-logo.png" alt="Sai University Crest">
       </div>
-    </div>
+      <div>
+        <div class="neo-top-brand-text">LOST &amp; FOUND</div>
+        <div style="font-size:0.65rem; font-weight:800; letter-spacing:0.05em; color:#475569;">CAMPUS PORTAL // EST. 2026</div>
+      </div>
+    </a>
+    <nav class="neo-top-nav-links">
+      <a href="index.html" class="neo-nav-link">BOARD</a>
+      <a href="index.html" class="neo-nav-link">REPORT</a>
+      <a href="dashboard.html" class="neo-nav-link">MY SPACE</a>
+    </nav>
   </header>
 
-  <main class="portal-wrapper">
-    <div class="portal-card">
-      <!-- Portal Header -->
-      <div class="portal-header">
-        <div class="portal-logo-wrap">
-          <img src="sai-university-logo.png" alt="Sai University Crest">
-        </div>
-        <h2 class="portal-title">Sai University Portal</h2>
-        <p class="portal-subtitle">Secure Academic Single Sign-On &amp; Campus Verification</p>
-        <div class="portal-db-pill">
-          <span style="width:8px; height:8px; border-radius:50%; background:#22c55e; display:inline-block; box-shadow:0 0 8px #22c55e;"></span>
-          <span>MongoDB Live &bull; campus_lost_found</span>
-        </div>
+  <main class="neo-portal-container">
+    <div class="neo-brutal-card">
+      <!-- Yellow Header Bar (Exact match to screenshot) -->
+      <div class="neo-header">
+        <h2 class="neo-title" id="portalHeaderTitle">SIGN IN TO CAMPUS</h2>
+        <a href="index.html" class="neo-close-btn" title="Back to Board">&times;</a>
       </div>
 
-      <!-- Active Session Banner (Shown if already signed in) -->
-      <div id="activeSessionBlock" class="active-session-banner hidden">
-        <span style="font-size:2rem; display:block; margin-bottom:0.4rem;">👋</span>
-        <h4 style="color:#fff; font-size:1.15rem; margin-bottom:0.2rem;" id="activeSessionName">Signed In Student</h4>
-        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;" id="activeSessionMeta">student@saiuniversity.edu.in</p>
-        <div style="display:flex; flex-direction:column; gap:0.6rem;">
-          <a href="dashboard.html" class="btn btn-primary" style="justify-content:center; padding:0.75rem;">
-            📊 Go to Personal Dashboard
-          </a>
-          <a href="index.html" class="btn btn-outline" style="justify-content:center; padding:0.75rem; border-color:rgba(255,255,255,0.15); color:#fff;">
-            🔍 Browse Lost &amp; Found Feed
-          </a>
-          <button id="btnSwitchAccount" class="btn btn-outline" style="justify-content:center; padding:0.75rem; border-color:rgba(248,113,113,0.3); color:#f87171;">
-            🚪 Sign Out &amp; Switch Account
-          </button>
-        </div>
+      <!-- Segmented Sub-Tabs -->
+      <div class="neo-tab-strip">
+        <button type="button" class="neo-tab-item active" id="tabBtnStudent">STUDENT SIGN IN</button>
+        <button type="button" class="neo-tab-item" id="tabBtnAdmin">ADMIN CONSOLE</button>
+        <button type="button" class="neo-tab-item" id="tabBtnRegister">NEW REGISTRATION</button>
       </div>
 
-      <!-- Authentication Container -->
-      <div id="authFormsContainer">
-        <!-- 1-Click Evaluation Credentials -->
-        <div class="portal-quick-bar">
-          <div class="portal-quick-label">
-            <span>⚡ 1-Click Demo Credentials</span>
-            <span style="color:var(--accent-cyan); font-size:0.7rem;">Click to Autofill</span>
+      <!-- Main White Body -->
+      <div class="neo-body">
+        <!-- Sai University Header Section -->
+        <div class="neo-brand-row">
+          <div class="neo-logo-box">
+            <img src="sai-university-logo.png" alt="Sai University Crest" class="neo-logo-img">
           </div>
-          <div class="portal-quick-chips">
-            <button type="button" class="quick-chip" id="chipStudent1">
-              🎓 Sai Sravan (Student)
-            </button>
-            <button type="button" class="quick-chip" id="chipStudent2">
-              🎓 Aditi Sharma (Student)
-            </button>
-            <button type="button" class="quick-chip" id="chipAdmin">
-              🛡️ Campus Security (Admin)
-            </button>
+          <span class="neo-brand-name">SAI UNIVERSITY</span>
+        </div>
+
+        <hr class="neo-divider">
+
+        <!-- Active Session Banner (Shown if already signed in) -->
+        <div id="activeSessionBlock" class="neo-alert hidden" style="background:#fffbe6; color:#000; flex-direction:column; align-items:flex-start; margin-bottom:1.25rem;">
+          <div style="display:flex; align-items:center; gap:8px; width:100%;">
+            <span style="font-size:1.4rem;">👋</span>
+            <div>
+              <div style="font-weight:900; font-size:0.95rem;" id="activeSessionName">Signed In Student</div>
+              <div style="font-size:0.75rem; color:#475569; font-weight:600;" id="activeSessionMeta">student@saiuniversity.edu.in</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px; width:100%; flex-wrap:wrap;">
+            <a href="dashboard.html" class="neo-btn-primary" style="text-decoration:none; padding:8px 16px; font-size:0.75rem;">GO TO DASHBOARD</a>
+            <a href="index.html" class="neo-btn-secondary" style="text-decoration:none; padding:8px 14px; font-size:0.75rem;">BROWSE BOARD</a>
+            <button id="btnSwitchAccount" class="neo-btn-secondary" style="background:#fee2e2; border-color:#000; padding:8px 14px; font-size:0.75rem;">SIGN OUT &bull; SWITCH</button>
           </div>
         </div>
 
-        <!-- Segmented Tab Navigation -->
-        <div class="portal-tabs">
-          <button type="button" class="portal-tab-btn active" id="tabBtnStudent">Student Sign In</button>
-          <button type="button" class="portal-tab-btn" id="tabBtnAdmin">Admin Console</button>
-          <button type="button" class="portal-tab-btn" id="tabBtnRegister">New Registration</button>
-        </div>
-
-        <!-- Global Alert Notification -->
-        <div id="portalAlert" class="auth-alert hidden">
-          <span id="portalAlertIcon">⚠️</span>
-          <span id="portalAlertText"></span>
-        </div>
-
-        <!-- 1. STUDENT LOGIN FORM -->
-        <form id="studentLoginForm">
-          <div class="portal-form-group">
-            <label for="studentEmail">Sai University Email</label>
-            <input type="email" id="studentEmail" placeholder="saisravan@saiuniversity.edu.in" required autocomplete="email">
-            <span class="email-domain-hint" id="hintStudentDomain">+ Add @saiuniversity.edu.in</span>
+        <!-- Authentication Container -->
+        <div id="authFormsContainer">
+          <!-- 1-Click Evaluation Credentials -->
+          <div class="neo-quick-chips-wrap">
+            <span class="neo-quick-label">⚡ 1-CLICK:</span>
+            <button type="button" class="neo-chip-btn" id="chipStudent1">🎓 SAI SRAVAN</button>
+            <button type="button" class="neo-chip-btn" id="chipStudent2">🎓 ADITI SHARMA</button>
+            <button type="button" class="neo-chip-btn" id="chipAdmin">🛡️ ADMIN (SECURITY)</button>
           </div>
 
-          <div class="portal-form-group">
-            <label for="studentPassword">Password</label>
-            <div class="password-input-wrap">
-              <input type="password" id="studentPassword" placeholder="Enter your password" required autocomplete="current-password" minlength="6">
-              <button type="button" class="password-toggle-btn" id="toggleStudentPassword" tabindex="-1">👁️</button>
+          <!-- Alert Notification -->
+          <div id="portalAlert" class="neo-alert hidden">
+            <span id="portalAlertIcon">⚠️</span>
+            <span id="portalAlertText"></span>
+          </div>
+
+          <!-- 1. STUDENT LOGIN FORM -->
+          <form id="studentLoginForm">
+            <div class="neo-field-group">
+              <label for="studentEmail" class="neo-label">UNIVERSITY EMAIL <span class="neo-req">*</span></label>
+              <input type="email" id="studentEmail" class="neo-input neo-input-highlight" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
             </div>
-          </div>
 
-          <div class="form-options-row">
-            <label class="remember-check">
-              <input type="checkbox" id="rememberStudent" checked>
-              <span>Remember my session</span>
-            </label>
-            <span class="forgot-link" id="btnForgotStudent">Forgot password?</span>
-          </div>
-
-          <button type="submit" class="submit-portal-btn btn-student-submit" id="btnStudentSubmit">
-            🎓 Sign In to Student Portal
-          </button>
-        </form>
-
-        <!-- 2. ADMIN LOGIN FORM (Hidden initially) -->
-        <form id="adminLoginForm" class="hidden">
-          <div class="portal-form-group">
-            <label for="adminEmail">Security Admin Email</label>
-            <input type="email" id="adminEmail" placeholder="admin@saiuniversity.edu.in" required autocomplete="email">
-          </div>
-
-          <div class="portal-form-group">
-            <label for="adminPassword">Master Security Password</label>
-            <div class="password-input-wrap">
-              <input type="password" id="adminPassword" placeholder="Admin password" required autocomplete="current-password">
-              <button type="button" class="password-toggle-btn" id="toggleAdminPassword" tabindex="-1">👁️</button>
+            <div class="neo-field-group">
+              <label for="studentPassword" class="neo-label">PASSWORD <span class="neo-req">*</span></label>
+              <div class="neo-password-wrap">
+                <input type="password" id="studentPassword" class="neo-input" placeholder="At least 8 characters, letter + number" required minlength="6" autocomplete="current-password">
+                <button type="button" class="neo-pwd-toggle" id="toggleStudentPassword" tabindex="-1">👁️</button>
+              </div>
             </div>
-          </div>
 
-          <div class="form-options-row">
-            <label class="remember-check">
-              <input type="checkbox" id="rememberAdmin" checked>
-              <span>Keep admin session active</span>
-            </label>
-            <span class="forgot-link" id="btnForgotAdmin">Help / Security PIN</span>
-          </div>
-
-          <button type="submit" class="submit-portal-btn btn-admin-submit" id="btnAdminSubmit">
-            🛡️ Access Campus Security Console
-          </button>
-        </form>
-
-        <!-- 3. STUDENT REGISTRATION FORM (Hidden initially) -->
-        <form id="studentRegisterForm" class="hidden">
-          <div class="portal-form-group">
-            <label for="regName">Full Legal Name</label>
-            <input type="text" id="regName" placeholder="e.g. Vikramaditya Sundaram" required autocomplete="name">
-          </div>
-
-          <div class="portal-form-group">
-            <label for="regEmail">Sai University Student Email</label>
-            <input type="email" id="regEmail" placeholder="name.surname@saiuniversity.edu.in" required autocomplete="email">
-            <span class="email-domain-hint" id="hintRegDomain">+ Add @saiuniversity.edu.in</span>
-          </div>
-
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
-            <div class="portal-form-group">
-              <label for="regStudentId">Student ID / Roll No</label>
-              <input type="text" id="regStudentId" placeholder="SAIU2024CS099" required>
+            <div class="neo-actions-row">
+              <button type="submit" class="neo-btn-primary" id="btnStudentSubmit">
+                SIGN IN
+              </button>
+              <button type="button" class="neo-btn-secondary" id="btnToggleToRegister">
+                NEW HERE? REGISTER
+              </button>
             </div>
-            <div class="portal-form-group">
-              <label for="regPhone">Mobile Phone</label>
-              <input type="tel" id="regPhone" placeholder="+91 98840 00000" required>
-            </div>
-          </div>
+          </form>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
-            <div class="portal-form-group">
-              <label for="regDept">Department / School</label>
-              <select id="regDept" required>
+          <!-- 2. ADMIN LOGIN FORM (Hidden initially) -->
+          <form id="adminLoginForm" class="hidden">
+            <div class="neo-field-group">
+              <label for="adminEmail" class="neo-label">SECURITY ADMIN EMAIL <span class="neo-req">*</span></label>
+              <input type="email" id="adminEmail" class="neo-input" placeholder="admin@saiuniversity.edu.in" required autocomplete="email">
+            </div>
+
+            <div class="neo-field-group">
+              <label for="adminPassword" class="neo-label">MASTER PASSWORD <span class="neo-req">*</span></label>
+              <div class="neo-password-wrap">
+                <input type="password" id="adminPassword" class="neo-input" placeholder="At least 8 characters" required autocomplete="current-password">
+                <button type="button" class="neo-pwd-toggle" id="toggleAdminPassword" tabindex="-1">👁️</button>
+              </div>
+            </div>
+
+            <div class="neo-actions-row">
+              <button type="submit" class="neo-btn-primary" id="btnAdminSubmit" style="background:#ffd83d;">
+                ACCESS CONSOLE
+              </button>
+              <button type="button" class="neo-btn-secondary" id="btnBackToStudent">
+                BACK TO STUDENT
+              </button>
+            </div>
+          </form>
+
+          <!-- 3. STUDENT REGISTRATION FORM (Hidden initially) -->
+          <form id="studentRegisterForm" class="hidden">
+            <div class="neo-field-group">
+              <label for="regName" class="neo-label">FULL LEGAL NAME <span class="neo-req">*</span></label>
+              <input type="text" id="regName" class="neo-input" placeholder="e.g. Sai Sravan V" required autocomplete="name">
+            </div>
+
+            <div class="neo-field-group">
+              <label for="regEmail" class="neo-label">UNIVERSITY EMAIL <span class="neo-req">*</span></label>
+              <input type="email" id="regEmail" class="neo-input" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="neo-field-group">
+                <label for="regStudentId" class="neo-label">STUDENT ID / ROLL NO <span class="neo-req">*</span></label>
+                <input type="text" id="regStudentId" class="neo-input" placeholder="SAIU2024CS001" required>
+              </div>
+              <div class="neo-field-group">
+                <label for="regPhone" class="neo-label">MOBILE PHONE <span class="neo-req">*</span></label>
+                <input type="tel" id="regPhone" class="neo-input" placeholder="+91 98840 55667" required autocomplete="tel">
+              </div>
+            </div>
+
+            <div class="neo-field-group">
+              <label for="regDept" class="neo-label">DEPARTMENT / SCHOOL <span class="neo-req">*</span></label>
+              <select id="regDept" class="neo-input neo-select" required>
                 <option value="School of Computing & Data Science">School of Computing &amp; Data Science</option>
                 <option value="School of Arts & Sciences">School of Arts &amp; Sciences</option>
                 <option value="School of Law">School of Law</option>
-                <option value="School of Management">School of Management</option>
+                <option value="School of Business">School of Business</option>
               </select>
             </div>
-            <div class="portal-form-group">
-              <label for="regYear">Year of Study</label>
-              <select id="regYear" required>
-                <option value="1st Year B.Tech">1st Year B.Tech</option>
-                <option value="2nd Year B.Tech">2nd Year B.Tech</option>
-                <option value="3rd Year B.Tech" selected>3rd Year B.Tech</option>
-                <option value="4th Year B.Tech">4th Year B.Tech</option>
-                <option value="Postgraduate / Master">Postgraduate / Master</option>
-              </select>
-            </div>
-          </div>
 
-          <div class="portal-form-group">
-            <label for="regPassword">Create Account Password</label>
-            <div class="password-input-wrap">
-              <input type="password" id="regPassword" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
-              <button type="button" class="password-toggle-btn" id="toggleRegPassword" tabindex="-1">👁️</button>
+            <div class="neo-field-group">
+              <label for="regPassword" class="neo-label">PASSWORD <span class="neo-req">*</span></label>
+              <div class="neo-password-wrap">
+                <input type="password" id="regPassword" class="neo-input" placeholder="At least 8 characters, letter + number" required minlength="6" autocomplete="new-password">
+                <button type="button" class="neo-pwd-toggle" id="toggleRegPassword" tabindex="-1">👁️</button>
+              </div>
+              <div class="neo-strength-meter" style="margin-top:6px;">
+                <div class="neo-strength-bar" id="regStrBar1"></div>
+                <div class="neo-strength-bar" id="regStrBar2"></div>
+                <div class="neo-strength-bar" id="regStrBar3"></div>
+              </div>
+              <div class="neo-strength-text" id="regStrengthText">At least 8 characters, letter + number</div>
             </div>
-            <!-- Live Password Strength Meter -->
-            <div class="auth-strength-meter">
-              <div class="auth-strength-bar" id="regStrBar1"></div>
-              <div class="auth-strength-bar" id="regStrBar2"></div>
-              <div class="auth-strength-bar" id="regStrBar3"></div>
+
+            <div class="neo-actions-row">
+              <button type="submit" class="neo-btn-primary" id="btnRegisterSubmit">
+                CREATE ACCOUNT
+              </button>
+              <button type="button" class="neo-btn-secondary" id="btnToggleToLogin">
+                ALREADY REGISTERED? SIGN IN
+              </button>
             </div>
-            <span class="auth-strength-text" id="regStrengthText">Enter a secure password</span>
-          </div>
+          </form>
+        </div>
 
-          <button type="submit" class="submit-portal-btn btn-student-submit" id="btnRegisterSubmit">
-            ✨ Register &amp; Save to MongoDB
-          </button>
-        </form>
-      </div> <!-- /#authFormsContainer -->
-
-      <!-- Footer Navigation Links -->
-      <div class="portal-footer-nav">
-        <a href="index.html">← Return to Lost &amp; Found Feed</a> &bull;
-        <a href="dashboard.html">Campus Dashboard</a> &bull;
-        <a href="javascript:void(0)" id="btnHelpModalTrigger">Need Help?</a>
+        <div style="margin-top:20px; padding-top:14px; border-top:2px solid #000; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800;">
+          <a href="index.html" style="color:#000; text-decoration:none;">&larr; BACK TO CAMPUS BOARD</a>
+          <span style="color:#64748b; cursor:pointer;" id="btnForgotStudent">FORGOT PASSWORD?</span>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- MODAL: Password Reset & Help -->
+  <!-- Self-Service Password Reset Modal -->
   <div id="resetModal" class="modal-overlay hidden">
-    <div class="modal-box modal-box-sm">
-      <div class="modal-header">
-        <h3>Self-Service Password Reset</h3>
-        <button class="modal-close" id="btnCloseReset">&times;</button>
+    <div class="neo-brutal-modal" style="max-width:460px;">
+      <div class="neo-header">
+        <h3 class="neo-title">PASSWORD RESET</h3>
+        <button class="neo-close-btn" id="btnCloseReset">&times;</button>
       </div>
-      <div class="modal-body">
-        <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:1.25rem;">
-          Enter your registered Sai University student or admin email and set your new password. Changes are immediately updated in MongoDB.
-        </p>
-
-        <div id="resetAlert" class="auth-alert hidden">
+      <div class="neo-body">
+        <div id="resetAlert" class="neo-alert hidden">
           <span>⚠️</span><span id="resetAlertText"></span>
         </div>
-
         <form id="resetPasswordForm">
-          <div class="portal-form-group">
-            <label for="resetEmail">Registered Email</label>
-            <input type="email" id="resetEmail" placeholder="student@saiuniversity.edu.in" required>
+          <div class="neo-field-group">
+            <label for="resetEmail" class="neo-label">REGISTERED EMAIL <span class="neo-req">*</span></label>
+            <input type="email" id="resetEmail" class="neo-input" placeholder="student@saiuniversity.edu.in" required>
           </div>
-          <div class="portal-form-group">
-            <label for="resetNewPassword">New Password</label>
-            <input type="password" id="resetNewPassword" placeholder="At least 6 characters" minlength="6" required>
+          <div class="neo-field-group">
+            <label for="resetNewPassword" class="neo-label">NEW PASSWORD <span class="neo-req">*</span></label>
+            <input type="password" id="resetNewPassword" class="neo-input" placeholder="At least 6 characters" minlength="6" required>
           </div>
-          <button type="submit" class="btn btn-primary" id="btnResetSubmit" style="width:100%; justify-content:center; padding:0.85rem; font-weight:700;">
-            🔄 Update Password in Database
+          <button type="submit" class="neo-btn-primary" id="btnResetSubmit" style="width:100%; justify-content:center; margin-top:8px;">
+            UPDATE PASSWORD IN DATABASE
           </button>
         </form>
       </div>
