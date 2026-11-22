@@ -1176,43 +1176,46 @@ select:focus, input:focus, textarea:focus {
 }
 
 /* ==========================================================================
-   NEO-BRUTALIST CAMPUS AUTHENTICATION MODAL & PORTAL (EXACT DESIGN MATCH)
+   CAMPUS AUTHENTICATION MODAL & PORTAL (HARMONIZED WITH SITE THEME)
+   Inspired by University Badge Design with Refined Dark Glassmorphism
    ========================================================================== */
 
 .neo-brutal-modal {
   width: 100%;
-  max-width: 580px;
-  background: #ffffff;
-  border: 3px solid #000000;
-  border-radius: 0px;
-  box-shadow: 8px 8px 0px #000000;
+  max-width: 540px;
+  background: rgba(18, 23, 33, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 45px rgba(245, 158, 11, 0.12);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
   overflow: hidden;
   position: relative;
-  animation: neoModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  color: #000000;
+  animation: neoModalPop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #ffffff;
   margin: 1.5rem auto;
 }
 
 @keyframes neoModalPop {
-  0% { transform: scale(0.96) translateY(10px); opacity: 0; }
+  0% { transform: scale(0.95) translateY(14px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 .neo-header {
-  background-color: #ffd83d; /* Vibrant retro yellow matching screenshot */
-  border-bottom: 2px solid #000000;
-  padding: 12px 18px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  padding: 15px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .neo-title {
-  font-family: 'Space Grotesk', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 1.12rem;
-  font-weight: 900;
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
   letter-spacing: 0.05em;
-  color: #000000;
+  color: #0f172a;
   text-transform: uppercase;
   margin: 0;
   line-height: 1.2;
@@ -1221,32 +1224,33 @@ select:focus, input:focus, textarea:focus {
 .neo-close-btn {
   width: 32px;
   height: 32px;
-  background: #ffffff;
-  border: 2px solid #000000;
-  border-radius: 0px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  font-weight: 900;
-  color: #000000;
+  font-weight: 700;
+  color: #ffffff;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #000000;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
   line-height: 1;
   padding: 0;
+  text-decoration: none;
 }
 
 .neo-close-btn:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px #000000;
-  background: #f1f5f9;
+  background: #0f172a;
+  transform: scale(1.06);
+  color: #fbbf24;
 }
 
 .neo-body {
-  padding: 22px 26px 26px 26px;
-  background: #ffffff;
-  color: #000000;
+  padding: 24px 28px 28px 28px;
+  background: transparent;
+  color: #ffffff;
 }
 
 .neo-brand-row {
@@ -1256,15 +1260,17 @@ select:focus, input:focus, textarea:focus {
 }
 
 .neo-logo-box {
-  width: 44px;
-  height: 44px;
-  border: 2px solid #000000;
-  background: #ffffff;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3px;
+  padding: 4px;
   flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .neo-logo-img {
@@ -1274,18 +1280,18 @@ select:focus, input:focus, textarea:focus {
 }
 
 .neo-brand-name {
-  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.15rem;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.06em;
-  color: #000000;
+  color: #ffffff;
   text-transform: uppercase;
 }
 
 .neo-divider {
   border: none;
-  border-bottom: 2px solid #000000;
-  margin: 16px 0 18px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 18px 0 20px 0;
 }
 
 .neo-quick-chips-wrap {
@@ -1293,61 +1299,62 @@ select:focus, input:focus, textarea:focus {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  background: #fffbeb;
-  border: 1.5px solid #000000;
-  padding: 6px 10px;
-  margin-bottom: 16px;
+  background: rgba(251, 191, 36, 0.06);
+  border: 1px dashed rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-bottom: 18px;
 }
 
 .neo-quick-label {
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: 0.72rem;
+  font-weight: 800;
   letter-spacing: 0.06em;
-  color: #000000;
+  color: #fbbf24;
   text-transform: uppercase;
 }
 
 .neo-chip-btn {
-  background: #ffffff;
-  border: 1.5px solid #000000;
-  color: #000000;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #000000;
-  border-radius: 0px;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .neo-chip-btn:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px #000000;
-  background: #ffd83d;
+  background: rgba(251, 191, 36, 0.2);
+  border-color: #fbbf24;
+  color: #fbbf24;
+  transform: translateY(-1px);
 }
 
 .neo-alert {
-  padding: 10px 14px;
-  border: 2px solid #000000;
+  padding: 11px 14px;
+  border-radius: 12px;
   font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .neo-alert-error {
-  background: #fee2e2;
-  color: #991b1b;
-  box-shadow: 3px 3px 0px #000000;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
 }
 
 .neo-alert-success {
-  background: #dcfce7;
-  color: #166534;
-  box-shadow: 3px 3px 0px #000000;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #86efac;
 }
 
 .neo-field-group {
@@ -1357,17 +1364,17 @@ select:focus, input:focus, textarea:focus {
 
 .neo-label {
   display: block;
-  font-size: 0.72rem;
-  font-weight: 900;
+  font-size: 0.74rem;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #000000;
+  color: #94a3b8;
   margin-bottom: 6px;
 }
 
 .neo-req {
-  color: #ef4444;
-  font-weight: 900;
+  color: #f43f5e;
+  font-weight: 800;
 }
 
 .neo-input {
@@ -1376,13 +1383,12 @@ select:focus, input:focus, textarea:focus {
   font-size: 0.92rem;
   font-family: inherit;
   font-weight: 500;
-  color: #000000;
-  background: #ffffff;
-  border: 2px solid #000000;
-  border-radius: 0px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
   outline: none;
-  box-shadow: none;
-  transition: outline 0.15s, border-color 0.15s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .neo-input::placeholder {
@@ -1391,20 +1397,30 @@ select:focus, input:focus, textarea:focus {
 }
 
 .neo-input:focus {
-  border-color: #000000;
-  outline: 2px solid #ef4444; /* Matches red focus outline from user screenshot */
-  outline-offset: 1px;
+  border-color: #38bdf8;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+  outline: none;
 }
 
 .neo-input-highlight {
-  /* Default red highlight matching user's active screenshot */
-  outline: 2px solid #ef4444;
-  outline-offset: 1px;
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.15);
+}
+
+.neo-input-highlight:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.3);
 }
 
 .neo-select {
   cursor: pointer;
   appearance: auto;
+}
+
+.neo-select option {
+  background: #121721;
+  color: #ffffff;
 }
 
 .neo-password-wrap {
@@ -1419,13 +1435,14 @@ select:focus, input:focus, textarea:focus {
 
 .neo-pwd-toggle {
   position: absolute;
-  right: 6px;
+  right: 8px;
   background: transparent;
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
   padding: 6px 8px;
   line-height: 1;
+  color: var(--text-secondary);
 }
 
 .neo-strength-meter {
@@ -1433,20 +1450,21 @@ select:focus, input:focus, textarea:focus {
   gap: 4px;
   height: 4px;
   margin-top: 6px;
-  border: 1px solid #000;
-  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .neo-strength-bar {
   flex: 1;
-  background: #cbd5e1;
+  background: rgba(255, 255, 255, 0.15);
   transition: background-color 0.25s;
 }
 
 .neo-strength-text {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -1454,56 +1472,56 @@ select:focus, input:focus, textarea:focus {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 22px;
+  margin-top: 24px;
   flex-wrap: wrap;
 }
 
 .neo-btn-primary {
-  background: #00df81; /* Neon green from screenshot */
-  color: #000000;
-  border: 2px solid #000000;
-  border-radius: 0px;
-  padding: 10px 22px;
-  font-size: 0.8rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 26px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 3px 3px 0px #000000;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .neo-btn-primary:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #000000;
-  background: #05df72;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.45);
+  filter: brightness(1.08);
 }
 
 .neo-btn-secondary {
-  background: #ffffff;
-  color: #000000;
-  border: 2px solid #000000;
-  border-radius: 0px;
-  padding: 10px 18px;
-  font-size: 0.8rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 3px 3px 0px #000000;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .neo-btn-secondary:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #000000;
-  background: #f1f5f9;
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
 /* ==========================================================================

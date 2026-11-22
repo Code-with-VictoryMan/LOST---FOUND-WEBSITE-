@@ -9,170 +9,79 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body.neo-login-page {
-      background-color: #ebebeb;
-      background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 0);
-      background-size: 24px 24px;
-      color: #000000;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 2rem;
-    }
-
-    body.neo-login-page::before,
-    body.neo-login-page::after {
-      display: none; /* Disable dark glowing spheres on neo-brutalist page */
-    }
-
-    .neo-top-banner {
-      border-bottom: 2px solid #000000;
-      background: #ffffff;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .neo-top-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: #000000;
-    }
-
-    .neo-top-brand .logo-box {
-      width: 36px;
-      height: 36px;
-      border: 2px solid #000000;
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-    }
-
-    .neo-top-brand .logo-box img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
-    .neo-top-brand-text {
-      font-weight: 900;
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .neo-top-nav-links {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .neo-nav-link {
-      background: #ffffff;
-      border: 2px solid #000000;
-      padding: 6px 14px;
-      font-size: 0.78rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #000000;
-      text-decoration: none;
-      box-shadow: 2px 2px 0px #000000;
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-
-    .neo-nav-link:hover {
-      transform: translate(1px, 1px);
-      box-shadow: 1px 1px 0px #000000;
-      background: #ffd83d;
-    }
-
-    .neo-portal-container {
-      flex: 1;
+    .neo-portal-wrapper {
+      min-height: calc(100vh - 120px);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2.5rem 1rem;
-    }
-
-    .neo-brutal-card {
-      width: 100%;
-      max-width: 580px;
-      background: #ffffff;
-      border: 3px solid #000000;
-      border-radius: 0px;
-      box-shadow: 8px 8px 0px #000000;
-      overflow: hidden;
       position: relative;
+      z-index: 1;
     }
 
     .neo-tab-strip {
       display: flex;
-      border-bottom: 2px solid #000000;
-      background: #f1f5f9;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.25);
     }
 
     .neo-tab-item {
       flex: 1;
-      padding: 10px;
+      padding: 12px 10px;
       background: none;
       border: none;
-      border-right: 2px solid #000000;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
       font-size: 0.78rem;
-      font-weight: 900;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #000000;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
       cursor: pointer;
       text-align: center;
-      transition: background-color 0.15s;
+      transition: all 0.2s ease;
     }
     .neo-tab-item:last-child {
       border-right: none;
     }
 
     .neo-tab-item.active {
-      background: #ffffff;
-      color: #000000;
-      border-bottom: 2px solid #ffffff;
-      margin-bottom: -2px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fbbf24;
+      border-bottom: 2px solid #fbbf24;
     }
 
     .neo-tab-item:hover:not(.active) {
-      background: #e2e8f0;
+      background: rgba(255, 255, 255, 0.04);
+      color: #ffffff;
     }
   </style>
 </head>
-<body class="neo-login-page">
-  <!-- Minimalist Neo-Brutalist Top Bar -->
-  <header class="neo-top-banner">
-    <a href="index.html" class="neo-top-brand">
-      <div class="logo-box">
-        <img src="sai-university-logo.png" alt="Sai University Crest">
+<body>
+  <!-- Standard Site Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-group">
+        <img src="sai-university-logo.png" alt="Sai University Logo" class="brand-logo-img">
+        <div>
+          <h1 class="brand-title">SAIU PROJECTS</h1>
+          <span class="brand-subtitle">CAMPUS SIGN IN &amp; VERIFICATION</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <nav class="desktop-nav-links">
+          <a href="index.html">← Browse Board</a>
+          <a href="dashboard.html">📊 Dashboard</a>
+        </nav>
       </div>
-      <div>
-        <div class="neo-top-brand-text">LOST &amp; FOUND</div>
-        <div style="font-size:0.65rem; font-weight:800; letter-spacing:0.05em; color:#475569;">CAMPUS PORTAL // EST. 2026</div>
-      </div>
-    </a>
-    <nav class="neo-top-nav-links">
-      <a href="index.html" class="neo-nav-link">BOARD</a>
-      <a href="index.html" class="neo-nav-link">REPORT</a>
-      <a href="dashboard.html" class="neo-nav-link">MY SPACE</a>
-    </nav>
+    </div>
   </header>
 
-  <main class="neo-portal-container">
-    <div class="neo-brutal-card">
-      <!-- Yellow Header Bar (Exact match to screenshot) -->
+  <main class="neo-portal-wrapper">
+    <div class="neo-brutal-modal" style="margin: 0 auto;">
+      <!-- Amber Header Bar (Inspired by Campus Portal Design) -->
       <div class="neo-header">
         <h2 class="neo-title" id="portalHeaderTitle">SIGN IN TO CAMPUS</h2>
-        <a href="index.html" class="neo-close-btn" title="Back to Board">&times;</a>
+        <a href="index.html" class="neo-close-btn" title="Back to Feed">&times;</a>
       </div>
 
       <!-- Segmented Sub-Tabs -->
@@ -182,9 +91,9 @@
         <button type="button" class="neo-tab-item" id="tabBtnRegister">NEW REGISTRATION</button>
       </div>
 
-      <!-- Main White Body -->
+      <!-- Main Modal Body -->
       <div class="neo-body">
-        <!-- Sai University Header Section -->
+        <!-- Sai University Brand Section -->
         <div class="neo-brand-row">
           <div class="neo-logo-box">
             <img src="sai-university-logo.png" alt="Sai University Crest" class="neo-logo-img">
@@ -195,18 +104,18 @@
         <hr class="neo-divider">
 
         <!-- Active Session Banner (Shown if already signed in) -->
-        <div id="activeSessionBlock" class="neo-alert hidden" style="background:#fffbe6; color:#000; flex-direction:column; align-items:flex-start; margin-bottom:1.25rem;">
-          <div style="display:flex; align-items:center; gap:8px; width:100%;">
-            <span style="font-size:1.4rem;">👋</span>
+        <div id="activeSessionBlock" class="neo-alert hidden" style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); color: #fff; flex-direction: column; align-items: flex-start; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+            <span style="font-size: 1.4rem;">👋</span>
             <div>
-              <div style="font-weight:900; font-size:0.95rem;" id="activeSessionName">Signed In Student</div>
-              <div style="font-size:0.75rem; color:#475569; font-weight:600;" id="activeSessionMeta">student@saiuniversity.edu.in</div>
+              <div style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;" id="activeSessionName">Signed In Student</div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;" id="activeSessionMeta">student@saiuniversity.edu.in</div>
             </div>
           </div>
-          <div style="display:flex; gap:8px; margin-top:12px; width:100%; flex-wrap:wrap;">
-            <a href="dashboard.html" class="neo-btn-primary" style="text-decoration:none; padding:8px 16px; font-size:0.75rem;">GO TO DASHBOARD</a>
-            <a href="index.html" class="neo-btn-secondary" style="text-decoration:none; padding:8px 14px; font-size:0.75rem;">BROWSE BOARD</a>
-            <button id="btnSwitchAccount" class="neo-btn-secondary" style="background:#fee2e2; border-color:#000; padding:8px 14px; font-size:0.75rem;">SIGN OUT &bull; SWITCH</button>
+          <div style="display: flex; gap: 8px; margin-top: 12px; width: 100%; flex-wrap: wrap;">
+            <a href="dashboard.html" class="neo-btn-primary" style="text-decoration: none; padding: 8px 16px; font-size: 0.75rem;">GO TO DASHBOARD</a>
+            <a href="index.html" class="neo-btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 0.75rem;">BROWSE BOARD</a>
+            <button id="btnSwitchAccount" class="neo-btn-secondary" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 8px 14px; font-size: 0.75rem;">SIGN OUT &bull; SWITCH</button>
           </div>
         </div>
 
@@ -267,7 +176,7 @@
             </div>
 
             <div class="neo-actions-row">
-              <button type="submit" class="neo-btn-primary" id="btnAdminSubmit" style="background:#ffd83d;">
+              <button type="submit" class="neo-btn-primary" id="btnAdminSubmit" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
                 ACCESS CONSOLE
               </button>
               <button type="button" class="neo-btn-secondary" id="btnBackToStudent">
@@ -288,7 +197,7 @@
               <input type="email" id="regEmail" class="neo-input" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="neo-field-group">
                 <label for="regStudentId" class="neo-label">STUDENT ID / ROLL NO <span class="neo-req">*</span></label>
                 <input type="text" id="regStudentId" class="neo-input" placeholder="SAIU2024CS001" required>
@@ -315,7 +224,7 @@
                 <input type="password" id="regPassword" class="neo-input" placeholder="At least 8 characters, letter + number" required minlength="6" autocomplete="new-password">
                 <button type="button" class="neo-pwd-toggle" id="toggleRegPassword" tabindex="-1">👁️</button>
               </div>
-              <div class="neo-strength-meter" style="margin-top:6px;">
+              <div class="neo-strength-meter" style="margin-top: 6px;">
                 <div class="neo-strength-bar" id="regStrBar1"></div>
                 <div class="neo-strength-bar" id="regStrBar2"></div>
                 <div class="neo-strength-bar" id="regStrBar3"></div>
@@ -334,9 +243,9 @@
           </form>
         </div>
 
-        <div style="margin-top:20px; padding-top:14px; border-top:2px solid #000; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800;">
-          <a href="index.html" style="color:#000; text-decoration:none;">&larr; BACK TO CAMPUS BOARD</a>
-          <span style="color:#64748b; cursor:pointer;" id="btnForgotStudent">FORGOT PASSWORD?</span>
+        <div style="margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; font-weight: 700;">
+          <a href="index.html" style="color: var(--text-secondary); text-decoration: none;">&larr; Return to Browse Feed</a>
+          <span style="color: var(--accent-cyan); cursor: pointer;" id="btnForgotStudent">Forgot password?</span>
         </div>
       </div>
     </div>
@@ -344,7 +253,7 @@
 
   <!-- Self-Service Password Reset Modal -->
   <div id="resetModal" class="modal-overlay hidden">
-    <div class="neo-brutal-modal" style="max-width:460px;">
+    <div class="neo-brutal-modal" style="max-width: 460px; margin: 0 auto;">
       <div class="neo-header">
         <h3 class="neo-title">PASSWORD RESET</h3>
         <button class="neo-close-btn" id="btnCloseReset">&times;</button>
@@ -362,7 +271,7 @@
             <label for="resetNewPassword" class="neo-label">NEW PASSWORD <span class="neo-req">*</span></label>
             <input type="password" id="resetNewPassword" class="neo-input" placeholder="At least 6 characters" minlength="6" required>
           </div>
-          <button type="submit" class="neo-btn-primary" id="btnResetSubmit" style="width:100%; justify-content:center; margin-top:8px;">
+          <button type="submit" class="neo-btn-primary" id="btnResetSubmit" style="width: 100%; justify-content: center; margin-top: 8px;">
             UPDATE PASSWORD IN DATABASE
           </button>
         </form>
