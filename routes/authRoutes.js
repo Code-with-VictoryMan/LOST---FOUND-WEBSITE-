@@ -21,16 +21,26 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide name, email, and password' });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Enforce university domain restriction: must contain or end with saiuniversity.edu.in
+    if (!cleanEmail.includes('saiuniversity.edu.in')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account email must contain or end with saiuniversity.edu.in (e.g. yourname@saiuniversity.edu.in)'
+      });
+    }
+
     // Resilient offline fallback if MongoDB is not connected
     if (mongoose.connection.readyState !== 1) {
-      const existingUser = offlineStore.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const existingUser = offlineStore.users.find(u => u.email.toLowerCase() === cleanEmail);
       if (existingUser) {
         return res.status(400).json({ success: false, message: 'An account with this email already exists' });
       }
       const newUser = {
         _id: 'usr_' + Date.now(),
         name,
-        email: email.toLowerCase(),
+        email: cleanEmail,
         passwordHash: bcrypt.hashSync(password, 8),
         role: role === 'admin' ? 'admin' : (role || 'student'),
         phone: phone || 'N/A',
@@ -58,14 +68,14 @@ router.post('/register', async (req, res) => {
     }
 
     // MongoDB Persistence
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'An account with this email already exists' });
     }
 
     const user = await User.create({
       name,
-      email,
+      email: cleanEmail,
       password,
       role: role === 'admin' ? 'admin' : (role || 'student'),
       phone: phone || 'N/A',

@@ -126,17 +126,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // 9. New Student Registration Submission
   studentRegisterForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const studentId = document.getElementById('regStudentId').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-    const department = document.getElementById('regDept').value;
-    const yearOfStudy = document.getElementById('regYear').value;
-    const password = document.getElementById('regPassword').value;
+    const name = document.getElementById('regName')?.value.trim();
+    const email = document.getElementById('regEmail')?.value.trim().toLowerCase();
+    const studentId = document.getElementById('regStudentId')?.value.trim();
+    const phone = document.getElementById('regPhone')?.value.trim();
+    const department = document.getElementById('regDept')?.value || 'School of Computing & Data Science';
+    const yearOfStudy = document.getElementById('regYear')?.value || '3rd Year Undergrad';
+    const password = document.getElementById('regPassword')?.value;
     const submitBtn = document.getElementById('btnRegisterSubmit');
 
     hideAlert();
-    setButtonLoading(submitBtn, 'Registering & Saving to MongoDB...');
+
+    // University Domain Check
+    if (!email || !email.includes('saiuniversity.edu.in')) {
+      showAlert('⚠️ Email must contain or end with saiuniversity.edu.in (e.g. yourname@saiuniversity.edu.in)', 'error');
+      document.getElementById('regEmail')?.focus();
+      return;
+    }
+
+    if (!name || !password) {
+      showAlert('Please enter your full name and password', 'error');
+      return;
+    }
+
+    setButtonLoading(submitBtn, 'Creating Account...');
 
     try {
       const res = await fetch('/api/auth/register', {
@@ -160,14 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showAlert('Registration complete! Account saved in MongoDB. Redirecting to your dashboard...', 'success');
         setTimeout(() => {
           window.location.href = redirectTarget;
-        }, 1500);
+        }, 1200);
       } else {
         showAlert(data.message || 'Registration failed. Please check inputs.', 'error');
-        resetButton(submitBtn, '✨ Register & Save to MongoDB');
+        resetButton(submitBtn, 'CREATE ACCOUNT');
       }
     } catch (err) {
       showAlert('Server connection error during registration.', 'error');
-      resetButton(submitBtn, '✨ Register & Save to MongoDB');
+      resetButton(submitBtn, 'CREATE ACCOUNT');
     }
   });
 

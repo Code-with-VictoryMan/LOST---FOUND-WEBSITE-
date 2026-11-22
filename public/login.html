@@ -159,8 +159,9 @@
             </div>
 
             <div class="neo-field-group">
-              <label for="regEmail" class="neo-label">UNIVERSITY EMAIL <span class="neo-req">*</span></label>
-              <input type="email" id="regEmail" class="neo-input" placeholder="name.initial-YY@department.saiuniversity.edu.in" required autocomplete="email">
+              <label for="regEmail" class="neo-label">SAI UNIVERSITY EMAIL (@saiuniversity.edu.in) <span class="neo-req">*</span></label>
+              <input type="email" id="regEmail" class="neo-input" placeholder="student@saiuniversity.edu.in" pattern=".*saiuniversity\.edu\.in.*" title="Must contain or end with saiuniversity.edu.in" required autocomplete="email">
+              <span style="font-size:0.74rem; color:var(--text-muted); margin-top:3px; display:block;">Email address must contain or end with <strong>saiuniversity.edu.in</strong></span>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -174,14 +175,26 @@
               </div>
             </div>
 
-            <div class="neo-field-group">
-              <label for="regDept" class="neo-label">DEPARTMENT / SCHOOL <span class="neo-req">*</span></label>
-              <select id="regDept" class="neo-input neo-select" required>
-                <option value="School of Computing & Data Science">School of Computing &amp; Data Science</option>
-                <option value="School of Arts & Sciences">School of Arts &amp; Sciences</option>
-                <option value="School of Law">School of Law</option>
-                <option value="School of Business">School of Business</option>
-              </select>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="neo-field-group">
+                <label for="regDept" class="neo-label">DEPARTMENT / SCHOOL <span class="neo-req">*</span></label>
+                <select id="regDept" class="neo-input neo-select" required>
+                  <option value="School of Computing & Data Science">School of Computing &amp; Data Science</option>
+                  <option value="School of Arts & Sciences">School of Arts &amp; Sciences</option>
+                  <option value="School of Law">School of Law</option>
+                  <option value="School of Business">School of Business</option>
+                </select>
+              </div>
+              <div class="neo-field-group">
+                <label for="regYear" class="neo-label">YEAR OF STUDY <span class="neo-req">*</span></label>
+                <select id="regYear" class="neo-input neo-select" required>
+                  <option value="1st Year Undergrad">1st Year Undergrad</option>
+                  <option value="2nd Year Undergrad">2nd Year Undergrad</option>
+                  <option value="3rd Year Undergrad" selected>3rd Year Undergrad</option>
+                  <option value="4th Year Undergrad">4th Year Undergrad</option>
+                  <option value="Postgraduate / Faculty">Postgraduate / Faculty</option>
+                </select>
+              </div>
             </div>
 
             <div class="neo-field-group">

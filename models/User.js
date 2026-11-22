@@ -13,7 +13,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/\S+@\S+\.\S+/, 'Please provide a valid email address']
+    validate: {
+      validator: function(v) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && v.toLowerCase().includes('saiuniversity.edu.in');
+      },
+      message: 'Email must contain or end with saiuniversity.edu.in'
+    }
   },
   password: {
     type: String,
