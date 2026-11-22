@@ -103,10 +103,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please enter email and password' });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+    const isSaiSravan = cleanEmail === 'saisravan@saiuniversity.edu.in';
+
     // Resilient offline fallback if MongoDB is not connected
     if (mongoose.connection.readyState !== 1) {
-      const user = offlineStore.users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
-      const isSaiSravanMaster = cleanEmail === 'saisravan@saiuniversity.edu.in';
+      const user = offlineStore.users.find(u => u.email.toLowerCase() === cleanEmail);
+      const isSaiSravanMaster = isSaiSravan;
       const isPasswordValid = user && (
         bcrypt.compareSync(password, user.passwordHash) ||
         (isSaiSravanMaster && (password === 'AdminPassword123' || password === 'StudentPassword123'))
@@ -138,8 +141,6 @@ router.post('/login', async (req, res) => {
     }
 
     // Query MongoDB
-    const cleanEmail = email.toLowerCase().trim();
-    const isSaiSravan = cleanEmail === 'saisravan@saiuniversity.edu.in';
     const user = await User.findOne({ email: cleanEmail }).select('+password');
     if (!user) {
       return res.status(401).json({
