@@ -247,10 +247,15 @@ router.get('/:id', async (req, res) => {
       if (!item) {
         return res.status(404).json({ success: false, message: 'Item listing not found' });
       }
+      item.viewCount = (item.viewCount || 0) + 1;
       return res.status(200).json({ success: true, data: item });
     }
 
-    const item = await Item.findById(req.params.id).populate('reportedBy', 'name email phone studentId department role');
+    const item = await Item.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    ).populate('reportedBy', 'name email phone studentId department role yearOfStudy');
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item listing not found' });
     }
@@ -272,6 +277,16 @@ router.post('/', protect, async (req, res) => {
       });
     }
 
+    const ownerInfo = {
+      name: (req.body.ownerName && req.body.ownerName.trim()) || req.user?.name || 'Sai University Member',
+      email: req.user?.email || 'N/A',
+      phone: (req.body.ownerPhone && req.body.ownerPhone.trim()) || req.user?.phone || 'N/A',
+      studentId: req.user?.studentId || 'N/A',
+      department: req.user?.department || 'School of Computing & Data Science',
+      yearOfStudy: req.user?.yearOfStudy || 'N/A'
+    };
+    const referenceCode = 'SAIU-LF-' + Math.floor(1000 + Math.random() * 9000);
+
     if (mongoose.connection.readyState !== 1) {
       const newItem = {
         _id: 'itm_' + Date.now(),
@@ -285,6 +300,9 @@ router.post('/', protect, async (req, res) => {
         imageUrl: imageUrl && imageUrl.trim() !== '' ? imageUrl : 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80',
         status: 'open',
         reportedBy: req.user || offlineStore.users[1],
+        ownerDetails: ownerInfo,
+        referenceCode,
+        viewCount: 0,
         createdAt: new Date()
       };
       offlineStore.items.unshift(newItem);
@@ -304,7 +322,10 @@ router.post('/', protect, async (req, res) => {
       specificLocation,
       dateOccurred,
       imageUrl: imageUrl && imageUrl.trim() !== '' ? imageUrl : undefined,
-      reportedBy: req.user._id
+      reportedBy: req.user._id,
+      ownerDetails: ownerInfo,
+      referenceCode,
+      viewCount: 0
     });
 
     return res.status(201).json({

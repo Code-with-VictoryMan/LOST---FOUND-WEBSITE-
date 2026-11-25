@@ -228,13 +228,17 @@
           <h3 style="font-size:1.4rem;font-weight:700;color:#fff;">My Reported Items</h3>
           <p class="section-desc">Manage items you reported and inspect incoming ownership verification claims.</p>
         </div>
+        <button id="btnExportItemsCsv" class="btn btn-outline btn-sm hidden" style="border-color:rgba(56,189,248,0.4); color:var(--accent-cyan); display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.9rem; border-radius:8px;">
+          <span>📥</span> Export Items &amp; Owners CSV
+        </button>
       </div>
       <div id="myItemsTableContainer" class="table-container" style="overflow-x:auto;">
         <table class="styled-table">
           <thead>
             <tr>
-              <th>Item</th>
+              <th>Item &amp; Ref ID</th>
               <th>Type</th>
+              <th>Owner / Reporter</th>
               <th>Building</th>
               <th>Date</th>
               <th>Status</th>
@@ -242,7 +246,7 @@
             </tr>
           </thead>
           <tbody id="myItemsBody">
-            <tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);">Loading your reports...</td></tr>
+            <tr><td colspan="7" class="text-center" style="text-align:center;color:var(--text-muted);">Loading your reports...</td></tr>
           </tbody>
         </table>
       </div>

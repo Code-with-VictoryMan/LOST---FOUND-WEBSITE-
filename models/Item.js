@@ -68,6 +68,23 @@ const itemSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  ownerDetails: {
+    name: { type: String, trim: true, default: 'Sai University Member' },
+    email: { type: String, trim: true, lowercase: true, default: 'N/A' },
+    phone: { type: String, trim: true, default: 'N/A' },
+    studentId: { type: String, trim: true, default: 'N/A' },
+    department: { type: String, trim: true, default: 'School of Computing & Data Science' },
+    yearOfStudy: { type: String, trim: true, default: 'N/A' }
+  },
+  referenceCode: {
+    type: String,
+    trim: true,
+    default: () => 'SAIU-LF-' + Math.floor(1000 + Math.random() * 9000)
+  },
+  viewCount: {
+    type: Number,
+    default: 0
+  },
   createdAt: {
     type: Date,
     default: Date.now

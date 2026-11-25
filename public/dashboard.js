@@ -217,9 +217,11 @@ function setupDashboardView() {
     .catch(() => {});
 
   // Segregate Dashboard Presentation: Admin View vs Student View based on credentials
+  const btnExportItemsCsv = document.getElementById('btnExportItemsCsv');
   if (isAdmin) {
     if (adminSection) adminSection.classList.remove('hidden');
     if (adminStudentLoginsSection) adminStudentLoginsSection.classList.remove('hidden');
+    if (btnExportItemsCsv) btnExportItemsCsv.classList.remove('hidden');
     loadAdminStats();
     loadStudentLogins();
     if (elProfileRole) elProfileRole.innerHTML = `🛡️ Campus Security Administrator &bull; Sai University Administration`;
@@ -232,10 +234,11 @@ function setupDashboardView() {
     const reportsHeader = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('h3');
     if (reportsHeader) reportsHeader.textContent = 'Campus-Wide Reported Items (Admin Fleet Control)';
     const reportsDesc = document.querySelector('#myItemsTableContainer')?.previousElementSibling?.querySelector('p');
-    if (reportsDesc) reportsDesc.textContent = 'Full administrative control across all lost and found listings on Sai University campus.';
+    if (reportsDesc) reportsDesc.textContent = 'Full administrative control across all lost and found listings and owner records on Sai University campus.';
   } else {
     if (adminSection) adminSection.classList.add('hidden');
     if (adminStudentLoginsSection) adminStudentLoginsSection.classList.add('hidden');
+    if (btnExportItemsCsv) btnExportItemsCsv.classList.add('hidden');
     if (elProfileRole) elProfileRole.innerHTML = `🎓 Verified Student Account &bull; Sai University Academic Profile`;
     if (elProfileId) elProfileId.textContent = currentUser.studentId || 'SAIU2024CS001';
     if (elProfileDept) elProfileDept.textContent = currentUser.department || 'School of Computing & Data Science';
@@ -356,6 +359,8 @@ function renderCategoryChart(categoryStats) {
   });
 }
 
+let allReportedItemsCache = [];
+
 async function loadMyReportedItems() {
   const tbody = document.getElementById('myItemsBody');
   if (!tbody) return;
@@ -370,10 +375,11 @@ async function loadMyReportedItems() {
     const data = await res.json();
     
     const items = data.data || [];
+    allReportedItemsCache = items;
     if (elProfileItemsCount) elProfileItemsCount.textContent = items.length;
 
     if (!items || items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);padding:2.5rem 1rem;">
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="text-align:center;color:var(--text-muted);padding:2.5rem 1rem;">
         <span style="font-size:2rem; display:block; margin-bottom:0.5rem;">📋</span>
         <p style="margin-bottom:0.5rem;">You have not reported any items yet.</p>
         <a href="index.html" class="btn btn-primary btn-sm">➕ Report Lost or Found Item</a>
@@ -381,18 +387,31 @@ async function loadMyReportedItems() {
       return;
     }
 
-    tbody.innerHTML = items.map(item => `
+    tbody.innerHTML = items.map(item => {
+      const owner = item.ownerDetails || {};
+      const ownerName = owner.name || item.reportedBy?.name || 'Sai University Member';
+      const ownerEmail = (owner.email && owner.email !== 'N/A' ? owner.email : item.reportedBy?.email) || 'N/A';
+      const ownerPhone = (owner.phone && owner.phone !== 'N/A' ? owner.phone : item.reportedBy?.phone) || 'N/A';
+      const ownerId = owner.studentId || item.reportedBy?.studentId || 'N/A';
+      const refCode = item.referenceCode || ('SAIU-LF-' + String(item._id).slice(-4).toUpperCase());
+
+      return `
       <tr>
         <td>
           <div style="display:flex; align-items:center; gap:0.75rem;">
             <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80';" alt="" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
             <div>
               <strong>${item.title}</strong><br>
-              <small style="color:var(--accent-cyan); font-weight:500;">${item.category}</small>
+              <small style="color:var(--accent-cyan); font-weight:500;">${item.category}</small> &bull; <code style="font-size:0.72rem; color:#fbbf24;">${refCode}</code> &bull; <small style="color:var(--text-muted);">👁️ ${item.viewCount || 0}</small>
             </div>
           </div>
         </td>
         <td><span class="badge-tag tag-${item.type}">${item.type.toUpperCase()}</span></td>
+        <td style="font-size:0.82rem;">
+          <strong style="color:#fff;">${ownerName}</strong> <code style="font-size:0.72rem; color:var(--accent-cyan);">${ownerId}</code><br>
+          <small style="color:var(--text-secondary);">${ownerEmail}</small><br>
+          <small style="color:var(--text-muted);">${ownerPhone}</small>
+        </td>
         <td>${item.building}<br><small style="color:var(--text-muted);">${item.specificLocation || ''}</small></td>
         <td>${new Date(item.dateOccurred).toLocaleDateString()}</td>
         <td><span class="status-badge status-${item.status}">${item.status.toUpperCase()}</span></td>
@@ -410,11 +429,48 @@ async function loadMyReportedItems() {
           </div>
         </td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="text-align:center;color:var(--text-muted);padding:2rem;">Failed to load reports.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="text-align:center;color:var(--text-muted);padding:2rem;">Failed to load reports.</td></tr>`;
   }
 }
+
+document.getElementById('btnExportItemsCsv')?.addEventListener('click', () => {
+  if (!allReportedItemsCache || allReportedItemsCache.length === 0) {
+    alert('No reported items available to export.');
+    return;
+  }
+  const headers = ['Reference Code', 'Title', 'Type', 'Category', 'Building', 'Location', 'Status', 'Views', 'Date', 'Owner Name', 'Owner Email', 'Owner Phone', 'Student ID', 'Department'];
+  const csvEsc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows = allReportedItemsCache.map(item => {
+    const owner = item.ownerDetails || {};
+    return [
+      item.referenceCode || ('SAIU-LF-' + String(item._id).slice(-4).toUpperCase()),
+      item.title,
+      item.type,
+      item.category,
+      item.building,
+      item.specificLocation,
+      item.status,
+      item.viewCount || 0,
+      new Date(item.dateOccurred).toLocaleDateString(),
+      owner.name || item.reportedBy?.name || 'N/A',
+      owner.email || item.reportedBy?.email || 'N/A',
+      owner.phone || item.reportedBy?.phone || 'N/A',
+      owner.studentId || item.reportedBy?.studentId || 'N/A',
+      owner.department || item.reportedBy?.department || 'N/A'
+    ].map(csvEsc).join(',');
+  });
+  const csvContent = [headers.map(csvEsc).join(','), ...rows].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `saiu_lost_found_items_owners_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
 
 async function loadMyClaims() {
   const tbody = document.getElementById('myClaimsBody');

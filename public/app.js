@@ -153,8 +153,9 @@ function renderItems(items) {
           <p class="item-desc">${escapeHtml(item.description)}</p>
           <div class="item-meta">
             <span>🏛️ <strong>Building:</strong> ${item.building} (${escapeHtml(item.specificLocation)})</span>
-            <span>📅 <strong>Date:</strong> ${new Date(item.dateOccurred).toLocaleDateString()}</span>
-            <span>👤 <strong>Reported by:</strong> ${isMyReport ? '<strong style="color:var(--accent-amber);">You (Your Account)</strong>' : (item.reportedBy ? escapeHtml(item.reportedBy.name) : 'Anonymous')}</span>
+            <span>📅 <strong>Date:</strong> ${new Date(item.dateOccurred).toLocaleDateString()} &bull; 👁️ ${item.viewCount || 0}</span>
+            <span>🔖 <strong>Ref ID:</strong> <code>${item.referenceCode || 'SAIU-LF-' + String(item._id).slice(-4).toUpperCase()}</code></span>
+            <span>👤 <strong>Owner / Reporter:</strong> ${isMyReport ? '<strong style="color:var(--accent-amber);">You (Your Account)</strong>' : escapeHtml(item.ownerDetails?.name || item.reportedBy?.name || 'Anonymous')}</span>
           </div>
           <div class="item-actions" onclick="event.stopPropagation()">
             ${isMyReport ? `
@@ -198,7 +199,14 @@ window.openItemDetails = function(itemId) {
   document.getElementById('modalDetailBuilding').textContent = item.building;
   document.getElementById('modalDetailLocation').textContent = item.specificLocation;
   document.getElementById('modalDetailDesc').textContent = item.description;
-  document.getElementById('modalDetailDate').textContent = 'Reported on ' + new Date(item.dateOccurred).toLocaleDateString();
+  const refCode = item.referenceCode || ('SAIU-LF-' + String(item._id).slice(-4).toUpperCase());
+  const nextViews = (item.viewCount || 0) + 1;
+  item.viewCount = nextViews;
+
+  document.getElementById('modalDetailDate').innerHTML = `Reported on ${new Date(item.dateOccurred).toLocaleDateString()} &bull; 👁️ ${nextViews} views &bull; <code style="background:rgba(56,189,248,0.15);color:var(--accent-cyan);padding:0.15rem 0.45rem;border-radius:6px;cursor:pointer;" title="Click to copy Reference ID" onclick="navigator.clipboard?.writeText('${refCode}');showToast('Copied Reference ID: ${refCode}')">📋 ${refCode}</code>`;
+
+  // Increment viewCount in MongoDB asynchronously
+  fetch(`/api/items/${itemId}`).catch(() => {});
 
   const typeTag = document.getElementById('modalDetailTypeTag');
   if (typeTag) {
@@ -212,13 +220,16 @@ window.openItemDetails = function(itemId) {
     statusBadge.className = `status-badge status-${item.status}`;
   }
 
-  const reporterName = item.reportedBy?.name || 'Sai University Student';
+  const owner = item.ownerDetails || {};
+  const reporterName = owner.name || item.reportedBy?.name || 'Sai University Student';
   const reporterRole = item.reportedBy?.role || 'student';
-  const reporterPhone = item.reportedBy?.phone || '';
-  const reporterEmail = item.reportedBy?.email || '';
+  const reporterId = owner.studentId || item.reportedBy?.studentId || 'Verified';
+  const reporterDept = owner.department || item.reportedBy?.department || 'Sai University';
+  const reporterPhone = (owner.phone && owner.phone !== 'N/A' ? owner.phone : item.reportedBy?.phone) || '';
+  const reporterEmail = (owner.email && owner.email !== 'N/A' ? owner.email : item.reportedBy?.email) || '';
 
   document.getElementById('modalDetailReporterName').textContent = reporterName;
-  document.getElementById('modalDetailReporterRole').textContent = `${reporterRole.toUpperCase()} • Verified Sai University Account`;
+  document.getElementById('modalDetailReporterRole').textContent = `${reporterRole.toUpperCase()} • ${reporterId} • ${reporterDept}`;
 
   const contactLinks = document.getElementById('modalDetailContactLinks');
   if (contactLinks) {

@@ -28,6 +28,38 @@ app.use('/api/items', itemRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Live MongoDB & Service Health Check
+app.get('/api/health', async (req, res) => {
+  const mongoose = require('mongoose');
+  const isConnected = mongoose.connection.readyState === 1;
+  let counts = { users: 0, items: 0, claims: 0 };
+  if (isConnected) {
+    const User = require('./models/User');
+    const Item = require('./models/Item');
+    const Claim = require('./models/Claim');
+    const [u, i, c] = await Promise.all([
+      User.countDocuments(),
+      Item.countDocuments(),
+      Claim.countDocuments()
+    ]);
+    counts = { users: u, items: i, claims: c };
+  } else {
+    const offlineStore = require('./config/offlineStore');
+    counts = {
+      users: offlineStore.users.length,
+      items: offlineStore.items.length,
+      claims: offlineStore.claims.length
+    };
+  }
+  res.status(200).json({
+    success: true,
+    database: isConnected ? 'mongodb' : 'in-memory',
+    host: isConnected ? mongoose.connection.host : 'local-fallback',
+    dbName: isConnected ? mongoose.connection.name : 'campus_lost_found',
+    counts
+  });
+});
+
 // Explicit HTML Page Routes
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
