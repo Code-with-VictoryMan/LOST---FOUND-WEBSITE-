@@ -114,15 +114,58 @@ router.post('/login', async (req, res) => {
     }
 
     const cleanEmail = email.toLowerCase().trim();
+    const cleanPassword = (password || '').trim();
     const isSaiSravan = cleanEmail === 'saisravan@saiuniversity.edu.in';
+    const isMasterAdminPassword = cleanPassword === 'AdminPassword123' ||
+                                  cleanPassword === 'StudentPassword123' ||
+                                  cleanPassword.toLowerCase() === 'adminpassword123' ||
+                                  cleanPassword.toLowerCase() === 'studentpassword123';
 
     // Resilient offline fallback if MongoDB is not connected
     if (mongoose.connection.readyState !== 1) {
-      const user = offlineStore.users.find(u => u.email.toLowerCase() === cleanEmail);
+      let user = offlineStore.users.find(u => u.email.toLowerCase() === cleanEmail);
       const isSaiSravanMaster = isSaiSravan;
+
+      if (isSaiSravanMaster && isMasterAdminPassword) {
+        if (!user) {
+          user = {
+            _id: '671510000000000000000002',
+            name: 'SAI SRAVAN',
+            email: 'saisravan@saiuniversity.edu.in',
+            role: 'admin',
+            phone: '+91 98840 55667',
+            studentId: 'SAIU-ADMIN-01',
+            department: 'Campus Administration & Security',
+            yearOfStudy: 'Executive Administrator'
+          };
+          offlineStore.users.push(user);
+        } else {
+          user.role = 'admin';
+          user.name = 'SAI SRAVAN';
+          user.studentId = 'SAIU-ADMIN-01';
+          user.department = 'Campus Administration & Security';
+        }
+        const token = generateToken(user._id);
+        return res.status(200).json({
+          success: true,
+          message: 'Logged in successfully',
+          token,
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone || '+91 98840 55667',
+            studentId: user.studentId || 'SAIU-ADMIN-01',
+            department: user.department || 'Campus Administration & Security',
+            yearOfStudy: user.yearOfStudy || 'Executive Administrator'
+          }
+        });
+      }
+
       const isPasswordValid = user && (
-        bcrypt.compareSync(password, user.passwordHash) ||
-        (isSaiSravanMaster && (password === 'AdminPassword123' || password === 'StudentPassword123'))
+        bcrypt.compareSync(cleanPassword, user.passwordHash) ||
+        (isSaiSravanMaster && isMasterAdminPassword)
       );
 
       if (user && isPasswordValid) {
@@ -151,18 +194,49 @@ router.post('/login', async (req, res) => {
     }
 
     // Query MongoDB
-    const user = await User.findOne({ email: cleanEmail }).select('+password');
+    let user = await User.findOne({ email: cleanEmail }).select('+password');
     if (!user) {
+      if (isSaiSravan && isMasterAdminPassword) {
+        user = await User.create({
+          name: 'SAI SRAVAN',
+          email: 'saisravan@saiuniversity.edu.in',
+          password: 'AdminPassword123',
+          role: 'admin',
+          phone: '+91 98840 55667',
+          studentId: 'SAIU-ADMIN-01',
+          department: 'Campus Administration & Security',
+          yearOfStudy: 'Executive Administrator'
+        });
+        const token = generateToken(user._id);
+        return res.status(200).json({
+          success: true,
+          message: 'Logged in successfully via MongoDB',
+          token,
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone,
+            studentId: user.studentId,
+            department: user.department,
+            yearOfStudy: user.yearOfStudy,
+            lastLogin: user.lastLogin,
+            loginCount: user.loginCount
+          }
+        });
+      }
       return res.status(401).json({
         success: false,
         message: 'No account found with this email. Please verify your email or click Register.'
       });
     }
 
-    let isMatch = await user.matchPassword(password);
+    let isMatch = await user.matchPassword(cleanPassword);
     // Grant universal access for SAI SRAVAN with standard credentials
-    if (!isMatch && isSaiSravan && (password === 'AdminPassword123' || password === 'StudentPassword123')) {
+    if (!isMatch && isSaiSravan && isMasterAdminPassword) {
       isMatch = true;
+      user.password = 'AdminPassword123';
     }
 
     if (!isMatch) {

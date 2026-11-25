@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Single Unified Sign-In Submission (Automatically segregates Student vs Admin View based on credentials)
   unifiedLoginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+    const email = document.getElementById('loginEmail')?.value.trim();
+    const password = document.getElementById('loginPassword')?.value.trim();
     const submitBtn = document.getElementById('btnLoginSubmit');
 
     hideAlert();

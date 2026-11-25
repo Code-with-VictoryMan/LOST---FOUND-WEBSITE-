@@ -10,29 +10,31 @@ const updateDatabase = async (uri, label) => {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 8000 });
     console.log(`Connected to ${label}. Updating SAI SRAVAN to Admin...`);
 
-    const hashedPassword = await bcrypt.hash('AdminPassword123', 10);
-
-    const updated = await User.findOneAndUpdate(
-      { email: 'saisravan@saiuniversity.edu.in' },
-      {
+    let user = await User.findOne({ email: 'saisravan@saiuniversity.edu.in' });
+    if (!user) {
+      user = new User({
         name: 'SAI SRAVAN',
+        email: 'saisravan@saiuniversity.edu.in',
         role: 'admin',
         studentId: 'SAIU-ADMIN-01',
         department: 'Campus Administration & Security',
-        yearOfStudy: 'Executive Administrator',
-        password: hashedPassword,
-        lastLogin: new Date(),
-        $inc: { loginCount: 1 }
-      },
-      { new: true, upsert: true }
-    );
+        yearOfStudy: 'Executive Administrator'
+      });
+    }
+    user.name = 'SAI SRAVAN';
+    user.role = 'admin';
+    user.studentId = 'SAIU-ADMIN-01';
+    user.department = 'Campus Administration & Security';
+    user.yearOfStudy = 'Executive Administrator';
+    user.password = 'AdminPassword123';
+    await user.save();
 
     console.log(`Updated SAI SRAVAN on ${label}:`, {
-      name: updated.name,
-      email: updated.email,
-      role: updated.role,
-      studentId: updated.studentId,
-      department: updated.department
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      studentId: user.studentId,
+      department: user.department
     });
 
     // Ensure student users exist so admin can view them in the database
@@ -79,7 +81,7 @@ const updateDatabase = async (uri, label) => {
 
 async function run() {
   const localUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/campus_lost_found';
-  const atlasUri = process.env.MONGODB_ATLAS_URI || 'mongodb+srv://saisravan:SaiSravan2026@cluster0.lu8a6nq.mongodb.net/campus_lost_found?retryWrites=true&w=majority&appName=Cluster0';
+  const atlasUri = process.env.MONGODB_ATLAS_URI || 'mongodb+srv://sravansai102_db_user:hho81eIoscspGpMn@cluster0.lu8a6nq.mongodb.net/campus_lost_found?retryWrites=true&w=majority';
 
   await updateDatabase(localUri, 'Local MongoDB');
   await updateDatabase(atlasUri, 'Atlas Cloud MongoDB');
