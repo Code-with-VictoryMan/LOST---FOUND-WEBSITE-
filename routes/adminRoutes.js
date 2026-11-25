@@ -131,7 +131,7 @@ router.get('/student-logins', protect, adminOnly, async (req, res) => {
         department: u.department || 'School of Computing & Data Science',
         yearOfStudy: u.yearOfStudy || '3rd Year B.Tech',
         phone: u.phone || 'N/A',
-        lastLogin: u.lastLogin || new Date(),
+        lastLogin: u.lastLogin || u.createdAt || new Date('2026-11-20T09:00:00Z'),
         loginCount: u.loginCount || 1,
         loginHistory: u.loginHistory || [
           {

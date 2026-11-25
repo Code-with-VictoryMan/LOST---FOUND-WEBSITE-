@@ -10,7 +10,17 @@ const users = [
     role: 'admin',
     phone: '+91 98401 22334',
     studentId: 'ADMIN-01',
-    department: 'Campus Safety & Administration'
+    department: 'Campus Safety & Administration',
+    yearOfStudy: 'Security Desk',
+    loginCount: 1,
+    lastLogin: new Date('2026-11-21T09:00:00Z'),
+    loginHistory: [
+      {
+        timestamp: new Date('2026-11-21T09:00:00Z'),
+        ipAddress: '127.0.0.1',
+        userAgent: 'Campus Security Console'
+      }
+    ]
   },
   {
     _id: '671510000000000000000002',
@@ -227,13 +237,23 @@ const items = [
     building: 'Computer Science Labs',
     specificLocation: 'Hardware Project Lab, Workbench 4',
     dateOccurred: new Date('2026-10-11'),
-    imageUrl: 'https://images.unsplash.com/photo-1609592424109-dd9892f1b177?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80',
     status: 'resolved',
     reportedBy: users[1]
   }
 ];
 
-const claims = [];
+const claims = [
+  {
+    _id: '671530000000000000000001',
+    item: '671520000000000000000004',
+    claimant: users[2],
+    proofDescription: 'Verified ownership via Bluetooth pairing name "Sravan-XM4" and original purchase invoice.',
+    contactPhone: '+91 97711 33445',
+    status: 'pending',
+    createdAt: new Date('2026-10-18T10:30:00Z')
+  }
+];
 
 module.exports = {
   users,

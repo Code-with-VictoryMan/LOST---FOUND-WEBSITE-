@@ -187,21 +187,53 @@ body::after {
 .desktop-nav-links {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.15rem;
+  flex-wrap: nowrap;
 }
 
-.desktop-nav-links a {
+.desktop-nav-links a,
+.desktop-nav-links button {
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   color: var(--text-secondary);
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
 .desktop-nav-links a:hover,
 .desktop-nav-links a.active {
   color: #ffffff;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.4rem;
+  border-radius: 8px;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+@media (min-width: 769px) {
+  .menu-toggle-pill {
+    display: none;
+  }
 }
 
 /* ========================================================
@@ -444,7 +476,7 @@ select:focus, input:focus, textarea:focus {
 .main-container {
   max-width: 1260px;
   margin: 0 auto;
-  padding: 2rem 1.75rem 4rem;
+  padding: 2rem 1.75rem 6.5rem;
   position: relative;
   z-index: 10;
 }
@@ -526,31 +558,50 @@ select:focus, input:focus, textarea:focus {
 }
 
 .badge-tag {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 0.3rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-pill);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.item-img-wrap .badge-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+.item-img-wrap .badge-tag.my-report-badge {
+  top: auto;
+  bottom: 10px;
+  left: 10px;
 }
 
 .tag-lost { background: rgba(239, 68, 68, 0.25); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
 .tag-found { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
 
 .status-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 0.28rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-pill);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.5px;
   backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.item-img-wrap .status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .status-open { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
@@ -943,6 +994,8 @@ select:focus, input:focus, textarea:focus {
   font-weight: 800;
   margin-top: 0.5rem;
   color: #ffffff;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .stat-lost { color: var(--danger); }
@@ -961,6 +1014,19 @@ select:focus, input:focus, textarea:focus {
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
   padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card canvas {
+  max-height: 280px;
+  width: 100% !important;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
   border-radius: var(--radius-lg);
 }
 
@@ -1733,10 +1799,9 @@ select:focus, input:focus, textarea:focus {
 
 .quick-filter-chips {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  overflow-x: auto;
   padding: 0.4rem 0;
-  scrollbar-width: none;
 }
 .quick-filter-chips::-webkit-scrollbar { display: none; }
 

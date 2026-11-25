@@ -288,7 +288,14 @@ function renderBuildingChart(buildingStats) {
   buildingChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: buildingStats.map(b => b._id.replace('Academic Block ', 'Block ').replace('Student Dining & ', '')),
+      labels: buildingStats.map(b =>
+        b._id
+          .replace('Academic Block ', 'Block ')
+          .replace('Student Dining & ', '')
+          .replace('Computer Science Labs', 'CS Labs')
+          .replace('Sports Complex & Gymnasium', 'Sports Complex')
+          .replace('Campus Grounds / Lawn', 'Campus Grounds')
+      ),
       datasets: [{
         label: 'Items Reported',
         data: buildingStats.map(b => b.count),
@@ -298,6 +305,10 @@ function renderBuildingChart(buildingStats) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: { left: 10, right: 10, top: 5, bottom: 5 }
+      },
       plugins: {
         legend: { display: false }
       },
@@ -334,6 +345,7 @@ function renderCategoryChart(categoryStats) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           position: 'right',
@@ -373,7 +385,7 @@ async function loadMyReportedItems() {
       <tr>
         <td>
           <div style="display:flex; align-items:center; gap:0.75rem;">
-            <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'}" alt="" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
+            <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80';" alt="" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
             <div>
               <strong>${item.title}</strong><br>
               <small style="color:var(--accent-cyan); font-weight:500;">${item.category}</small>
@@ -694,9 +706,14 @@ async function loadStudentLogins(showRefreshToast = false) {
 
     if (auditTotalStudents) auditTotalStudents.textContent = data.summary?.totalStudents || allStudentLoginsCache.filter(u => u.role === 'student').length;
     if (auditTotalLogins) auditTotalLogins.textContent = data.summary?.totalLogins || 0;
+    const isMongo = data.source === 'mongodb';
     if (auditDbBadge) {
-      auditDbBadge.textContent = data.source === 'mongodb' ? 'MongoDB: Live Cloud' : 'Offline In-Memory DB';
-      auditDbBadge.style.color = data.source === 'mongodb' ? '#4ade80' : '#fbbf24';
+      auditDbBadge.textContent = isMongo ? 'MongoDB: Live Cloud' : 'Resilient In-Memory DB';
+      auditDbBadge.style.color = isMongo ? '#4ade80' : '#fbbf24';
+    }
+    const dbSyncStatus = document.getElementById('dbSyncStatus');
+    if (dbSyncStatus) {
+      dbSyncStatus.textContent = isMongo ? 'MongoDB Connected • Live DB Active' : 'Resilient In-Memory Store Active';
     }
 
     renderStudentLoginsTable(allStudentLoginsCache);
@@ -767,8 +784,8 @@ function renderStudentLoginsTable(users) {
           <small style="color:var(--text-muted); font-size:0.75rem;">${user.yearOfStudy || ''}</small>
         </td>
         <td style="padding:1rem; text-align:center;">
-          <span style="display:inline-block; padding:0.25rem 0.7rem; border-radius:999px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:#c084fc; font-weight:700; font-size:0.82rem;">
-            ${user.loginCount || 0} logins
+          <span style="display:inline-block; padding:0.25rem 0.7rem; border-radius:999px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:#c084fc; font-weight:700; font-size:0.82rem; white-space:nowrap;">
+            ${user.loginCount || 0} ${(user.loginCount || 0) === 1 ? 'login' : 'logins'}
           </span>
         </td>
         <td style="padding:1rem; font-size:0.85rem; color:#38bdf8;">

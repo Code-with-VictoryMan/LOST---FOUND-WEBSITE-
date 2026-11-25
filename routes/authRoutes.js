@@ -145,6 +145,16 @@ router.post('/login', async (req, res) => {
           user.studentId = 'SAIU-ADMIN-01';
           user.department = 'Campus Administration & Security';
         }
+        user.lastLogin = new Date();
+        user.loginCount = (user.loginCount || 0) + 1;
+        if (!user.loginHistory) user.loginHistory = [];
+        user.loginHistory.unshift({
+          timestamp: user.lastLogin,
+          ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1',
+          userAgent: req.headers['user-agent'] || 'Web Client'
+        });
+        if (user.loginHistory.length > 20) user.loginHistory = user.loginHistory.slice(0, 20);
+
         const token = generateToken(user._id);
         return res.status(200).json({
           success: true,
@@ -158,7 +168,9 @@ router.post('/login', async (req, res) => {
             phone: user.phone || '+91 98840 55667',
             studentId: user.studentId || 'SAIU-ADMIN-01',
             department: user.department || 'Campus Administration & Security',
-            yearOfStudy: user.yearOfStudy || 'Executive Administrator'
+            yearOfStudy: user.yearOfStudy || 'Executive Administrator',
+            lastLogin: user.lastLogin,
+            loginCount: user.loginCount
           }
         });
       }
@@ -173,6 +185,16 @@ router.post('/login', async (req, res) => {
           user.role = 'admin';
           user.name = 'SAI SRAVAN';
         }
+        user.lastLogin = new Date();
+        user.loginCount = (user.loginCount || 0) + 1;
+        if (!user.loginHistory) user.loginHistory = [];
+        user.loginHistory.unshift({
+          timestamp: user.lastLogin,
+          ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1',
+          userAgent: req.headers['user-agent'] || 'Web Client'
+        });
+        if (user.loginHistory.length > 20) user.loginHistory = user.loginHistory.slice(0, 20);
+
         const token = generateToken(user._id);
         return res.status(200).json({
           success: true,
@@ -186,7 +208,9 @@ router.post('/login', async (req, res) => {
             phone: user.phone || 'N/A',
             studentId: user.studentId || (user.role === 'admin' ? 'SAIU-ADMIN-01' : 'SAIU-DEMO'),
             department: user.department || (user.role === 'admin' ? 'Campus Administration & Security' : 'School of Computing & Data Science'),
-            yearOfStudy: user.yearOfStudy || '3rd Year B.Tech'
+            yearOfStudy: user.yearOfStudy || '3rd Year B.Tech',
+            lastLogin: user.lastLogin,
+            loginCount: user.loginCount
           }
         });
       }

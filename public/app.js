@@ -145,7 +145,7 @@ function renderItems(items) {
           <img src="${item.imageUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
           <span class="badge-tag tag-${item.type}">${item.type}</span>
           <span class="status-badge status-${item.status}">${item.status.toUpperCase()}</span>
-          ${isMyReport ? `<span class="badge-tag" style="position:absolute; bottom:8px; left:8px; background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-weight:700; z-index:3; border:1px solid rgba(255,255,255,0.4); box-shadow:0 2px 8px rgba(0,0,0,0.4);">⭐ Your Report</span>` : ''}
+          ${isMyReport ? `<span class="badge-tag my-report-badge" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-weight:700; z-index:3; border:1px solid rgba(255,255,255,0.4); box-shadow:0 2px 8px rgba(0,0,0,0.4);">⭐ Your Report</span>` : ''}
         </div>
         <div class="item-body">
           <span class="item-category">${item.category}</span>

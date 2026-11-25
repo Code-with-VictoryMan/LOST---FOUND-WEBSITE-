@@ -124,7 +124,7 @@ const sampleItems = [
     building: 'Computer Science Labs',
     specificLocation: 'Hardware Project Lab, Workbench 4',
     dateOccurred: new Date('2026-10-11'),
-    imageUrl: 'https://images.unsplash.com/photo-1609592424109-dd9892f1b177?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80',
     status: 'resolved'
   }
 ];
