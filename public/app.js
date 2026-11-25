@@ -528,7 +528,7 @@ function stopCamera() {
   }
 }
 
-function capturePhoto() {
+async function capturePhoto() {
   const scanVideo = document.getElementById('scanVideo');
   const scanPreviewImg = document.getElementById('scanPreviewImg');
   const btnCapturePhoto = document.getElementById('btnCapturePhoto');
