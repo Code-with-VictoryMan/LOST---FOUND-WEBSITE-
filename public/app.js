@@ -512,12 +512,14 @@ function handleFileUpload(e) {
 async function executeScanMatch() {
   const keywordsInput = document.getElementById('scanItemKeywords');
   const queryText = keywordsInput ? keywordsInput.value.trim() : '';
-  const building = document.getElementById('scanBuilding').value;
-  const category = document.getElementById('scanCategory').value;
+  const scanMode = document.getElementById('scanMode')?.value || 'all';
+  const building = document.getElementById('scanBuilding')?.value || 'all';
+  const category = document.getElementById('scanCategory')?.value || 'all';
   const resultsArea = document.getElementById('scanResultsArea');
 
-  if (!queryText) {
-    alert('Please enter or scan the item name / markings (e.g. calculator, Dell, AirPods, lanyard)');
+  if (!queryText && category === 'all') {
+    showToast('Enter keywords (e.g. bottle, ID card, AirPods) or pick a category.');
+    keywordsInput?.focus();
     return;
   }
 
@@ -525,8 +527,8 @@ async function executeScanMatch() {
   resultsArea.innerHTML = `
     <div style="text-align:center;padding:1.5rem;color:var(--accent-cyan);">
       <div style="font-size:1.8rem;animation:pulse 1.2s infinite;">📡</div>
-      <p style="margin-top:0.5rem;font-weight:600;">Searching active Sai University lost reports...</p>
-      <small style="color:var(--text-muted);">Comparing location: ${building} | Keywords: ${escapeHtml(queryText)}</small>
+      <p style="margin-top:0.5rem;font-weight:600;">Scanning Sai University MongoDB database...</p>
+      <small style="color:var(--text-muted);">Scope: ${building === 'all' ? 'All Buildings' : building} | Keywords: ${escapeHtml(queryText || category)}</small>
     </div>
   `;
 
@@ -534,105 +536,147 @@ async function executeScanMatch() {
     const res = await fetch('/api/items/scan-match', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ queryText, category, building })
+      body: JSON.stringify({ queryText, category, building, scanMode })
     });
     const data = await res.json();
 
     if (data.success && data.matchFound && data.bestMatch) {
       const match = data.bestMatch;
-      const owner = match.reportedBy || {};
+      const owner = {
+        name: match.ownerDetails?.name || match.reportedBy?.name || 'Sai University Member',
+        email: (match.ownerDetails?.email && match.ownerDetails.email !== 'N/A' ? match.ownerDetails.email : match.reportedBy?.email) || 'N/A',
+        phone: (match.ownerDetails?.phone && match.ownerDetails.phone !== 'N/A' ? match.ownerDetails.phone : match.reportedBy?.phone) || 'N/A',
+        studentId: match.ownerDetails?.studentId || match.reportedBy?.studentId || 'Verified',
+        department: match.ownerDetails?.department || match.reportedBy?.department || 'Sai University',
+        role: match.reportedBy?.role || 'student'
+      };
+      const refCode = match.referenceCode || ('SAIU-LF-' + String(match._id).slice(-4).toUpperCase());
+      const otherMatches = data.otherMatches || [];
 
       resultsArea.innerHTML = `
         <div class="scan-match-banner">
           <div class="scan-match-header">
             <div>
-              <span style="font-size:1.1rem;font-weight:800;color:#6ee7b7;">🎯 Match Found in Campus Database!</span>
-              <p style="font-size:0.78rem;color:var(--text-secondary);">An active lost report matches your found item description.</p>
+              <span style="font-size:1.1rem;font-weight:800;color:#6ee7b7;">🎯 ${data.totalMatches || 1} Match${(data.totalMatches || 1) > 1 ? 'es' : ''} Found in Campus Database!</span>
+              <p style="font-size:0.78rem;color:var(--text-secondary);">Top matching ${match.type.toUpperCase()} report from Sai University database.</p>
             </div>
-            <span class="match-confidence-pill">${match.matchScore || 90}% Match Confidence</span>
+            <span class="match-confidence-pill">${match.matchScore || 90}% Match</span>
           </div>
 
           <!-- Matched Item Summary -->
           <div style="display:flex;gap:1rem;background:rgba(10,13,19,0.7);padding:0.9rem;border-radius:10px;border:1px solid var(--border-subtle);align-items:center;">
-            <img src="${match.imageUrl}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
+            <img src="${match.imageUrl}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'">
             <div>
+              <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.2rem;">
+                <span class="badge-tag tag-${match.type}" style="font-size:0.65rem;padding:0.1rem 0.45rem;">${match.type.toUpperCase()}</span>
+                <code style="font-size:0.72rem;color:#fbbf24;">${refCode}</code>
+              </div>
               <strong style="font-size:1.05rem;color:#fff;">${escapeHtml(match.title)}</strong><br>
-              <span style="font-size:0.8rem;color:var(--accent-cyan);font-weight:600;">${match.category}</span> • 
+              <span style="font-size:0.8rem;color:var(--accent-cyan);font-weight:600;">${match.category}</span> &bull; 
               <span style="font-size:0.8rem;color:var(--text-muted);">${match.building} (${escapeHtml(match.specificLocation)})</span><br>
-              <small style="font-size:0.75rem;color:var(--text-secondary);">Lost Date: ${new Date(match.dateOccurred).toLocaleDateString()}</small>
+              <small style="font-size:0.75rem;color:var(--text-secondary);">Date: ${new Date(match.dateOccurred).toLocaleDateString()}</small>
             </div>
           </div>
 
           <!-- OWNER DETAILS BOX -->
           <div class="owner-details-card">
             <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);padding-bottom:0.5rem;">
-              <strong style="color:var(--accent-cyan);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Owner Contact Details</strong>
-              <span style="font-size:0.72rem;background:rgba(56,189,248,0.15);color:#7dd3fc;padding:0.2rem 0.5rem;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Verified Campus Reporter</span>
+              <strong style="color:var(--accent-cyan);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Owner / Reporter Details</strong>
+              <span style="font-size:0.72rem;background:rgba(56,189,248,0.15);color:#7dd3fc;padding:0.2rem 0.5rem;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">${escapeHtml(owner.studentId)}</span>
             </div>
 
             <div class="owner-info-row">
-              <span style="color:var(--text-muted);">Owner Name:</span>
-              <strong style="color:#fff;">${escapeHtml(owner.name || 'Anonymous Student')}</strong>
+              <span style="color:var(--text-muted);">Name:</span>
+              <strong style="color:#fff;">${escapeHtml(owner.name)}</strong>
             </div>
 
             <div class="owner-info-row">
-              <span style="color:var(--text-muted);">Department / Role:</span>
-              <span style="color:#cbd5e1;text-transform:capitalize;">${escapeHtml(owner.role || 'Student')}</span>
+              <span style="color:var(--text-muted);">Department:</span>
+              <span style="color:#cbd5e1;">${escapeHtml(owner.department)} (${escapeHtml(owner.role)})</span>
             </div>
 
             <div class="owner-info-row">
               <span style="color:var(--text-muted);">Sai University Email:</span>
-              <a href="mailto:${owner.email}?subject=Found Item: ${encodeURIComponent(match.title)}" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">${escapeHtml(owner.email || 'N/A')}</a>
+              <a href="mailto:${owner.email}?subject=Regarding%20Campus%20Item:%20${encodeURIComponent(match.title)}" style="color:var(--accent-cyan);text-decoration:none;font-weight:600;">${escapeHtml(owner.email)}</a>
             </div>
 
             <div class="owner-info-row">
               <span style="color:var(--text-muted);">Contact Phone:</span>
-              <a href="tel:${owner.phone}" style="color:#34d399;text-decoration:none;font-weight:600;">${escapeHtml(owner.phone || 'N/A')}</a>
+              <span style="color:#34d399;font-weight:600;">${escapeHtml(owner.phone)}</span>
             </div>
 
-            <div class="owner-actions-row">
-              <a href="mailto:${owner.email}?subject=Found Your Lost Item: ${encodeURIComponent(match.title)}&body=Hello ${encodeURIComponent(owner.name || 'Student')}, I found your item on campus at ${encodeURIComponent(building)}. Please get in touch to collect it!" class="btn btn-primary btn-sm" style="flex:1;">
-                ✉️ Email Owner Directly
-              </a>
+            <div class="owner-actions-row" style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+              ${owner.email && owner.email !== 'N/A' ? `
+                <a href="mailto:${owner.email}?subject=Found%20/Regarding%20Item:%20${encodeURIComponent(match.title)}&body=Hello%20${encodeURIComponent(owner.name)},%20I%20am%20reaching%20out%20via%20Sai%20University%20Lost%20%26%20Found%20regarding:%20${encodeURIComponent(match.title)}." class="btn btn-primary btn-sm" style="flex:1;justify-content:center;">
+                  ✉️ Email
+                </a>
+              ` : ''}
               ${owner.phone && owner.phone !== 'N/A' ? `
-                <a href="tel:${owner.phone}" class="btn btn-secondary btn-sm" style="flex:1;">
-                  📞 Call Owner
+                <a href="https://wa.me/${owner.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(owner.name)},%20regarding%20${encodeURIComponent(match.title)}%20on%20Sai%20University%20Lost%20%26%20Found" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;border-color:rgba(34,197,94,0.4);color:#4ade80;">
+                  💬 WhatsApp
+                </a>
+                <a href="tel:${owner.phone.replace(/\s+/g, '')}" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;">
+                  📞 Call
                 </a>
               ` : ''}
             </div>
           </div>
+
+          ${otherMatches.length > 0 ? `
+            <div style="margin-top:0.9rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Other Possible Matches (${otherMatches.length})</div>
+              <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                ${otherMatches.map(m => `
+                  <div onclick="closeScannerModal(); openItemDetails('${m._id}');" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <span class="badge-tag tag-${m.type}" style="font-size:0.62rem;padding:0.1rem 0.4rem;">${m.type.toUpperCase()}</span>
+                      <div>
+                        <div style="font-size:0.85rem;font-weight:600;color:#fff;">${escapeHtml(m.title)}</div>
+                        <small style="font-size:0.72rem;color:var(--text-muted);">${m.building} &bull; ${escapeHtml(m.ownerDetails?.name || m.reportedBy?.name || 'Reporter')}</small>
+                      </div>
+                    </div>
+                    <span style="font-size:0.74rem;color:var(--accent-cyan);font-weight:700;">${m.matchScore}%</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
         </div>
       `;
     } else {
+      const nextReportType = scanMode === 'found' ? 'lost' : 'found';
       resultsArea.innerHTML = `
         <div class="no-match-box">
           <span style="font-size:2rem;">🔍</span>
-          <strong style="color:#ffffff;">No Matching Lost Reports Found</strong>
+          <strong style="color:#ffffff;">No Matching Active Reports Found</strong>
           <p style="font-size:0.85rem;color:var(--text-secondary);max-width:440px;">
-            The student who lost this has not reported it yet. You can list it as a <strong>Found Item</strong> right now so they can discover and claim it!
+            No matching report exists in MongoDB yet. List this as a <strong>${nextReportType === 'found' ? 'Found' : 'Lost'} Item</strong> right now so campus members can discover it!
           </p>
-          <button type="button" class="btn btn-primary btn-sm" onclick="prefillFoundReport('${escapeHtml(queryText)}', '${building}', '${category}')">
-            ✨ List as Found Item in 1-Click
+          <button type="button" id="btnPrefillFromScan" class="btn btn-primary btn-sm">
+            ✨ List as ${nextReportType === 'found' ? 'Found' : 'Lost'} Item in 1-Click
           </button>
         </div>
       `;
+      document.getElementById('btnPrefillFromScan')?.addEventListener('click', () => {
+        prefillFoundReport(queryText || category, building, category, nextReportType);
+      });
     }
   } catch (err) {
     resultsArea.innerHTML = `<p style="color:var(--danger);text-align:center;">Error communicating with server during scan.</p>`;
   }
 }
 
-window.prefillFoundReport = function(title, building, category) {
+window.prefillFoundReport = function(title, building, category, reportType = 'found') {
   closeScannerModal();
   if (!authToken) {
-    showToast('Please sign in to list this found item.');
+    showToast('Please sign in to list this item.');
     openAuthModal();
     return;
   }
 
   // Pre-fill report form
-  document.getElementById('reportType').value = 'found';
-  document.getElementById('reportTitle').value = title;
+  document.getElementById('reportType').value = reportType;
+  document.getElementById('reportTitle').value = title === 'all' ? '' : title;
   if (category && category !== 'all') document.getElementById('reportCategory').value = category;
   if (building && building !== 'all') document.getElementById('reportBuilding').value = building;
   
@@ -798,6 +842,22 @@ function setupEventListeners() {
   if (btnCapturePhoto) btnCapturePhoto.addEventListener('click', capturePhoto);
   if (scanFileInput) scanFileInput.addEventListener('change', handleFileUpload);
   if (btnExecuteScan) btnExecuteScan.addEventListener('click', executeScanMatch);
+
+  const scanKeywordsInput = document.getElementById('scanItemKeywords');
+  if (scanKeywordsInput) {
+    scanKeywordsInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        executeScanMatch();
+      }
+    });
+  }
+  document.querySelectorAll('.scan-quick-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (scanKeywordsInput) scanKeywordsInput.value = chip.dataset.kw || '';
+      executeScanMatch();
+    });
+  });
 
   // Search and Filters
   searchInput.addEventListener('input', () => {

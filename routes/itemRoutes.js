@@ -117,36 +117,57 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
-// @route   POST /api/items/scan-match (Scan Item & Find Owner)
+// @route   POST /api/items/scan-match (Smart Scan Item & Owner/Finder Lookup)
 router.post('/scan-match', async (req, res) => {
   try {
-    const queryText = req.body.queryText || req.body.keyword || req.body.text || req.body.itemText || '';
-    const { category, building } = req.body;
-    if (!queryText || queryText.trim() === '') {
-      return res.status(400).json({ success: false, message: 'Please provide scanned text or keywords' });
+    const queryText = (req.body.queryText || req.body.keyword || req.body.text || req.body.itemText || '').trim();
+    const { category, building, scanMode } = req.body;
+    if (!queryText && (!category || category === 'all')) {
+      return res.status(400).json({ success: false, message: 'Please provide scanned text, keywords, or select a category' });
     }
 
-    // Retrieve active lost items (Atlas or offlineStore)
-    let lostItems = [];
+    // Determine which report types to search (default 'all' so both Lost & Found reports are discoverable)
+    const targetType = scanMode === 'lost' ? 'lost' : (scanMode === 'found' ? 'found' : 'all');
+
+    let candidateItems = [];
     if (mongoose.connection.readyState !== 1) {
-      lostItems = offlineStore.items.filter(i => i.type === 'lost' && i.status !== 'resolved');
+      candidateItems = offlineStore.items.filter(i => {
+        if (i.status === 'resolved') return false;
+        if (targetType !== 'all' && i.type !== targetType) return false;
+        return true;
+      });
     } else {
-      lostItems = await Item.find({ type: 'lost', status: { $ne: 'resolved' } })
-        .populate('reportedBy', 'name email phone role');
+      const dbFilter = { status: { $ne: 'resolved' } };
+      if (targetType !== 'all') dbFilter.type = targetType;
+      candidateItems = await Item.find(dbFilter)
+        .populate('reportedBy', 'name email phone studentId department role yearOfStudy');
     }
 
-    const searchTerms = queryText.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const searchTerms = queryText
+      .toLowerCase()
+      .split(/[\s,;|/]+/)
+      .filter(w => w.length >= 2);
 
-    const scoredItems = lostItems.map(item => {
+    const scoredItems = candidateItems.map(item => {
       let score = 0;
+      let keywordHits = 0;
       const titleLower = (item.title || '').toLowerCase();
       const descLower = (item.description || '').toLowerCase();
       const locLower = (item.specificLocation || '').toLowerCase();
+      const catLower = (item.category || '').toLowerCase();
+      const bldLower = (item.building || '').toLowerCase();
+      const refLower = (item.referenceCode || '').toLowerCase();
+      const ownerNameLower = (item.ownerDetails?.name || item.reportedBy?.name || '').toLowerCase();
 
       searchTerms.forEach(term => {
-        if (titleLower.includes(term)) score += 40;
-        if (descLower.includes(term)) score += 20;
-        if (locLower.includes(term)) score += 15;
+        let matchedThisTerm = false;
+        if (refLower && refLower.includes(term)) { score += 80; matchedThisTerm = true; }
+        if (titleLower.includes(term)) { score += 45; matchedThisTerm = true; }
+        if (descLower.includes(term)) { score += 25; matchedThisTerm = true; }
+        if (catLower.includes(term)) { score += 20; matchedThisTerm = true; }
+        if (locLower.includes(term) || bldLower.includes(term)) { score += 15; matchedThisTerm = true; }
+        if (ownerNameLower.includes(term)) { score += 25; matchedThisTerm = true; }
+        if (matchedThisTerm) keywordHits++;
       });
 
       if (category && category !== 'all' && item.category === category) {
@@ -155,6 +176,11 @@ router.post('/scan-match', async (req, res) => {
 
       if (building && building !== 'all' && item.building === building) {
         score += 20;
+      }
+
+      // Require at least one keyword hit if searchTerms were provided
+      if (searchTerms.length > 0 && keywordHits === 0) {
+        score = 0;
       }
 
       const itemObj = typeof item.toObject === 'function' ? item.toObject() : item;
@@ -170,7 +196,7 @@ router.post('/scan-match', async (req, res) => {
       return res.status(200).json({
         success: true,
         matchFound: false,
-        message: 'No matching lost reports found in the campus database.',
+        message: 'No matching active reports found in the campus database.',
         matches: []
       });
     }
@@ -180,11 +206,12 @@ router.post('/scan-match', async (req, res) => {
       success: true,
       matchFound: true,
       confidence: bestMatch.score,
+      totalMatches: scoredItems.length,
       bestMatch: {
         ...bestMatch.item,
         matchScore: bestMatch.score
       },
-      otherMatches: scoredItems.slice(1, 4).map(m => ({
+      otherMatches: scoredItems.slice(1, 5).map(m => ({
         ...m.item,
         matchScore: m.score
       }))

@@ -304,8 +304,18 @@
         <!-- Detected / Input Details -->
         <div class="form-row" style="margin-top:0.5rem;">
           <div class="form-group">
-            <label for="scanBuilding">Campus Building Where Found *</label>
+            <label for="scanMode">Scan Mode *</label>
+            <select id="scanMode">
+              <option value="all" selected>All Active Reports (Lost &amp; Found)</option>
+              <option value="lost">I Found This (Search Lost Reports)</option>
+              <option value="found">I Lost This (Search Found Reports)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="scanBuilding">Campus Building</label>
             <select id="scanBuilding" required>
+              <option value="all" selected>All Campus Buildings</option>
               <option value="Academic Block A">Academic Block A</option>
               <option value="Academic Block B">Academic Block B</option>
               <option value="Library">Library</option>
@@ -318,7 +328,7 @@
           </div>
 
           <div class="form-group">
-            <label for="scanCategory">Item Category *</label>
+            <label for="scanCategory">Item Category</label>
             <select id="scanCategory" required>
               <option value="all">Auto-Detect Any Category</option>
               <option value="Electronics &amp; Gadgets">Electronics &amp; Gadgets</option>
@@ -334,9 +344,18 @@
         </div>
 
         <div class="form-group">
-          <label for="scanItemKeywords">Scanned Item Label / Brand / Name *</label>
-          <input type="text" id="scanItemKeywords" placeholder="e.g. Sony headphones, Dell charger, CASIO calculator, student ID card, flask..." required>
-          <small class="form-hint">Type key identifying words written on or describing the found item.</small>
+          <label for="scanItemKeywords">Scanned Item Label / Brand / Ref ID *</label>
+          <input type="text" id="scanItemKeywords" placeholder="e.g. Sony headphones, Dell charger, ID card, bottle, SAIU-LF-..." required>
+          <div id="scanQuickChips" style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem;">
+            <button type="button" class="chip scan-quick-chip" data-kw="ID Card" style="font-size:0.72rem; padding:0.25rem 0.65rem;">ID Card</button>
+            <button type="button" class="chip scan-quick-chip" data-kw="Water Bottle" style="font-size:0.72rem; padding:0.25rem 0.65rem;">Water Bottle</button>
+            <button type="button" class="chip scan-quick-chip" data-kw="AirPods" style="font-size:0.72rem; padding:0.25rem 0.65rem;">AirPods</button>
+            <button type="button" class="chip scan-quick-chip" data-kw="Charger" style="font-size:0.72rem; padding:0.25rem 0.65rem;">Charger</button>
+            <button type="button" class="chip scan-quick-chip" data-kw="Wallet" style="font-size:0.72rem; padding:0.25rem 0.65rem;">Wallet</button>
+            <button type="button" class="chip scan-quick-chip" data-kw="Keys" style="font-size:0.72rem; padding:0.25rem 0.65rem;">Keys</button>
+            <button type="button" class="chip scan-quick-chip" data-kw="Calculator" style="font-size:0.72rem; padding:0.25rem 0.65rem;">Calculator</button>
+          </div>
+          <small class="form-hint">Type keywords or tap a tag above to scan the live MongoDB database.</small>
         </div>
 
         <button type="button" id="btnExecuteScan" class="btn btn-primary" style="width:100%;margin-top:0.4rem;">
