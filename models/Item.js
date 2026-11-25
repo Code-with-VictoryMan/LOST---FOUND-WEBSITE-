@@ -58,6 +58,11 @@ const itemSchema = new mongoose.Schema({
     type: String,
     default: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'
   },
+  imageHash: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   status: {
     type: String,
     enum: ['open', 'claimed', 'resolved'],

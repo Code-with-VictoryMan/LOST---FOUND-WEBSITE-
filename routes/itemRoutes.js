@@ -117,13 +117,23 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
-// @route   POST /api/items/scan-match (Smart Scan Item & Owner/Finder Lookup)
+function hammingDistance(h1, h2) {
+  if (!h1 || !h2 || h1.length !== h2.length) return Infinity;
+  let dist = 0;
+  for (let i = 0; i < h1.length; i++) {
+    if (h1[i] !== h2[i]) dist++;
+  }
+  return dist;
+}
+
+// @route   POST /api/items/scan-match (Smart Visual + Keyword Scan & Owner Lookup)
 router.post('/scan-match', async (req, res) => {
   try {
     const queryText = (req.body.queryText || req.body.keyword || req.body.text || req.body.itemText || '').trim();
-    const { category, building, scanMode } = req.body;
-    if (!queryText && (!category || category === 'all')) {
-      return res.status(400).json({ success: false, message: 'Please provide scanned text, keywords, or select a category' });
+    const { category, building, scanMode, imageHash, detectedColors } = req.body;
+    const hasVisualSignal = Boolean(imageHash) || (Array.isArray(detectedColors) && detectedColors.length > 0);
+    if (!queryText && (!category || category === 'all') && !hasVisualSignal) {
+      return res.status(400).json({ success: false, message: 'Please snap/upload a photo, enter keywords, or select a category' });
     }
 
     // Determine which report types to search (default 'all' so both Lost & Found reports are discoverable)
@@ -147,10 +157,12 @@ router.post('/scan-match', async (req, res) => {
       .toLowerCase()
       .split(/[\s,;|/]+/)
       .filter(w => w.length >= 2);
+    const colorsList = Array.isArray(detectedColors) ? detectedColors.map(c => String(c).toLowerCase()) : [];
 
     const scoredItems = candidateItems.map(item => {
       let score = 0;
       let keywordHits = 0;
+      let visualHit = false;
       const titleLower = (item.title || '').toLowerCase();
       const descLower = (item.description || '').toLowerCase();
       const locLower = (item.specificLocation || '').toLowerCase();
@@ -159,6 +171,27 @@ router.post('/scan-match', async (req, res) => {
       const refLower = (item.referenceCode || '').toLowerCase();
       const ownerNameLower = (item.ownerDetails?.name || item.reportedBy?.name || '').toLowerCase();
 
+      // 1. Visual Perceptual Image Hash Match
+      if (imageHash && item.imageHash) {
+        const dist = hammingDistance(imageHash, item.imageHash);
+        if (dist <= 6) {
+          score += 95;
+          visualHit = true;
+        } else if (dist <= 14) {
+          score += 65;
+          visualHit = true;
+        }
+      }
+
+      // 2. Dominant Color Visual Match against item title/description
+      colorsList.forEach(col => {
+        if (col && (titleLower.includes(col) || descLower.includes(col))) {
+          score += 28;
+          visualHit = true;
+        }
+      });
+
+      // 3. Keyword / Ref ID / Owner Match
       searchTerms.forEach(term => {
         let matchedThisTerm = false;
         if (refLower && refLower.includes(term)) { score += 80; matchedThisTerm = true; }
@@ -178,8 +211,8 @@ router.post('/scan-match', async (req, res) => {
         score += 20;
       }
 
-      // Require at least one keyword hit if searchTerms were provided
-      if (searchTerms.length > 0 && keywordHits === 0) {
+      // Require at least one keyword hit OR visual hit if searchTerms were provided
+      if (searchTerms.length > 0 && keywordHits === 0 && !visualHit) {
         score = 0;
       }
 
@@ -187,7 +220,8 @@ router.post('/scan-match', async (req, res) => {
 
       return {
         item: itemObj,
-        score: Math.min(score, 100)
+        score: Math.min(score, 100),
+        visualMatch: visualHit
       };
     }).filter(resItem => resItem.score >= 20)
       .sort((a, b) => b.score - a.score);
@@ -209,11 +243,13 @@ router.post('/scan-match', async (req, res) => {
       totalMatches: scoredItems.length,
       bestMatch: {
         ...bestMatch.item,
-        matchScore: bestMatch.score
+        matchScore: bestMatch.score,
+        visualMatch: bestMatch.visualMatch
       },
       otherMatches: scoredItems.slice(1, 5).map(m => ({
         ...m.item,
-        matchScore: m.score
+        matchScore: m.score,
+        visualMatch: m.visualMatch
       }))
     });
   } catch (error) {
@@ -325,6 +361,7 @@ router.post('/', protect, async (req, res) => {
         specificLocation,
         dateOccurred: new Date(dateOccurred),
         imageUrl: imageUrl && imageUrl.trim() !== '' ? imageUrl : 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80',
+        imageHash: req.body.imageHash || '',
         status: 'open',
         reportedBy: req.user || offlineStore.users[1],
         ownerDetails: ownerInfo,
@@ -349,6 +386,7 @@ router.post('/', protect, async (req, res) => {
       specificLocation,
       dateOccurred,
       imageUrl: imageUrl && imageUrl.trim() !== '' ? imageUrl : undefined,
+      imageHash: req.body.imageHash || '',
       reportedBy: req.user._id,
       ownerDetails: ownerInfo,
       referenceCode,

@@ -415,6 +415,79 @@ function resetScannerState() {
   if (btnToggleCamera) btnToggleCamera.textContent = '📹 Start Camera';
   if (scanResultsArea) { scanResultsArea.classList.add('hidden'); scanResultsArea.innerHTML = ''; }
   scannedPhotoData = null;
+  window.scannedImageHash = '';
+  window.scannedDetectedColors = [];
+}
+
+// Compute 64-bit Perceptual dHash & Dominant Colors in-browser (zero external APIs)
+function analyzeImageSignature(imgSrc) {
+  return new Promise((resolve) => {
+    if (!imgSrc) return resolve({ imageHash: '', detectedColors: [] });
+    const img = new Image();
+    if (!imgSrc.startsWith('data:')) img.crossOrigin = 'anonymous';
+    const timer = setTimeout(() => resolve({ imageHash: '', detectedColors: [] }), 1200);
+    img.onload = () => {
+      clearTimeout(timer);
+      try {
+        // 1. 9x8 grayscale for 64-bit dHash
+        const cHash = document.createElement('canvas');
+        cHash.width = 9;
+        cHash.height = 8;
+        const ctxH = cHash.getContext('2d');
+        ctxH.drawImage(img, 0, 0, 9, 8);
+        const pxH = ctxH.getImageData(0, 0, 9, 8).data;
+        let hash = '';
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const idx1 = (y * 9 + x) * 4;
+            const idx2 = (y * 9 + x + 1) * 4;
+            const g1 = pxH[idx1] * 0.299 + pxH[idx1 + 1] * 0.587 + pxH[idx1 + 2] * 0.114;
+            const g2 = pxH[idx2] * 0.299 + pxH[idx2 + 1] * 0.587 + pxH[idx2 + 2] * 0.114;
+            hash += g1 > g2 ? '1' : '0';
+          }
+        }
+
+        // 2. 24x24 center crop for dominant colors
+        const cCol = document.createElement('canvas');
+        cCol.width = 24;
+        cCol.height = 24;
+        const ctxC = cCol.getContext('2d');
+        ctxC.drawImage(img, 0, 0, 24, 24);
+        const pxC = ctxC.getImageData(4, 4, 16, 16).data;
+        const counts = {};
+        for (let i = 0; i < pxC.length; i += 4) {
+          const r = pxC[i], g = pxC[i + 1], b = pxC[i + 2];
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          const diff = max - min;
+          let col = 'grey';
+          if (max < 55) col = 'black';
+          else if (min > 200 && diff < 35) col = 'white';
+          else if (diff < 30) col = 'silver';
+          else if (r >= g && r >= b) {
+            if (g > 150 && b < 100) col = 'yellow';
+            else if (g > 90 && b < 80) col = 'orange';
+            else if (r > 110 && g > 60 && b < 70 && max < 165) col = 'brown';
+            else col = 'red';
+          } else if (g >= r && g >= b) col = 'green';
+          else if (b >= r && b >= g) col = (r > 110 && g < 90) ? 'purple' : 'blue';
+          counts[col] = (counts[col] || 0) + 1;
+        }
+        const topColors = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 2)
+          .map(e => e[0]);
+
+        resolve({ imageHash: hash, detectedColors: topColors });
+      } catch (e) {
+        resolve({ imageHash: '', detectedColors: [] });
+      }
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      resolve({ imageHash: '', detectedColors: [] });
+    };
+    img.src = imgSrc;
+  });
 }
 
 async function toggleCamera() {
@@ -476,7 +549,12 @@ function capturePhoto() {
   btnCapturePhoto.classList.add('hidden');
   btnToggleCamera.textContent = '📹 Retake Camera Photo';
   stopCamera();
-  showToast('Photo captured! Now specify item label to scan database.');
+
+  showToast('Photo captured! Analyzing visual signature & scanning database...');
+  const sig = await analyzeImageSignature(scannedPhotoData);
+  window.scannedImageHash = sig.imageHash;
+  window.scannedDetectedColors = sig.detectedColors;
+  executeScanMatch();
 }
 
 function handleFileUpload(e) {
@@ -484,7 +562,7 @@ function handleFileUpload(e) {
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = function(evt) {
+  reader.onload = async function(evt) {
     scannedPhotoData = evt.target.result;
     const scanPreviewImg = document.getElementById('scanPreviewImg');
     const scanPlaceholder = document.getElementById('scanPlaceholder');
@@ -498,13 +576,19 @@ function handleFileUpload(e) {
       scanPreviewImg.classList.remove('hidden');
     }
 
-    // Auto-populate keywords from file name if helpful
-    const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    // Auto-populate keywords from meaningful file name (ignore generic IMG_1234 / photo names)
+    const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').trim();
+    const isGenericName = /^(img|dsc|photo|image|screenshot|pxl|vid|cam)\s*\d*$/i.test(cleanName);
     const keywordsInput = document.getElementById('scanItemKeywords');
-    if (keywordsInput && !keywordsInput.value) {
+    if (keywordsInput && !keywordsInput.value && !isGenericName) {
       keywordsInput.value = cleanName;
     }
-    showToast('Photo uploaded successfully.');
+
+    showToast('Photo uploaded! Analyzing visual signature & scanning database...');
+    const sig = await analyzeImageSignature(scannedPhotoData);
+    window.scannedImageHash = sig.imageHash;
+    window.scannedDetectedColors = sig.detectedColors;
+    executeScanMatch();
   };
   reader.readAsDataURL(file);
 }
@@ -516,9 +600,11 @@ async function executeScanMatch() {
   const building = document.getElementById('scanBuilding')?.value || 'all';
   const category = document.getElementById('scanCategory')?.value || 'all';
   const resultsArea = document.getElementById('scanResultsArea');
+  const imageHash = window.scannedImageHash || '';
+  const detectedColors = window.scannedDetectedColors || [];
 
-  if (!queryText && category === 'all') {
-    showToast('Enter keywords (e.g. bottle, ID card, AirPods) or pick a category.');
+  if (!queryText && category === 'all' && !imageHash && detectedColors.length === 0) {
+    showToast('Take/upload a photo, enter keywords, or pick a category to scan.');
     keywordsInput?.focus();
     return;
   }
@@ -528,7 +614,10 @@ async function executeScanMatch() {
     <div style="text-align:center;padding:1.5rem;color:var(--accent-cyan);">
       <div style="font-size:1.8rem;animation:pulse 1.2s infinite;">📡</div>
       <p style="margin-top:0.5rem;font-weight:600;">Scanning Sai University MongoDB database...</p>
-      <small style="color:var(--text-muted);">Scope: ${building === 'all' ? 'All Buildings' : building} | Keywords: ${escapeHtml(queryText || category)}</small>
+      <small style="color:var(--text-muted);">
+        ${imageHash ? `Visual Fingerprint Active${detectedColors.length ? ` (${detectedColors.join(', ')})` : ''} &bull; ` : ''}
+        Scope: ${building === 'all' ? 'All Buildings' : building}${queryText ? ` &bull; Keywords: ${escapeHtml(queryText)}` : ''}
+      </small>
     </div>
   `;
 
@@ -536,7 +625,7 @@ async function executeScanMatch() {
     const res = await fetch('/api/items/scan-match', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ queryText, category, building, scanMode })
+      body: JSON.stringify({ queryText, category, building, scanMode, imageHash, detectedColors })
     });
     const data = await res.json();
 
@@ -1155,6 +1244,9 @@ function setupEventListeners() {
       return;
     }
 
+    const imageUrl = selectedReportPhotoBase64 || document.getElementById('reportImage').value.trim();
+    const sig = imageUrl ? await analyzeImageSignature(imageUrl) : { imageHash: '' };
+
     const payload = {
       title: document.getElementById('reportTitle').value.trim(),
       type: document.getElementById('reportType').value,
@@ -1163,7 +1255,8 @@ function setupEventListeners() {
       specificLocation: document.getElementById('reportLocation').value.trim(),
       dateOccurred: document.getElementById('reportDate').value,
       description: document.getElementById('reportDescription').value.trim(),
-      imageUrl: selectedReportPhotoBase64 || document.getElementById('reportImage').value.trim()
+      imageUrl,
+      imageHash: sig.imageHash || ''
     };
 
     try {
