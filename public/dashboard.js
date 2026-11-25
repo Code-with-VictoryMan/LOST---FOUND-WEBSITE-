@@ -175,7 +175,7 @@ function setupDashboardView() {
 
   if (dashUserDisplay) {
     dashUserDisplay.innerHTML = `
-      <span>${currentUser.name} <span class="badge-tag ${isAdmin ? 'tag-lost' : 'tag-found'}" style="margin-left:0.4rem;font-size:0.75rem;">${isAdmin ? '🛡️ ADMIN CONSOLE' : '🎓 STUDENT'}</span></span>
+      <span>${currentUser.name} <span class="badge-tag ${isAdmin ? 'tag-lost' : 'tag-found'}" style="margin-left:0.4rem;font-size:0.75rem;">${isAdmin ? 'ADMIN CONSOLE' : '🎓 STUDENT'}</span></span>
       <a href="login.html" class="btn btn-outline btn-sm" style="margin-left:0.6rem;padding:0.22rem 0.55rem;font-size:0.75rem;border-color:rgba(255,255,255,0.2);color:#fff;text-decoration:none;">Switch Account</a>
     `;
   }
@@ -224,7 +224,7 @@ function setupDashboardView() {
     if (btnExportItemsCsv) btnExportItemsCsv.classList.remove('hidden');
     loadAdminStats();
     loadStudentLogins();
-    if (elProfileRole) elProfileRole.innerHTML = `🛡️ Campus Security Administrator &bull; Sai University Administration`;
+    if (elProfileRole) elProfileRole.innerHTML = `Campus Security Administrator &bull; Sai University Administration`;
     if (elProfileId) elProfileId.textContent = currentUser.studentId || 'SAIU-ADMIN-01';
     if (elProfileDept) elProfileDept.textContent = currentUser.department || 'Campus Administration & Security';
 

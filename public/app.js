@@ -653,7 +653,7 @@ window.openMenu = function() {
 
   if (drawerUserStatus) {
     if (authToken && currentUser) {
-      drawerUserStatus.textContent = `${currentUser.name} (${currentUser.role === 'admin' ? '🛡️ Admin' : '🎓 Student'})`;
+      drawerUserStatus.textContent = `${currentUser.name} (${currentUser.role === 'admin' ? 'Admin' : '🎓 Student'})`;
     } else {
       drawerUserStatus.textContent = 'Guest Session (Not Signed In)';
     }
