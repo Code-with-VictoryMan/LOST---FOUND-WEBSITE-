@@ -159,15 +159,36 @@
 
         <!-- Quick Filter Category & Type Chips -->
         <div class="quick-filter-chips" id="quickFilterChips" style="margin-top:0.85rem;">
-          <button type="button" class="chip active" data-type="all" data-cat="all">✨ All Listings</button>
-          <button type="button" class="chip hidden" id="chipMyReports" data-user-filter="me" style="border-color:var(--accent-amber);color:var(--accent-amber);font-weight:600;">👤 My Reported Items</button>
-          <button type="button" class="chip" data-type="lost" data-cat="all">🚨 Lost Only</button>
-          <button type="button" class="chip" data-type="found" data-cat="all">📦 Found Only</button>
-          <button type="button" class="chip" data-cat="Electronics &amp; Gadgets">📱 Electronics</button>
-          <button type="button" class="chip" data-cat="Student ID &amp; Cards">🪪 ID Cards</button>
-          <button type="button" class="chip" data-cat="Wallets &amp; Bags">🎒 Bags &amp; Wallets</button>
+          <button type="button" class="chip active" data-type="all" data-cat="all">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            All Listings
+          </button>
+          <button type="button" class="chip hidden" id="chipMyReports" data-user-filter="me" style="border-color:var(--accent-amber);color:var(--accent-amber);font-weight:600;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            My Reported Items
+          </button>
+          <button type="button" class="chip" data-type="lost" data-cat="all">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Lost Only
+          </button>
+          <button type="button" class="chip" data-type="found" data-cat="all">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Found Only
+          </button>
+          <button type="button" class="chip" data-cat="Electronics &amp; Gadgets">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            Electronics
+          </button>
+          <button type="button" class="chip" data-cat="Student ID &amp; Cards">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="14" y1="10" x2="18" y2="10"/><line x1="14" y1="14" x2="18" y2="14"/></svg>
+            ID Cards
+          </button>
+          <button type="button" class="chip" data-cat="Wallets &amp; Bags">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Bags &amp; Wallets
+          </button>
           <button type="button" class="chip" data-cat="Water Bottles &amp; Flasks">
-            <svg class="chip-bottle-icon" viewBox="0 0 24 24" width="14" height="14" style="display:inline-block; vertical-align:-2px; margin-right:4px;" aria-hidden="true">
+            <svg class="chip-bottle-icon" viewBox="0 0 24 24" width="14" height="14" style="display:inline-block;" aria-hidden="true">
               <defs>
                 <linearGradient id="redBottleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stop-color="#dc2626"/>
@@ -188,10 +209,17 @@
               <line x1="8.5" y1="14" x2="15.5" y2="14" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" opacity="0.45"/>
               <line x1="8.5" y1="17" x2="15.5" y2="17" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" opacity="0.45"/>
               <line x1="9" y1="7.5" x2="9" y2="21" stroke="#ffffff" stroke-width="0.9" stroke-linecap="round" opacity="0.55"/>
-            </svg>Bottles
+            </svg>
+            Bottles
           </button>
-          <button type="button" class="chip" data-cat="Books &amp; Stationery">📚 Stationery</button>
-          <button type="button" class="chip" data-cat="Keys &amp; Access Cards">🔑 Keys</button>
+          <button type="button" class="chip" data-cat="Books &amp; Stationery">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            Stationery
+          </button>
+          <button type="button" class="chip" data-cat="Keys &amp; Access Cards">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+            Keys
+          </button>
         </div>
       </div>
     </div>
