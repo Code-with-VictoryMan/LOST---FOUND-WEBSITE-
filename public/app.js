@@ -635,6 +635,28 @@ window.prefillFoundReport = function(title, building, category) {
 
 // Menu Open Blur Transition Controls
 window.openMenu = function() {
+  const drawerUserStatus = document.getElementById('drawerUserStatus');
+  const drawerItemsCount = document.getElementById('drawerItemsCount');
+  const drawerMyReportsBtn = document.getElementById('drawerMyReportsBtn');
+  const drawerLogoutBtn = document.getElementById('drawerLogoutBtn');
+
+  if (drawerUserStatus) {
+    if (authToken && currentUser) {
+      drawerUserStatus.textContent = `${currentUser.name} (${currentUser.role === 'admin' ? '🛡️ Admin' : '🎓 Student'})`;
+    } else {
+      drawerUserStatus.textContent = 'Guest Session (Not Signed In)';
+    }
+  }
+  if (drawerItemsCount) {
+    drawerItemsCount.textContent = `${currentItems.length} Active ${currentItems.length === 1 ? 'Listing' : 'Listings'}`;
+  }
+  if (drawerMyReportsBtn) {
+    drawerMyReportsBtn.classList.toggle('hidden', !authToken);
+  }
+  if (drawerLogoutBtn) {
+    drawerLogoutBtn.classList.toggle('hidden', !authToken);
+  }
+
   if (menuBlurDrawer) menuBlurDrawer.classList.add('open');
 };
 
@@ -649,6 +671,13 @@ function setupEventListeners() {
   const btnCloseMenu = document.getElementById('btnCloseMenu');
   if (btnOpenMenu) btnOpenMenu.addEventListener('click', openMenu);
   if (btnCloseMenu) btnCloseMenu.addEventListener('click', closeMenu);
+
+  // Close menu with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuBlurDrawer?.classList.contains('open')) {
+      closeMenu();
+    }
+  });
 
   // Drawer Action Shortcuts
   const drawerReportLink = document.getElementById('drawerReportLink');
@@ -665,6 +694,45 @@ function setupEventListeners() {
     });
   }
 
+  const drawerLostLink = document.getElementById('drawerLostLink');
+  if (drawerLostLink) {
+    drawerLostLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenu();
+      if (filterType) filterType.value = 'lost';
+      fetchItems();
+      document.getElementById('itemsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  const drawerFoundLink = document.getElementById('drawerFoundLink');
+  if (drawerFoundLink) {
+    drawerFoundLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenu();
+      if (filterType) filterType.value = 'found';
+      fetchItems();
+      document.getElementById('itemsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  const drawerMyReportsBtn = document.getElementById('drawerMyReportsBtn');
+  if (drawerMyReportsBtn) {
+    drawerMyReportsBtn.addEventListener('click', () => {
+      closeMenu();
+      document.getElementById('chipMyReports')?.click();
+      document.getElementById('itemsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  const drawerLogoutBtn = document.getElementById('drawerLogoutBtn');
+  if (drawerLogoutBtn) {
+    drawerLogoutBtn.addEventListener('click', () => {
+      closeMenu();
+      handleLogout();
+    });
+  }
+
   const drawerAuthLink = document.getElementById('drawerAuthLink');
   if (drawerAuthLink) {
     drawerAuthLink.addEventListener('click', (e) => {
@@ -673,7 +741,7 @@ function setupEventListeners() {
       if (authToken) {
         handleLogout();
       } else {
-        openAuthModal();
+        window.location.href = 'login.html';
       }
     });
   }

@@ -230,12 +230,6 @@ body::after {
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
-@media (min-width: 769px) {
-  .menu-toggle-pill {
-    display: none;
-  }
-}
-
 /* ========================================================
    MENU OPEN BLUR TRANSITION (Editorial Fullscreen Drawer)
    ======================================================== */
@@ -243,18 +237,32 @@ body::after {
   position: fixed;
   inset: 0;
   z-index: 300;
-  background: rgba(10, 13, 19, 0.72);
+  background: rgba(10, 13, 19, 0.78);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2.5rem 3rem;
+  padding: 2rem 3rem;
+  overflow-y: auto;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
               backdrop-filter 0.45s cubic-bezier(0.16, 1, 0.3, 1),
               -webkit-backdrop-filter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  margin: 1rem 0;
 }
 
 .menu-blur-drawer.open {

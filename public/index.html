@@ -46,11 +46,23 @@
     </div>
   </header>
 
-  <!-- Menu Open Blur Transition Drawer -->
+  <!-- Menu Open Blur Transition Drawer (Upgraded) -->
   <div id="menuBlurDrawer" class="menu-blur-drawer">
     <div class="drawer-header">
       <div class="drawer-brand">SAIU PROJECTS / MENU</div>
       <button id="btnCloseMenu" class="drawer-close-btn" aria-label="Close Menu">✕</button>
+    </div>
+
+    <div class="drawer-meta-bar">
+      <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+        <span class="live-dot"></span>
+        <span id="drawerUserStatus" style="font-size:0.88rem; font-weight:600; color:#fff;">Guest Session</span>
+        <span id="drawerItemsCount" style="font-size:0.8rem; color:var(--accent-cyan); background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.25); padding:0.2rem 0.6rem; border-radius:999px;">0 Active Listings</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <button id="drawerMyReportsBtn" class="btn btn-outline btn-sm hidden" style="font-size:0.78rem; padding:0.3rem 0.7rem; border-color:rgba(255,255,255,0.2); color:#fff;">👤 My Reports</button>
+        <button id="drawerLogoutBtn" class="btn btn-outline btn-sm hidden" style="font-size:0.78rem; padding:0.3rem 0.7rem; border-color:rgba(239,68,68,0.4); color:#fca5a5;">🚪 Sign Out</button>
+      </div>
     </div>
 
     <nav class="drawer-nav-list">
@@ -70,15 +82,23 @@
         <span class="link-index">04</span>
         <span>Report Lost / Found Belonging</span>
       </a>
-      <a href="login.html" class="drawer-link" id="drawerAuthLink">
+      <a href="#" class="drawer-link" id="drawerLostLink">
         <span class="link-index">05</span>
+        <span>View Lost Items Only</span>
+      </a>
+      <a href="#" class="drawer-link" id="drawerFoundLink">
+        <span class="link-index">06</span>
+        <span>View Found Items Only</span>
+      </a>
+      <a href="login.html" class="drawer-link" id="drawerAuthLink">
+        <span class="link-index">07</span>
         <span id="drawerAuthText">Sign In / Register</span>
       </a>
     </nav>
 
     <div class="drawer-footer">
       <span>Sai University • Web Technology &amp; Internet Programming Project</span>
-      <span>Academic Year 2026–2027</span>
+      <span>Press Esc to close &bull; Academic Year 2026–2027</span>
     </div>
   </div>
 
