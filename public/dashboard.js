@@ -815,17 +815,17 @@ function renderStudentLoginsTable(users) {
 
     return `
       <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
-        <td style="padding:1rem;">
+        <td style="padding:1rem; cursor:pointer;" onclick="viewStudentProfileAndItems('${user._id}', 'items')" title="Click to view profile & items listed by ${user.name}">
           <div style="display:flex; align-items:center; gap:0.75rem;">
-            <div style="width:36px; height:36px; border-radius:50%; background:${isAdmin ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'}; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+            <div style="width:36px; height:36px; border-radius:50%; background:${isAdmin ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'}; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; box-shadow:0 0 10px rgba(0,0,0,0.3); flex-shrink:0;">
               ${initials}
             </div>
             <div>
               <div style="font-weight:700; color:#fff; display:flex; align-items:center; gap:0.4rem;">
-                ${user.name}
+                <span style="text-decoration:underline; text-decoration-color:rgba(56,189,248,0.45); text-underline-offset:3px;">${user.name}</span>
                 ${isAdmin ? '<span class="badge-tag tag-lost" style="font-size:0.68rem; padding:0.1rem 0.4rem;">ADMIN</span>' : '<span class="badge-tag tag-found" style="font-size:0.68rem; padding:0.1rem 0.4rem;">STUDENT</span>'}
               </div>
-              <small style="color:var(--text-muted); font-size:0.75rem;">Joined: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}</small>
+              <small style="color:var(--accent-cyan); font-size:0.75rem;">Click profile to view listed items &bull; Joined ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}</small>
             </div>
           </div>
         </td>
@@ -849,7 +849,7 @@ function renderStudentLoginsTable(users) {
           <small style="color:var(--text-muted); font-size:0.75rem;">IP: ${user.loginHistory && user.loginHistory[0] ? user.loginHistory[0].ipAddress : '127.0.0.1'}</small>
         </td>
         <td style="padding:1rem;">
-          <button class="btn btn-outline btn-sm" style="font-size:0.78rem; padding:0.35rem 0.65rem; border-color:rgba(255,255,255,0.2); color:#fff; display:inline-flex; align-items:center; gap:0.35rem;" onclick="viewStudentLoginSessions('${user._id}')">
+          <button class="btn btn-outline btn-sm" style="font-size:0.78rem; padding:0.35rem 0.65rem; border-color:rgba(255,255,255,0.2); color:#fff; display:inline-flex; align-items:center; gap:0.35rem;" onclick="viewStudentProfileAndItems('${user._id}', 'sessions')">
             <span>👁️</span> Audit Sessions (${loginSessionsCount})
           </button>
         </td>
@@ -873,7 +873,7 @@ function filterStudentLogins(query) {
   renderStudentLoginsTable(filtered);
 }
 
-window.viewStudentLoginSessions = function(userId) {
+window.viewStudentProfileAndItems = async function(userId, activeTab = 'items') {
   const user = allStudentLoginsCache.find(u => u._id.toString() === userId.toString());
   if (!user) return;
 
@@ -882,46 +882,107 @@ window.viewStudentLoginSessions = function(userId) {
   const modalEmail = document.getElementById('modalStudentEmail');
   const modalBody = document.getElementById('modalStudentLoginBody');
 
-  if (modalName) modalName.textContent = `${user.name} - Login Audit Sessions`;
-  if (modalEmail) modalEmail.innerHTML = `<strong>${user.email}</strong> &bull; Roll No: <code>${user.studentId}</code> &bull; ${user.department}`;
+  if (modalName) modalName.textContent = `${user.name} — Profile & Activity`;
+  if (modalEmail) modalEmail.innerHTML = `<strong>${user.email}</strong> &bull; Roll No: <code>${user.studentId || 'N/A'}</code> &bull; ${user.department || 'Sai University'} &bull; ${user.phone || 'N/A'}`;
+  if (modalBody) modalBody.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted);">Loading listed items &amp; sessions...</div>`;
+  if (modal) modal.classList.remove('hidden');
 
-  if (!user.loginHistory || user.loginHistory.length === 0) {
-    modalBody.innerHTML = `
-      <div style="text-align:center; padding:2rem; color:var(--text-muted);">
-        <span style="font-size:2.5rem; display:block; margin-bottom:0.5rem;">🔒</span>
-        <p>No historical session snapshots stored yet for this profile in MongoDB.</p>
-        <p style="font-size:0.8rem;">Total Recorded Login Counter: <strong>${user.loginCount || 0}</strong></p>
-      </div>
-    `;
-  } else {
-    modalBody.innerHTML = `
-      <div style="margin-bottom:1rem; padding:0.75rem 1rem; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#93c5fd; font-size:0.85rem;"><strong>MongoDB User History:</strong> Capped at last 20 verified sessions</span>
-        <span style="color:#fff; font-weight:700; font-size:0.85rem;">Total Logins: ${user.loginCount || user.loginHistory.length}</span>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:0.75rem;">
-        ${user.loginHistory.map((s, idx) => `
-          <div style="padding:0.9rem 1.1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-            <div>
-              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
-                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e;"></span>
-                <strong style="color:#fff; font-size:0.9rem;">Session #${user.loginHistory.length - idx}</strong>
-                <span style="font-size:0.75rem; color:var(--accent-cyan); font-family:monospace;">IP: ${s.ipAddress || '127.0.0.1'}</span>
-              </div>
-              <div style="font-size:0.78rem; color:var(--text-muted); max-width:440px; word-break:break-all;">
-                Device / Client: ${s.userAgent || 'Web Browser'}
-              </div>
-            </div>
-            <div style="text-align:right;">
-              <span style="font-size:0.85rem; color:#38bdf8; font-weight:600;">
-                ${new Date(s.timestamp).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
+  let userItems = [];
+  try {
+    const res = await fetch(`/api/items/user/${userId}`);
+    const data = await res.json();
+    if (data.success) userItems = data.data || [];
+  } catch (e) {
+    userItems = (allReportedItemsCache || []).filter(i => {
+      const repId = i.reportedBy?._id ? String(i.reportedBy._id) : String(i.reportedBy || '');
+      return repId === String(userId);
+    });
   }
 
-  if (modal) modal.classList.remove('hidden');
+  const renderModalContent = (tab) => {
+    const sessionsHtml = (!user.loginHistory || user.loginHistory.length === 0)
+      ? `<div style="text-align:center; padding:2rem; color:var(--text-muted);">
+           <span style="font-size:2.2rem; display:block; margin-bottom:0.5rem;">🔒</span>
+           <p>No historical session snapshots stored yet for this profile.</p>
+           <p style="font-size:0.8rem;">Total Recorded Login Counter: <strong>${user.loginCount || 0}</strong></p>
+         </div>`
+      : `<div style="margin-bottom:1rem; padding:0.75rem 1rem; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+           <span style="color:#93c5fd; font-size:0.85rem;"><strong>Session History:</strong> Capped at last 20 verified sessions</span>
+           <span style="color:#fff; font-weight:700; font-size:0.85rem;">Total Logins: ${user.loginCount || user.loginHistory.length}</span>
+         </div>
+         <div style="display:flex; flex-direction:column; gap:0.75rem;">
+           ${user.loginHistory.map((s, idx) => `
+             <div style="padding:0.9rem 1.1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+               <div>
+                 <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                   <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e;"></span>
+                   <strong style="color:#fff; font-size:0.9rem;">Session #${user.loginHistory.length - idx}</strong>
+                   <span style="font-size:0.75rem; color:var(--accent-cyan); font-family:monospace;">IP: ${s.ipAddress || '127.0.0.1'}</span>
+                 </div>
+                 <div style="font-size:0.78rem; color:var(--text-muted); max-width:440px; word-break:break-all;">
+                   Device / Client: ${s.userAgent || 'Web Browser'}
+                 </div>
+               </div>
+               <div style="text-align:right;">
+                 <span style="font-size:0.85rem; color:#38bdf8; font-weight:600;">
+                   ${new Date(s.timestamp).toLocaleString()}
+                 </span>
+               </div>
+             </div>
+           `).join('')}
+         </div>`;
+
+    const itemsHtml = userItems.length === 0
+      ? `<div style="text-align:center; padding:2rem; color:var(--text-muted);">
+           <span style="font-size:2.2rem; display:block; margin-bottom:0.5rem;">📦</span>
+           <p>No items listed by <strong>${user.name}</strong> yet.</p>
+         </div>`
+      : `<div style="display:flex; flex-direction:column; gap:0.75rem;">
+           ${userItems.map(item => {
+             const refCode = item.referenceCode || ('SAIU-LF-' + String(item._id).slice(-4).toUpperCase());
+             return `
+               <div style="padding:0.9rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; display:flex; align-items:center; justify-content:space-between; gap:0.9rem; flex-wrap:wrap;">
+                 <div style="display:flex; align-items:center; gap:0.8rem; min-width:220px; flex:1;">
+                   <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80'}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=600&q=80';" alt="" style="width:48px; height:48px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.12); flex-shrink:0;">
+                   <div>
+                     <div style="font-weight:700; color:#fff; font-size:0.95rem;">${item.title}</div>
+                     <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
+                       <span class="badge-tag tag-${item.type}" style="font-size:0.65rem; padding:0.1rem 0.45rem;">${item.type.toUpperCase()}</span>
+                       <span class="status-badge status-${item.status}" style="font-size:0.65rem; padding:0.1rem 0.45rem; margin-left:4px;">${item.status.toUpperCase()}</span>
+                       <code style="margin-left:6px; color:#fbbf24; font-size:0.72rem;">${refCode}</code>
+                     </div>
+                     <div style="font-size:0.76rem; color:var(--text-muted); margin-top:4px;">
+                       🏛️ ${item.building} (${item.specificLocation || ''}) &bull; 📅 ${new Date(item.dateOccurred).toLocaleDateString()} &bull; 👁️ ${item.viewCount || 0}
+                     </div>
+                   </div>
+                 </div>
+                 <button class="btn btn-outline btn-sm" style="font-size:0.76rem; padding:0.35rem 0.65rem;" onclick="document.getElementById('studentLoginHistoryModal').classList.add('hidden'); reviewClaims('${item._id}', '${item.title.replace(/'/g, "\\'")}')">
+                   🔍 Claims
+                 </button>
+               </div>
+             `;
+           }).join('')}
+         </div>`;
+
+    modalBody.innerHTML = `
+      <div style="display:flex; gap:0.5rem; margin-bottom:1.15rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.75rem;">
+        <button id="tabBtnUserItems" class="btn btn-sm ${tab === 'items' ? 'btn-primary' : 'btn-outline'}" style="font-size:0.8rem; padding:0.4rem 0.85rem;">
+          📦 Listed Items (${userItems.length})
+        </button>
+        <button id="tabBtnUserSessions" class="btn btn-sm ${tab === 'sessions' ? 'btn-primary' : 'btn-outline'}" style="font-size:0.8rem; padding:0.4rem 0.85rem;">
+          🔐 Login Sessions (${(user.loginHistory && user.loginHistory.length) || 0})
+        </button>
+      </div>
+      ${tab === 'items' ? itemsHtml : sessionsHtml}
+    `;
+
+    document.getElementById('tabBtnUserItems')?.addEventListener('click', () => renderModalContent('items'));
+    document.getElementById('tabBtnUserSessions')?.addEventListener('click', () => renderModalContent('sessions'));
+  };
+
+  renderModalContent(activeTab);
+};
+
+window.viewStudentLoginSessions = function(userId) {
+  window.viewStudentProfileAndItems(userId, 'sessions');
 };
