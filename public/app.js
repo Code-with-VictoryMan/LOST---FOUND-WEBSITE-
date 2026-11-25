@@ -1165,8 +1165,9 @@ function setupEventListeners() {
 }
 
 function openAuthModal() {
-  hideAuthAlert();
-  authModal.classList.remove('hidden');
+  const authAlert = document.getElementById('authAlert');
+  if (authAlert) authAlert.classList.add('hidden');
+  if (authModal) authModal.classList.remove('hidden');
   const emailInput = document.getElementById('authEmail');
   if (emailInput) setTimeout(() => emailInput.focus(), 150);
 }
