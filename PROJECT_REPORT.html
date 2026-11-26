@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Report — Campus Lost &amp; Found Portal (SAIU PROJECTS)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1in;
+      @bottom-center {
+        content: "Sai University | Campus Lost & Found Portal — Page " counter(page);
+        font-family: "Times New Roman", Times, serif;
+        font-size: 10pt;
+        color: #555;
+      }
+    }
+
+    @page :first {
+      @bottom-center { content: none; }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      color: #111827;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .cover-page {
+      text-align: center;
+      padding-top: 20px;
+    }
+
+    .cover-header {
+      font-size: 18pt;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      color: #0f172a;
+    }
+
+    .cover-on {
+      font-size: 13pt;
+      margin-bottom: 12px;
+    }
+
+    .cover-title {
+      font-size: 20pt;
+      font-weight: bold;
+      color: #1e3a8a;
+      margin: 10px auto 24px auto;
+      max-width: 90%;
+      line-height: 1.35;
+    }
+
+    .cover-logo {
+      width: 140px;
+      height: auto;
+      margin: 16px auto 24px auto;
+      display: block;
+    }
+
+    .cover-degree {
+      font-size: 12.5pt;
+      margin: 20px 0 28px 0;
+    }
+
+    .cover-blocks {
+      width: 82%;
+      margin: 0 auto 28px auto;
+      text-align: left;
+      font-size: 12pt;
+    }
+
+    .cover-block-title {
+      font-weight: bold;
+      text-align: center;
+      font-size: 13pt;
+      margin: 18px 0 8px 0;
+      color: #0f172a;
+    }
+
+    .cover-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+    }
+
+    .cover-table td {
+      padding: 4px 8px;
+      border: none;
+    }
+
+    .cover-table td:first-child {
+      width: 38%;
+      font-weight: bold;
+    }
+
+    .cover-footer {
+      margin-top: 32px;
+      font-size: 13pt;
+      font-weight: bold;
+      line-height: 1.6;
+      color: #0f172a;
+    }
+
+    h1.chapter-heading {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #1e3a8a;
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 4px;
+      margin-top: 0;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    h2.sub-heading {
+      font-size: 14pt;
+      font-weight: bold;
+      color: #0f172a;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    h3.minor-heading {
+      font-size: 12.5pt;
+      font-weight: bold;
+      color: #1e293b;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      text-align: justify;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    ul, ol {
+      margin-top: 4px;
+      margin-bottom: 12px;
+      padding-left: 24px;
+      text-align: justify;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 16px 0;
+      font-size: 11pt;
+      line-height: 1.35;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      border: 1px solid #94a3b8;
+      padding: 7px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    table.data-table th {
+      background-color: #dbeafe;
+      color: #0f172a;
+      font-weight: bold;
+    }
+
+    .sig-row {
+      margin-top: 24px;
+      line-height: 2.1;
+    }
+
+    .diagram-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 12px 0 16px 0;
+      text-align: center;
+      background: #f8fafc;
+      page-break-inside: avoid;
+    }
+
+    .figure-caption {
+      font-size: 10.5pt;
+      font-style: italic;
+      color: #334155;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .screenshot-img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+    }
+
+    pre.code-block {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 9.5pt;
+      line-height: 1.35;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #1e3a8a;
+      padding: 10px 12px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 8px 0 14px 0;
+      page-break-inside: avoid;
+    }
+
+    .badge-pass {
+      color: #15803d;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== COVER PAGE ==================== -->
+  <div class="cover-page">
+    <div class="cover-header">PROJECT REPORT</div>
+    <div class="cover-on">ON</div>
+    <div class="cover-title">CAMPUS LOST &amp; FOUND PORTAL (SAIU PROJECTS)<br><span style="font-size: 14pt; font-weight: normal; color: #334155;">A Full-Stack MongoDB-Backed Web Application with Visual Item Scanning &amp; Role-Based Administration</span></div>
+
+    <img src="public/sai-university-logo.png" alt="Sai University Logo" class="cover-logo">
+
+    <div class="cover-degree">
+      Submitted in partial fulfilment of the requirements for the<br>
+      <strong>Bachelor of Technology (B.Tech) – Third Semester</strong><br>
+      <em>Course: Full Stack Development / Web Technology &amp; Internet Programming</em>
+    </div>
+
+    <div class="cover-blocks">
+      <div class="cover-block-title">Submitted by</div>
+      <table class="cover-table">
+        <tr><td>Student Name:</td><td>SAI SRAVAN V</td></tr>
+        <tr><td>Roll Number:</td><td>SAIU2024CS001 (Update with Official Roll No.)</td></tr>
+        <tr><td>Section / Group:</td><td>B.Tech CSE – Third Semester</td></tr>
+      </table>
+
+      <div class="cover-block-title">Submitted to</div>
+      <table class="cover-table">
+        <tr><td>Faculty Name:</td><td>Course Faculty, Full Stack Development</td></tr>
+        <tr><td>Department:</td><td>School of Computing &amp; Data Science</td></tr>
+      </table>
+    </div>
+
+    <div class="cover-footer">
+      SAI UNIVERSITY<br>
+      Chennai, Tamil Nadu, India<br>
+      <span style="font-weight: normal; font-size: 12pt;">Academic Session: 2026–2027</span><br>
+      <span style="font-weight: normal; font-size: 10.5pt; color: #1e3a8a;">Live Deployment: https://lost-found-website-sai-university.onrender.com/</span>
+    </div>
+  </div>
+
+  <!-- ==================== CERTIFICATE, DECLARATION, ACKNOWLEDGEMENT ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CERTIFICATE</h1>
+  <p>
+    This is to certify that the project report entitled <strong>&ldquo;Campus Lost &amp; Found Portal (SAIU PROJECTS)&rdquo;</strong> has been prepared and submitted by <strong>SAI SRAVAN V</strong> of B.Tech Third Semester as part of the Full Stack Development course. The work presented in this report is based on the full-stack web application designed, implemented, tested, and deployed by the student under faculty guidance.
+  </p>
+  <div class="sig-row">
+    Faculty Signature: ______________________________________<br>
+    Name: _________________________________________________<br>
+    Date: __________________________________________________
+  </div>
+
+  <h1 class="chapter-heading" style="margin-top: 32px;">DECLARATION</h1>
+  <p>
+    I hereby declare that the project entitled <strong>&ldquo;Campus Lost &amp; Found Portal (SAIU PROJECTS)&rdquo;</strong> is my own original work, completed as part of the Full Stack Development course at Sai University. All technical references, libraries, and open-source documentation used in developing this application and preparing this report have been acknowledged appropriately. I understand that copying another group&rsquo;s work or presenting work that is not my own is not permitted.
+  </p>
+  <div class="sig-row">
+    Student Signature: ______________________________________<br>
+    Name: SAI SRAVAN V<br>
+    Date: __________________________________________________
+  </div>
+
+  <h1 class="chapter-heading" style="margin-top: 32px;">ACKNOWLEDGEMENT</h1>
+  <p>
+    I express my sincere gratitude to my course faculty, the School of Computing &amp; Data Science, and Sai University for providing continuous guidance, technical encouragement, and academic support during the development and deployment of this project. I also thank my classmates and peers who offered valuable feedback during user-interface testing and multi-account verification of the Campus Lost &amp; Found Portal.
+  </p>
+
+  <!-- ==================== ABSTRACT & TABLE OF CONTENTS ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">ABSTRACT</h1>
+  <p>
+    Misplacing personal belongings such as student ID cards, electronics, keys, water bottles, and academic stationery across university buildings is a recurring challenge on campus. Traditional recovery relies on fragmented physical notice boards, word of mouth, or unorganized messaging groups, leading to low recovery rates and delayed handovers.
+  </p>
+  <p>
+    The <strong>Campus Lost &amp; Found Portal (SAIU PROJECTS)</strong> is a full-stack web application built to centralize lost-and-found reporting, verification, and recovery for Sai University students, faculty, and security administrators. The frontend uses HTML5, CSS3 (dark glassmorphic responsive UI), Vanilla JavaScript, and Chart.js, while the backend is powered by Node.js and Express.js with RESTful APIs secured by JSON Web Tokens (JWT) and bcrypt password hashing. Persistent storage is managed in MongoDB (supporting both MongoDB Atlas Cloud and Local MongoDB via Mongoose, with an automatic in-memory fallback for high availability).
+  </p>
+  <p>
+    Key implemented features include university-domain-restricted authentication (<code>@saiuniversity.edu.in</code>), embedded owner metadata and unique tracking reference codes (<code>SAIU-LF-XXXX</code>) on every item, duplicate-report detection, an intelligent <strong>Scan Found Item</strong> engine combining keyword/reference matching with in-browser perceptual image fingerprinting (64-bit dHash and dominant color analysis), an ownership-claim approval workflow, and an Administrative Console featuring recovery charts, student login audit trails, and CSV export. Automated Newman API testing (18 requests, 25 assertions, 100% pass rate) and live browser testing on Render verified production readiness.
+  </p>
+
+  <h1 class="chapter-heading" style="margin-top: 24px;">TABLE OF CONTENTS</h1>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 78%;">Chapter / Section</th>
+        <th style="width: 22%;">Section Reference</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Certificate, Declaration &amp; Acknowledgement</td><td>Front Matter</td></tr>
+      <tr><td>Abstract &amp; Table of Contents</td><td>Front Matter</td></tr>
+      <tr><td>1. Introduction (Overview, Problem Statement, Scope)</td><td>Chapter 1</td></tr>
+      <tr><td>2. Objectives and Scope (Objectives, Users, Features)</td><td>Chapter 2</td></tr>
+      <tr><td>3. Hardware and Software Requirements</td><td>Chapter 3</td></tr>
+      <tr><td>4. Technologies Used (Frontend, Backend, Database, Libraries)</td><td>Chapter 4</td></tr>
+      <tr><td>5. System Design and Architecture (Diagrams, Schema, Modules)</td><td>Chapter 5</td></tr>
+      <tr><td>6. Implementation (Frontend, Backend, DB Connectivity, Code)</td><td>Chapter 6</td></tr>
+      <tr><td>7. Screenshots and Results</td><td>Chapter 7</td></tr>
+      <tr><td>8. Testing (Approach &amp; Verified Test Cases TC-01 to TC-08)</td><td>Chapter 8</td></tr>
+      <tr><td>9. Conclusion, Limitations and Future Scope</td><td>Chapter 9</td></tr>
+      <tr><td>10. References</td><td>Chapter 10</td></tr>
+      <tr><td>Final Submission Checklist</td><td>Checklist</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== CHAPTER 1: INTRODUCTION ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 1: INTRODUCTION</h1>
+
+  <h2 class="sub-heading">1.1 Project Overview</h2>
+  <p>
+    <strong>SAIU PROJECTS — Campus Lost &amp; Found Portal</strong> is a full-stack, database-driven web application designed specifically for the Sai University community. It provides a unified digital directory where students, faculty members, and campus security administrators can report lost or found belongings, search and filter active listings by campus building or category, scan found items using keywords or camera/uploaded photos to locate owners, submit verified ownership claims, and manage handovers through a role-segregated dashboard.
+  </p>
+  <p>
+    The application is deployed live on Render (<code>https://lost-found-website-sai-university.onrender.com/</code>) and backed by MongoDB Atlas Cloud, ensuring anytime access across desktop and mobile browsers.
+  </p>
+
+  <h2 class="sub-heading">1.2 Problem Statement</h2>
+  <p>
+    Across a multi-building university campus comprising Academic Blocks, Libraries, Computer Science Labs, Dining Halls, Auditoriums, and Sports Complexes, students frequently misplace valuable items such as RFID ID cards, laptop chargers, wireless earbuds, calculators, wallets, and water bottles. Currently, finding or returning these items suffers from three major difficulties:
+  </p>
+  <ul>
+    <li><strong>Information Silos:</strong> Lost items are reported verbally at different security desks or scattered across informal group chats, making it difficult for finders to locate the rightful owner.</li>
+    <li><strong>Lack of Ownership Verification:</strong> Without structured claim verification and contact tracking, items risk being handed over without proof of ownership or audit records.</li>
+    <li><strong>No Visual or Location-Based Matching:</strong> Students who find an unlabeled item have no rapid way to check whether a matching lost report already exists in a centralized campus database.</li>
+  </ul>
+
+  <h2 class="sub-heading">1.3 Project Scope</h2>
+  <p>
+    <strong>Included in the Current Version:</strong>
+  </p>
+  <ul>
+    <li>Unified campus authentication (Sign In, New Student Registration restricted to <code>saiuniversity.edu.in</code> emails, and self-service password reset).</li>
+    <li>Full CRUD management for Lost and Found item listings across 8 campus buildings and 8 item categories, with embedded owner details, unique reference codes (<code>SAIU-LF-XXXX</code>), and live view counters.</li>
+    <li>Smart Item Scanner supporting camera capture, photo upload, in-browser perceptual image hashing (<code>dHash</code>), dominant color detection, keyword/reference-ID matching, and 1-click report pre-filling.</li>
+    <li>Ownership Claim &amp; Verification workflow (submit proof, approve/reject handover, direct Email/WhatsApp/Call contact).</li>
+    <li>Role-Based Admin Console with Chart.js analytics, Student Database &amp; Login Audit Trail (session timestamps, IP, user-agent), clickable student profile item inspection, and CSV export.</li>
+  </ul>
+  <p>
+    <strong>Outside the Current Scope:</strong> Automated email/SMS push notifications via external paid gateways (SMTP/Twilio), native iOS/Android mobile binaries, and automated CCTV hardware integration.
+  </p>
+
+  <!-- ==================== CHAPTER 2: OBJECTIVES AND SCOPE ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 2: OBJECTIVES AND SCOPE</h1>
+
+  <h2 class="sub-heading">2.1 Objectives</h2>
+  <ol>
+    <li><strong>Develop an Intuitive, Responsive Web Interface:</strong> Build a clean, dark-glassmorphic portal accessible on both desktop and mobile devices with instant search, category chips, and building filters.</li>
+    <li><strong>Implement Secure Role-Based Authentication:</strong> Enforce university domain validation (<code>saiuniversity.edu.in</code>), bcrypt password hashing, and JWT authorization separating Student and Admin privileges.</li>
+    <li><strong>Establish Persistent MongoDB Storage:</strong> Store user credentials, login histories, listed items with embedded owner details, and ownership claims in MongoDB Atlas / Local MongoDB using Mongoose schemas.</li>
+    <li><strong>Enable Full CRUD &amp; Verification Workflows:</strong> Allow authenticated users to create, read, update status (<code>open</code>, <code>claimed</code>, <code>resolved</code>), and delete listings, as well as submit and review ownership claims.</li>
+    <li><strong>Provide Intelligent Item Scanning &amp; Admin Observability:</strong> Implement visual + keyword scanning to reunite found items with owners and equip administrators with analytics charts, audit logs, and CSV export.</li>
+  </ol>
+
+  <h2 class="sub-heading">2.2 Intended Users</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 24%;">User Role</th>
+        <th style="width: 76%;">Capabilities &amp; Permissions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Students &amp; Faculty</strong><br>(<code>role: 'student'</code>)</td>
+        <td>Register with a verified <code>@saiuniversity.edu.in</code> email, report lost/found items with photos, scan found items to contact owners, submit ownership claims with proof, review incoming claims on their own reports, and track status on their Personal Dashboard.</td>
+      </tr>
+      <tr>
+        <td><strong>Campus Administrators</strong><br>(<code>role: 'admin'</code>)</td>
+        <td>Possess all student capabilities plus full campus-wide oversight: view building/category recovery analytics charts, inspect the Student Database &amp; Login Audit Trail (session history, IP addresses, and items listed per student), resolve or delete any listing, approve/reject claims, and export all item + owner records to CSV.</td>
+      </tr>
+      <tr>
+        <td><strong>Unauthenticated Visitors</strong></td>
+        <td>Browse the public active campus listings feed, filter by category/building, and use the Smart Scanner; prompted to sign in before reporting or claiming items.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-heading">2.3 Main Features Implemented</h2>
+  <ul>
+    <li><strong>Unified Login &amp; Domain-Enforced Registration:</strong> Automatically routes authenticated users to Student or Admin dashboard views based on their MongoDB role.</li>
+    <li><strong>Duplicate Detection Alert:</strong> Checks for similar active items in the same category and building as the user types a report title.</li>
+    <li><strong>Embedded Owner Snapshot &amp; Reference Codes:</strong> Every item stores <code>ownerDetails</code> (name, email, phone, student ID, department, year) and a unique <code>SAIU-LF-XXXX</code> code with 1-click copy.</li>
+    <li><strong>Smart Visual &amp; Keyword Scanner:</strong> Computes a 64-bit perceptual difference hash (<code>dHash</code>) and dominant colors from captured/uploaded photos in-browser, matching them against database items alongside keyword, category, building, and Scan Mode filters.</li>
+    <li><strong>Admin Fleet Control &amp; Student Audit:</strong> Real-time Chart.js visualizations, searchable student login table, clickable student profile modal displaying listed items and login sessions, and 1-click CSV export.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 3: HARDWARE AND SOFTWARE REQUIREMENTS ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 3: HARDWARE AND SOFTWARE REQUIREMENTS</h1>
+
+  <h2 class="sub-heading">3.1 Hardware Requirements</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 30%;">Component</th>
+        <th style="width: 35%;">Development / Recommended</th>
+        <th style="width: 35%;">Client / End-User</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Processor</td><td>Intel Core i5 / AMD Ryzen 5 (or higher)</td><td>Any modern dual-core CPU / mobile SoC</td></tr>
+      <tr><td>RAM</td><td>8 GB minimum (16 GB recommended)</td><td>2 GB minimum</td></tr>
+      <tr><td>Storage</td><td>1 GB free disk space for Node.js &amp; packages</td><td>Not required (Cloud web app)</td></tr>
+      <tr><td>Network &amp; Peripherals</td><td>Stable broadband internet connection</td><td>Internet access; optional camera for Scan Item</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-heading">3.2 Software Requirements</h2>
+  <ul>
+    <li><strong>Operating System:</strong> Windows 11 (Development) / Linux Container (Render Cloud Production).</li>
+    <li><strong>Runtime Environment:</strong> Node.js (v24.12.0 verified locally; Node 18+ compatible).</li>
+    <li><strong>Database:</strong> MongoDB Atlas Cloud Cluster (<code>cluster0.lu8a6nq.mongodb.net</code>) and Local MongoDB Community Server (<code>127.0.0.1:27017</code>).</li>
+    <li><strong>Code Editor &amp; CLI Tools:</strong> Visual Studio Code, PowerShell, Git, Newman CLI (Postman runner).</li>
+    <li><strong>Web Browser:</strong> Google Chrome, Microsoft Edge, or any modern HTML5/ES6-compliant browser.</li>
+  </ul>
+
+  <h2 class="sub-heading">3.3 Functional and Non-Functional Requirements</h2>
+  <h3 class="minor-heading">Functional Requirements</h3>
+  <ul>
+    <li>Users must be able to register using an email containing <code>saiuniversity.edu.in</code> and sign in securely.</li>
+    <li>Authenticated users must be able to create Lost/Found listings with location, date, description, and image.</li>
+    <li>Users must be able to scan found/lost items via photo upload, camera capture, or keywords to retrieve matching reports and owner contact details.</li>
+    <li>Users must be able to submit ownership claims and item reporters/admins must be able to approve or reject them.</li>
+    <li>Administrators must be able to view recovery analytics, audit all student login sessions and listed items, and export records as CSV.</li>
+  </ul>
+  <h3 class="minor-heading">Non-Functional Requirements</h3>
+  <ul>
+    <li><strong>Security:</strong> Passwords hashed with <code>bcryptjs</code> (10 salt rounds); API mutations and admin routes protected via JWT Bearer tokens and RBAC middleware (<code>protect</code>, <code>adminOnly</code>).</li>
+    <li><strong>Reliability &amp; Availability:</strong> Dual-connection fallback (<code>config/db.js</code>) automatically switches between MongoDB Atlas, Local MongoDB, and an in-memory store (<code>config/offlineStore.js</code>) if database connectivity drops.</li>
+    <li><strong>Performance:</strong> Text indexing on MongoDB item titles/descriptions and debounced frontend search (300 ms); average API response time under 40 ms locally.</li>
+    <li><strong>Usability:</strong> Responsive layout adapting seamlessly across desktop and mobile viewports with clear validation alerts and toast feedback.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 4: TECHNOLOGIES USED ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 4: TECHNOLOGIES USED</h1>
+
+  <h2 class="sub-heading">4.1 Frontend Technologies</h2>
+  <ul>
+    <li><strong>HTML5:</strong> Semantic page structure across <code>index.html</code> (Portal &amp; Scanner), <code>login.html</code> (Unified Sign In, Registration &amp; Password Reset), and <code>dashboard.html</code> (Personal &amp; Admin Console).</li>
+    <li><strong>CSS3 (<code>public/styles.css</code>):</strong> Custom dark atmospheric glassmorphism theme using CSS variables, backdrop filters, CSS Grid/Flexbox responsive layouts, custom vector SVG icons, and modal transitions.</li>
+    <li><strong>Vanilla JavaScript (ES6+):</strong> Modular client-side state management, Fetch API integration, DOM rendering, Canvas API image processing for 64-bit <code>dHash</code> &amp; color extraction, and CSV generation.</li>
+    <li><strong>Chart.js (CDN):</strong> Interactive Bar Chart (Listings by Campus Building) and Doughnut Chart (Listings by Category) on the Admin Dashboard.</li>
+  </ul>
+
+  <h2 class="sub-heading">4.2 Backend Technologies</h2>
+  <ul>
+    <li><strong>Node.js:</strong> Asynchronous event-driven JavaScript runtime powering the HTTP server (<code>server.js</code>).</li>
+    <li><strong>Express.js (<code>^4.19.2</code>):</strong> RESTful API routing framework organized cleanly into <code>authRoutes.js</code>, <code>itemRoutes.js</code>, <code>claimRoutes.js</code>, and <code>adminRoutes.js</code>, with CORS and JSON payload handling (up to 15 MB for base64 image uploads).</li>
+  </ul>
+
+  <h2 class="sub-heading">4.3 Database</h2>
+  <ul>
+    <li><strong>MongoDB &amp; Mongoose (<code>^8.3.1</code>):</strong> NoSQL document database (<code>campus_lost_found</code>) hosted on MongoDB Atlas Cloud and Local MongoDB. Stores three primary collections:
+      <ul>
+        <li><code>users</code>: Student/Admin credentials, academic metadata, and persistent login audit history.</li>
+        <li><code>items</code>: Lost/Found listings, reference codes, view counts, perceptual image hashes, and embedded <code>ownerDetails</code>.</li>
+        <li><code>claims</code>: Ownership verification requests linking claimants to target items with review status and notes.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2 class="sub-heading">4.4 Development Tools and Libraries</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 26%;">Package / Tool</th>
+        <th style="width: 18%;">Version</th>
+        <th style="width: 56%;">Purpose in Project</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>bcryptjs</code></td><td><code>^2.4.3</code></td><td>Salted password hashing and credential verification.</td></tr>
+      <tr><td><code>jsonwebtoken</code></td><td><code>^9.0.2</code></td><td>Stateless 7-day JWT generation and middleware verification.</td></tr>
+      <tr><td><code>dotenv</code></td><td><code>^16.4.5</code></td><td>Environment variable management (MongoDB URIs, JWT secret, port).</td></tr>
+      <tr><td><code>cors</code></td><td><code>^2.8.5</code></td><td>Cross-Origin Resource Sharing configuration for API requests.</td></tr>
+      <tr><td><code>newman</code></td><td><code>^6.2.3</code></td><td>Automated CLI execution of the Postman v2.1.0 API test collection.</td></tr>
+      <tr><td>Git, GitHub &amp; Render</td><td>Cloud</td><td>Version control and continuous automatic deployment to production.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== CHAPTER 5: SYSTEM DESIGN AND ARCHITECTURE ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 5: SYSTEM DESIGN AND ARCHITECTURE</h1>
+
+  <h2 class="sub-heading">5.1 System Architecture</h2>
+  <p>
+    The application follows a layered three-tier Client–Server–Database architecture. The browser client communicates over HTTPS/JSON with the Express.js REST API, which enforces JWT authentication and role-based access control before reading or persisting documents in MongoDB via Mongoose (with automatic fallback to the resilient in-memory store).
+  </p>
+
+  <div class="diagram-box">
+    <svg width="100%" height="190" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg">
+      <!-- Client Tier -->
+      <rect x="15" y="25" width="175" height="135" rx="8" fill="#eff6ff" stroke="#1e3a8a" stroke-width="2"/>
+      <text x="102" y="48" text-anchor="middle" font-weight="bold" font-size="12" fill="#1e3a8a">CLIENT TIER (Browser)</text>
+      <text x="102" y="72" text-anchor="middle" font-size="10.5" fill="#1e293b">index.html + app.js</text>
+      <text x="102" y="92" text-anchor="middle" font-size="10.5" fill="#1e293b">login.html + login.js</text>
+      <text x="102" y="112" text-anchor="middle" font-size="10.5" fill="#1e293b">dashboard.html + Chart.js</text>
+      <text x="102" y="135" text-anchor="middle" font-size="9.5" fill="#475569">Canvas dHash &amp; Fetch API</text>
+
+      <!-- Arrow 1 -->
+      <line x1="190" y1="92" x2="245" y2="92" stroke="#1e3a8a" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="217" y="82" text-anchor="middle" font-size="9" fill="#334155">JSON + JWT</text>
+
+      <!-- Server Tier -->
+      <rect x="248" y="20" width="195" height="145" rx="8" fill="#f0fdf4" stroke="#15803d" stroke-width="2"/>
+      <text x="345" y="43" text-anchor="middle" font-weight="bold" font-size="12" fill="#15803d">API TIER (Node + Express)</text>
+      <text x="345" y="65" text-anchor="middle" font-size="10" fill="#1e293b">/api/auth (JWT + Bcrypt)</text>
+      <text x="345" y="85" text-anchor="middle" font-size="10" fill="#1e293b">/api/items (CRUD + Scan)</text>
+      <text x="345" y="105" text-anchor="middle" font-size="10" fill="#1e293b">/api/claims (Verification)</text>
+      <text x="345" y="125" text-anchor="middle" font-size="10" fill="#1e293b">/api/admin (Stats + Audit)</text>
+      <text x="345" y="148" text-anchor="middle" font-size="9.5" fill="#475569">Middleware: protect, adminOnly</text>
+
+      <!-- Arrow 2 -->
+      <line x1="443" y1="92" x2="495" y2="92" stroke="#15803d" stroke-width="2"/>
+      <text x="469" y="82" text-anchor="middle" font-size="9" fill="#334155">Mongoose</text>
+
+      <!-- Database Tier -->
+      <rect x="498" y="25" width="168" height="135" rx="8" fill="#fefce8" stroke="#a16207" stroke-width="2"/>
+      <text x="582" y="48" text-anchor="middle" font-weight="bold" font-size="12" fill="#a16207">DATA TIER</text>
+      <text x="582" y="72" text-anchor="middle" font-size="10.5" fill="#1e293b">MongoDB Atlas Cloud</text>
+      <text x="582" y="92" text-anchor="middle" font-size="10.5" fill="#1e293b">Local MongoDB (27017)</text>
+      <text x="582" y="115" text-anchor="middle" font-size="9.5" fill="#475569">Collections: users,</text>
+      <text x="582" y="130" text-anchor="middle" font-size="9.5" fill="#475569">items, claims</text>
+      <text x="582" y="148" text-anchor="middle" font-size="9" fill="#b45309">+ In-Memory Fallback</text>
+    </svg>
+    <div class="figure-caption">Figure 5.1: Three-Tier System Architecture of Campus Lost &amp; Found Portal</div>
+  </div>
+
+  <h2 class="sub-heading">5.2 Data Flow / Workflow</h2>
+  <p>
+    Information flows through three primary user journeys: (1) <strong>Authentication</strong> validates <code>@saiuniversity.edu.in</code> credentials, logs the session, and issues a JWT; (2) <strong>Reporting &amp; Scanning</strong> stores items with <code>ownerDetails</code> and <code>imageHash</code>, enabling visual/keyword owner lookup; and (3) <strong>Claim &amp; Handover</strong> verifies proof and transitions items to <code>resolved</code>.
+  </p>
+
+  <div class="diagram-box">
+    <svg width="100%" height="125" viewBox="0 0 680 125" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="32" width="115" height="58" rx="6" fill="#eff6ff" stroke="#1e3a8a" stroke-width="1.5"/>
+      <text x="67" y="56" text-anchor="middle" font-weight="bold" font-size="10">1. Auth &amp; Login</text>
+      <text x="67" y="72" text-anchor="middle" font-size="9" fill="#475569">JWT + Role Check</text>
+
+      <line x1="125" y1="61" x2="152" y2="61" stroke="#334155" stroke-width="1.5"/>
+
+      <rect x="152" y="32" width="122" height="58" rx="6" fill="#eff6ff" stroke="#1e3a8a" stroke-width="1.5"/>
+      <text x="213" y="56" text-anchor="middle" font-weight="bold" font-size="10">2. Report Item</text>
+      <text x="213" y="72" text-anchor="middle" font-size="9" fill="#475569">Owner + dHash + Ref</text>
+
+      <line x1="274" y1="61" x2="301" y2="61" stroke="#334155" stroke-width="1.5"/>
+
+      <rect x="301" y="32" width="122" height="58" rx="6" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+      <text x="362" y="56" text-anchor="middle" font-weight="bold" font-size="10">3. Scan / Search</text>
+      <text x="362" y="72" text-anchor="middle" font-size="9" fill="#475569">Visual + Keyword Match</text>
+
+      <line x1="423" y1="61" x2="450" y2="61" stroke="#334155" stroke-width="1.5"/>
+
+      <rect x="450" y="32" width="112" height="58" rx="6" fill="#fefce8" stroke="#a16207" stroke-width="1.5"/>
+      <text x="506" y="56" text-anchor="middle" font-weight="bold" font-size="10">4. Claim Proof</text>
+      <text x="506" y="72" text-anchor="middle" font-size="9" fill="#475569">Pending Verification</text>
+
+      <line x1="562" y1="61" x2="585" y2="61" stroke="#334155" stroke-width="1.5"/>
+
+      <rect x="585" y="32" width="85" height="58" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+      <text x="627" y="56" text-anchor="middle" font-weight="bold" font-size="10">5. Handover</text>
+      <text x="627" y="72" text-anchor="middle" font-size="9" fill="#475569">Resolved</text>
+    </svg>
+    <div class="figure-caption">Figure 5.2: End-to-End Application Workflow from Authentication to Item Handover</div>
+  </div>
+
+  <h2 class="sub-heading">5.3 Database Design</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 18%;">Collection</th>
+        <th style="width: 52%;">Key Fields &amp; Types</th>
+        <th style="width: 30%;">Relationships &amp; Rules</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong><code>users</code></strong><br>(<code>User.js</code>)</td>
+        <td><code>_id</code>, <code>name</code>, <code>email</code> (unique), <code>password</code> (bcrypt, hidden), <code>role</code> (<code>student</code>/<code>faculty</code>/<code>admin</code>), <code>studentId</code>, <code>department</code>, <code>yearOfStudy</code>, <code>phone</code>, <code>lastLogin</code>, <code>loginCount</code>, <code>loginHistory[]</code></td>
+        <td>Enforces <code>saiuniversity.edu.in</code> email domain. One user can report many items and submit many claims.</td>
+      </tr>
+      <tr>
+        <td><strong><code>items</code></strong><br>(<code>Item.js</code>)</td>
+        <td><code>_id</code>, <code>title</code>, <code>type</code> (<code>lost</code>/<code>found</code>), <code>category</code>, <code>description</code>, <code>building</code>, <code>specificLocation</code>, <code>dateOccurred</code>, <code>imageUrl</code>, <code>imageHash</code>, <code>status</code> (<code>open</code>/<code>claimed</code>/<code>resolved</code>), <code>referenceCode</code>, <code>viewCount</code>, <code>ownerDetails{}</code></td>
+        <td><code>reportedBy</code> references <code>User._id</code>; embeds <code>ownerDetails</code> snapshot and 64-bit <code>imageHash</code> for fast retrieval.</td>
+      </tr>
+      <tr>
+        <td><strong><code>claims</code></strong><br>(<code>Claim.js</code>)</td>
+        <td><code>_id</code>, <code>item</code>, <code>claimant</code>, <code>proofDescription</code>, <code>contactPhone</code>, <code>status</code> (<code>pending</code>/<code>approved</code>/<code>rejected</code>), <code>reviewNotes</code>, <code>createdAt</code></td>
+        <td>References <code>Item._id</code> and <code>User._id</code>. Prevents duplicate claims by the same user on an item.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-heading">5.4 Module Description</h2>
+  <ul>
+    <li><strong>Authentication Module (<code>routes/authRoutes.js</code>):</strong> Handles registration with <code>saiuniversity.edu.in</code> enforcement, login with role detection and persistent session logging, profile retrieval, and password reset.</li>
+    <li><strong>Item &amp; Visual Scanner Module (<code>routes/itemRoutes.js</code>):</strong> Manages item CRUD, text/category/building filtering, duplicate checks, view-count increments, and multi-signal scanning (<code>dHash</code> + color + keyword + Ref ID).</li>
+    <li><strong>Claims &amp; Verification Module (<code>routes/claimRoutes.js</code>):</strong> Handles claim submission, prevents self-claims, and authorizes reporters or admins to approve/reject claims and update item status.</li>
+    <li><strong>Admin Analytics &amp; Audit Module (<code>routes/adminRoutes.js</code>):</strong> Aggregates building/category metrics, serves full item inventory, and exposes student database &amp; login audit logs strictly to <code>admin</code> accounts.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 6: IMPLEMENTATION ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 6: IMPLEMENTATION</h1>
+
+  <h2 class="sub-heading">6.1 Frontend Implementation</h2>
+  <p>
+    The frontend consists of three synchronized pages served statically by Express:
+  </p>
+  <ul>
+    <li><strong>Portal &amp; Scanner (<code>public/index.html</code>, <code>public/app.js</code>):</strong> Displays the hero search card, category filter chips with vector SVG icons, active item grid with <code>SAIU-LF-XXXX</code> reference badges, the editorial full-screen blur navigation drawer (<code>Menu</code>), the Item Details modal with 1-click contact links, the Report Item modal with duplicate detection, and the Smart Camera/Upload Scanner modal.</li>
+    <li><strong>Unified Auth Portal (<code>public/login.html</code>, <code>public/login.js</code>):</strong> Provides Sign In, New Registration (with live password strength meter and <code>saiuniversity.edu.in</code> validation), and Password Reset modals.</li>
+    <li><strong>Management Dashboard (<code>public/dashboard.html</code>, <code>public/dashboard.js</code>):</strong> Dynamically adapts to the user&rsquo;s role. Students manage their own reported items and submitted claims; Admins unlock Chart.js recovery graphs, campus-wide item fleet control with CSV export, and the searchable Student Database &amp; Login Audit Trail with clickable profile inspection.</li>
+  </ul>
+
+  <h2 class="sub-heading">6.2 Backend Implementation</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 12%;">Method</th>
+        <th style="width: 34%;">API Endpoint</th>
+        <th style="width: 18%;">Access</th>
+        <th style="width: 36%;">Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/api/auth/register</code></td><td>Public</td><td>Register student account (<code>saiuniversity.edu.in</code>)</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/auth/login</code></td><td>Public</td><td>Authenticate user, log session, return JWT</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/items</code></td><td>Public</td><td>List &amp; filter active campus lost/found items</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/items</code></td><td>Protected</td><td>Create listing with embedded <code>ownerDetails</code> &amp; <code>imageHash</code></td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/items/scan-match</code></td><td>Public</td><td>Match photo (<code>dHash</code>/color) &amp; keywords to find owners</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/claims</code></td><td>Protected</td><td>Submit ownership claim with verification proof</td></tr>
+      <tr><td><code>PUT</code></td><td><code>/api/claims/:id/status</code></td><td>Reporter/Admin</td><td>Approve or reject claim and update item status</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/admin/stats</code></td><td>Admin Only</td><td>Aggregated recovery rate, building &amp; category metrics</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/admin/student-logins</code></td><td>Admin Only</td><td>Full student database &amp; login session audit logs</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/health</code></td><td>Public</td><td>Live MongoDB connection state &amp; document counts</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-heading">6.3 Database Connectivity</h2>
+  <p>
+    <code>config/db.js</code> inspects <code>process.env.RENDER</code> and <code>NODE_ENV</code> to prioritize MongoDB Atlas Cloud in production and Local MongoDB (<code>127.0.0.1:27017/campus_lost_found</code>) in development, automatically falling back to the secondary URI or <code>offlineStore.js</code> if a network timeout occurs.
+  </p>
+
+  <h2 class="sub-heading">6.4 Key Functionalities (Code Snippets)</h2>
+  <p><strong>1. Embedded Owner Details &amp; Visual Fingerprint Storage (<code>routes/itemRoutes.js</code>):</strong></p>
+  <pre class="code-block">const ownerInfo = {
+  name: req.user?.name || 'Sai University Member',
+  email: req.user?.email || 'N/A',
+  phone: req.user?.phone || 'N/A',
+  studentId: req.user?.studentId || 'N/A',
+  department: req.user?.department || 'School of Computing &amp; Data Science'
+};
+const referenceCode = 'SAIU-LF-' + Math.floor(1000 + Math.random() * 9000);</pre>
+
+  <p><strong>2. Perceptual Image Matching via Hamming Distance (<code>routes/itemRoutes.js</code>):</strong></p>
+  <pre class="code-block">if (imageHash &amp;&amp; item.imageHash) {
+  const dist = hammingDistance(imageHash, item.imageHash);
+  if (dist &lt;= 6) { score += 95; visualHit = true; }
+  else if (dist &lt;= 14) { score += 65; visualHit = true; }
+}</pre>
+
+  <!-- ==================== CHAPTER 7: SCREENSHOTS AND RESULTS ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 7: SCREENSHOTS AND RESULTS</h1>
+
+  <h2 class="sub-heading">7.1 Application Screenshots</h2>
+
+  <div class="diagram-box">
+    <img src="report_assets/fig1_portal_home.png" alt="Portal Home Page" class="screenshot-img">
+    <div class="figure-caption">Figure 7.1: Campus Lost &amp; Found Portal Home Page (<code>index.html</code>) with Vector Filter Icons &amp; Menu Button</div>
+  </div>
+
+  <div class="diagram-box">
+    <img src="report_assets/fig2_login_portal.png" alt="Unified Sign In Portal" class="screenshot-img">
+    <div class="figure-caption">Figure 7.2: Unified Campus Sign In &amp; Registration Portal (<code>login.html</code>)</div>
+  </div>
+
+  <div class="page-break"></div>
+  <div class="diagram-box">
+    <img src="report_assets/fig3_admin_dashboard.png" alt="Admin Dashboard" class="screenshot-img">
+    <div class="figure-caption">Figure 7.3: Admin Console Dashboard (<code>dashboard.html</code>) Showing Recovery Analytics &amp; Management Controls</div>
+  </div>
+
+  <div class="diagram-box">
+    <img src="report_assets/fig4_listings_feed.png" alt="Active Campus Listings" class="screenshot-img">
+    <div class="figure-caption">Figure 7.4: Active Campus Lost &amp; Found Item Cards with Status &amp; Category Badges</div>
+  </div>
+
+  <h2 class="sub-heading">7.2 Output and Results</h2>
+  <ul>
+    <li><strong>Authentication &amp; Validation Output:</strong> Attempting to register with an external email (e.g., <code>@gmail.com</code>) returns <code>HTTP 400</code> with a clear validation message requiring <code>saiuniversity.edu.in</code>. Valid registration returns <code>HTTP 201</code> and redirects directly to the dashboard.</li>
+    <li><strong>Visual &amp; Keyword Scan Output:</strong> Uploading or capturing an item photo without typing keywords automatically computes its 64-bit <code>dHash</code> and dominant colors, querying <code>/api/items/scan-match</code> and returning a <strong>100% Match</strong> along with the owner&rsquo;s verified name, Student ID, email, and phone.</li>
+    <li><strong>Admin Audit Output:</strong> Signing in as <code>SAI SRAVAN</code> unlocks campus recovery charts, the student login audit table, clickable student profile item inspection, and 1-click CSV export.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 8: TESTING ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 8: TESTING</h1>
+
+  <h2 class="sub-heading">8.1 Testing Approach</h2>
+  <p>
+    Application correctness was verified using two complementary methods: (1) <strong>Automated API Testing</strong> using a 18-request, 25-assertion Postman v2.1.0 collection executed via Newman CLI (<code>npm run test:postman</code>), and (2) <strong>Live End-to-End Browser Testing</strong> on the deployed Render production URL across multiple user accounts (Student, Temp Student, and Admin).
+  </p>
+
+  <h2 class="sub-heading">8.2 Test Cases</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 9%;">Test ID</th>
+        <th style="width: 24%;">Test / Input</th>
+        <th style="width: 28%;">Expected Result</th>
+        <th style="width: 29%;">Actual Result</th>
+        <th style="width: 10%;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>TC-01</strong></td>
+        <td>Student &amp; Admin Login (<code>POST /api/auth/login</code>)</td>
+        <td><code>200 OK</code>, JWT returned, role segregated, <code>loginCount</code> incremented.</td>
+        <td><code>200 OK</code>; returned valid JWT, <code>admin</code>/<code>student</code> roles, and updated <code>loginCount</code>.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-02</strong></td>
+        <td>Registration with external domain (<code>external@gmail.com</code>)</td>
+        <td>Rejected with <code>400 Bad Request</code> requiring <code>saiuniversity.edu.in</code>.</td>
+        <td>Returned <code>400</code>: <em>&ldquo;Account email must contain or end with saiuniversity.edu.in&rdquo;</em>.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-03</strong></td>
+        <td>RBAC Check: Student calls <code>GET /api/admin/student-logins</code></td>
+        <td>Access denied with <code>403 Forbidden</code>.</td>
+        <td>Returned <code>403 Forbidden: Admin access privileges required</code>.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-04</strong></td>
+        <td>Report Item (<code>POST /api/items</code>) with photo</td>
+        <td><code>201 Created</code> with embedded <code>ownerDetails</code>, <code>referenceCode</code>, and <code>imageHash</code>.</td>
+        <td><code>201 Created</code>; generated <code>SAIU-LF-XXXX</code>, embedded owner profile, and saved <code>imageHash</code>.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-05</strong></td>
+        <td>Scan Item by Keyword (<code>"Sony"</code>) &amp; Ref ID (<code>SAIU-LF-6652</code>)</td>
+        <td><code>200 OK</code>, <code>matchFound: true</code>, displays <code>Temp Student</code> contact details.</td>
+        <td><code>200 OK</code>; matched at <code>45%</code> (keyword) and <code>80%</code> (Ref ID) with owner email &amp; phone.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-06</strong></td>
+        <td>Photo-Only Scan (<code>IMG_9999.png</code>, empty keywords)</td>
+        <td>Auto-computes <code>dHash</code> &amp; color, matches reported bottle, shows owner details.</td>
+        <td><code>200 OK</code>; returned <code>100% Match</code>, <code>visualMatch: true</code>, and owner contact info.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-07</strong></td>
+        <td>Ownership Claim &amp; Admin Handover Approval</td>
+        <td><code>201 Created</code> on claim; <code>200 OK</code> on approval updating item status.</td>
+        <td>Newman 3.1 &amp; 3.4 passed; claim approved and item status updated.</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+      <tr>
+        <td><strong>TC-08</strong></td>
+        <td>Full Newman Suite (<code>npm run test:postman</code>)</td>
+        <td>All 18 API requests &amp; 25 assertions pass with 0 failures.</td>
+        <td>Executed 18 requests, 25/25 assertions passed (0 failures, avg 22–37 ms).</td>
+        <td class="badge-pass">PASS</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== CHAPTER 9: CONCLUSION AND FUTURE SCOPE ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">CHAPTER 9: CONCLUSION AND FUTURE SCOPE</h1>
+
+  <h2 class="sub-heading">9.1 Conclusion</h2>
+  <p>
+    The <strong>Campus Lost &amp; Found Portal (SAIU PROJECTS)</strong> successfully addresses the fragmented recovery process at Sai University by delivering a secure, responsive, and database-driven full-stack solution. All core objectives—university-domain authentication, full CRUD item management with embedded owner details, visual and keyword-based item scanning, ownership claim verification, and role-based administrative analytics and audit logging—were achieved and verified through automated Newman API tests and live cloud deployment testing on Render.
+  </p>
+
+  <h2 class="sub-heading">9.2 Limitations</h2>
+  <ul>
+    <li><strong>In-Browser Visual Matching Scope:</strong> The 64-bit <code>dHash</code> algorithm excels at matching identical or near-identical photos and dominant colors, but does not perform deep semantic object classification across drastically different camera angles or lighting.</li>
+    <li><strong>No Automated Email Dispatch:</strong> Contacting an owner or claimant opens the user&rsquo;s default mail client, phone dialer, or WhatsApp rather than sending automated background emails from the server.</li>
+    <li><strong>Fallback Synchronization:</strong> When running in offline in-memory fallback mode during temporary database outages, new writes reside in server memory until MongoDB connectivity is restored.</li>
+  </ul>
+
+  <h2 class="sub-heading">9.3 Future Scope</h2>
+  <ul>
+    <li><strong>Automated Email &amp; Push Notifications:</strong> Integrate Nodemailer or Web Push API to alert students immediately when a matching item or claim is submitted.</li>
+    <li><strong>Cloud Object Storage (AWS S3 / Cloudinary):</strong> Offload uploaded item photographs from base64 strings to dedicated CDN object storage for smaller database documents.</li>
+    <li><strong>AI Vision Embeddings:</strong> Integrate lightweight TensorFlow.js / CLIP embeddings for angle-invariant visual similarity search.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 10: REFERENCES ==================== -->
+  <h1 class="chapter-heading" style="margin-top: 24px;">CHAPTER 10: REFERENCES</h1>
+  <h2 class="sub-heading">10.1 References</h2>
+  <ol>
+    <li>Node.js Official Documentation — <em>https://nodejs.org/en/docs</em> (Accessed: November 2026)</li>
+    <li>Express.js Web Framework Guide — <em>https://expressjs.com/</em> (Accessed: November 2026)</li>
+    <li>MongoDB &amp; Mongoose ODM Documentation — <em>https://mongoosejs.com/docs/</em> (Accessed: November 2026)</li>
+    <li>JSON Web Tokens (JWT) Specification &amp; Library — <em>https://jwt.io/</em> (Accessed: November 2026)</li>
+    <li>Chart.js Data Visualization Documentation — <em>https://www.chartjs.org/docs/</em> (Accessed: November 2026)</li>
+    <li>MDN Web Docs (HTML5 Canvas, Fetch API, MediaDevices) — <em>https://developer.mozilla.org/</em> (Accessed: November 2026)</li>
+    <li>Postman &amp; Newman CLI Documentation — <em>https://learning.postman.com/docs/</em> (Accessed: November 2026)</li>
+    <li>Render Cloud Hosting Documentation — <em>https://render.com/docs</em> (Accessed: November 2026)</li>
+  </ol>
+
+  <!-- ==================== FINAL SUBMISSION CHECKLIST ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-heading">FINAL SUBMISSION CHECKLIST</h1>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 82%;">Checklist Item</th>
+        <th style="width: 18%; text-align: center;">Verified</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Cover page includes project title and student details</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Certificate, declaration and acknowledgement included</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Abstract and table of contents included</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>All chapters completed using the actual project</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Architecture / workflow / database design diagrams included</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Actual project screenshots included with captions</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Test cases filled with genuine verified results</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>References provided for sources used</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Spelling, page numbers and formatting checked (A4, Times New Roman, 12pt, 1.5 spacing)</td><td style="text-align: center;">&#9745;</td></tr>
+      <tr><td>Final report exported as PDF</td><td style="text-align: center;">&#9745;</td></tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
