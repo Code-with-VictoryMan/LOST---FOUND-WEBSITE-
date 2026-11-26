@@ -1404,6 +1404,15 @@ function openAuthModal() {
   if (emailInput) setTimeout(() => emailInput.focus(), 150);
 }
 
+window.openReportModal = function() {
+  if (!authToken) {
+    showToast('Please sign in to report a lost or found item.');
+    openAuthModal();
+    return;
+  }
+  if (reportModal) reportModal.classList.remove('hidden');
+};
+
 window.openClaimModal = function(itemId) {
   if (!authToken) {
     showToast('Please sign in first to submit a claim.');
