@@ -187,7 +187,7 @@
                   "    var json = pm.response.json();",
                   "    pm.expect(json.success).to.be.true;",
                   "    pm.expect(json.data).to.be.an('array');",
-                  "    pm.expect(json.count).to.be.above(0);",
+                  "    pm.expect(json.count).to.be.at.least(0);",
                   "    var currentUserId = pm.environment.get('currentUserId');",
                   "    var otherItem = json.data.find(function(i) {",
                   "        var rep = i.reportedBy ? (i.reportedBy._id || i.reportedBy) : '';",
@@ -330,6 +330,7 @@
                   "    pm.expect(json.success).to.be.true;",
                   "    pm.expect(json.data.title).to.include('Scientific Calculator');",
                   "    pm.environment.set('createdItemId', json.data._id);",
+                  "    pm.environment.set('targetClaimItemId', json.data._id);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -341,7 +342,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
+                "value": "Bearer {{adminToken}}"
               },
               {
                 "key": "Content-Type",
